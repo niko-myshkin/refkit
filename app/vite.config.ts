@@ -14,6 +14,9 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT) || 5173,
     strictPort: true,
+    // Refkit без пароля: только этот компьютер (см. library-plugin.ts, защита от --host)
+    host: '127.0.0.1',
+    allowedHosts: ['localhost', '127.0.0.1'],
     // Сборка результата ноды не должна перезагружать открытый холст.
     watch: { ignored: ['**/.analyze/screens/**'] },
   },

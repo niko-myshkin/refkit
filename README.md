@@ -12,7 +12,7 @@
 - **Find by meaning.** Build a concept graph over your cards and follow an idea from one card to the next.
 - **Works with your agent.** A local MCP server lets Claude Code or Codex read your library, search it, and save into it. Edits are proposals you accept.
 - **Memory that stays with you.** What the agent learns about how you work is stored as files in your library, not inside any one agent.
-- **Nothing runs in the background.** The agent acts only when you press a button or ask it from Claude Code or Codex.
+- **No autonomous background work.** Adding a material triggers a short automatic description and tags (a small model call on your subscription). Everything heavier (digests, the graph, chains, image steps) runs only when you press a button or ask your agent from Claude Code or Codex.
 
 ## Requirements
 - **macOS** (some features use `sips`; Linux and Windows are not tested)
@@ -47,6 +47,15 @@ In the app, open the agent connection and copy the ready command for Claude Code
 
 ## Demo library
 About 50 cards, a few canvases with saved results, a graph. See [`library/README.md`](library/README.md) for sources and licenses. The moodboard contains screenshots of third-party sites that belong to their authors and are not MIT-licensed; they will be removed on request.
+
+## Security
+Refkit is a local tool **without authentication**. Please read this before using it with materials you care about.
+- It listens on `127.0.0.1` only and refuses to start with `--host`. Do not expose it to a network. Requests from other websites open in your browser are blocked, but any program running on your computer can use it.
+- Keep it stopped when you are not using it.
+- Your agent reads the text of what you save and can search the web. A saved page can contain text that tries to steer the agent (prompt injection). Keep the permissions for web search and library changes on **ask**, and be careful with untrusted pages.
+- When you run an AI step, prompts and inputs go to your model provider through your own CLI. Refkit reads `~/.codex/auth.json` only so Codex can sign in; it stores no API keys.
+- The server fetches links you save, so it can reach addresses on your local network. Do not save links to internal services.
+- Report vulnerabilities privately, see [SECURITY.md](SECURITY.md).
 
 ## License
 MIT, see [LICENSE](LICENSE). Third-party notices: [NOTICE.md](NOTICE.md).

@@ -370,7 +370,12 @@ function list(): Meta[] {
 // и журнал «движение 2,1–2,9 с»: микроанимации живут 0,2–0,9 с, равномерные 6 кадров их пропускали (замер 2026-10-18 —
 // ловили 2–3 эпизода из 5–6). Нет движения — 6 кадров равномерно. 768 px по ширине; кадры кэшируются в library/<id>/.motion
 // (точка — наружу не отдаётся).
-const onDisk = (url: unknown) => typeof url === 'string' && url.startsWith('/library/') ? join(libraryDir, url.replace(/^\/library\//, '')) : ''
+// Файл библиотеки по адресу «/library/…»; путь, выходящий за папку библиотеки (../), не принимаем: адреса приходят из meta.json и canvas.json
+const onDisk = (url: unknown) => {
+  if (typeof url !== 'string' || !url.startsWith('/library/')) return ''
+  const full = resolve(libraryDir, url.replace(/^\/library\//, ''))
+  return full.startsWith(resolve(libraryDir) + sep) ? full : ''
+}
 const MOTION_FPS = 10
 const MOTION_FRAMES = 12
 function motionEpisodes(file: string, seconds: number): Array<[number, number]> {
@@ -2979,12 +2984,30 @@ export function libraryPlugin(): Plugin {
       const cuesTimer = setInterval(() => void backfillCues(), 30_000)
       server.httpServer?.on('close', () => { clearInterval(timer); clearInterval(cuesTimer) })
 
+      // Refkit без пароля: он должен слушать только этот компьютер. С --host / 0.0.0.0 API (запуск агента, чтение и удаление материалов) открылось бы всей сети
+      const listen = server.config.server.host
+      if (process.env.REFKIT_ALLOW_NETWORK !== '1' && (listen === true || (typeof listen === 'string' && !/^(localhost|127\.0\.0\.1|::1)$/.test(listen)))) {
+        throw new Error('Refkit has no authentication, so it must not listen on the network (--host / 0.0.0.0). Run it without --host. REFKIT_ALLOW_NETWORK=1 overrides this at your own risk.')
+      }
+      // Защита API от запросов с чужих сайтов (CSRF): страница в браузере может слать запросы на localhost вслепую.
+      // Принимаем только запросы со своего адреса: у браузерных запросов Sec-Fetch-Site и Origin видны и должны совпасть с Host.
+      // Запросы без этих заголовков (MCP, curl, локальные скрипты) пропускаем, расширение Chrome ходит на /clip и /batch со своим ключом
+      server.middlewares.use('/api/library', (req, res, next) => {
+        const route = (req.url ?? '').split('?')[0].replace(/^\//, '').split('/')[0]
+        if ((route === 'clip' || route === 'batch') && req.method !== 'GET') return next()
+        const site = req.headers['sec-fetch-site'], origin = req.headers.origin, host = req.headers.host ?? ''
+        const foreignSite = site !== undefined && site !== 'same-origin' && site !== 'none'
+        const foreignOrigin = origin !== undefined && origin !== `http://${host}` && origin !== `https://${host}`
+        if (foreignSite || foreignOrigin) { res.statusCode = 403; res.setHeader('Content-Type', 'application/json'); return res.end(JSON.stringify({ error: 'Cross-site request blocked' })) }
+        next()
+      })
+
       // Файлы рефов: /library/<id>/source.png
       server.middlewares.use('/library', (req, res, next) => {
         const path = decodeURIComponent((req.url ?? '').split('?')[0])
         const file = join(libraryDir, path)
         // Служебные папки с точкой не отдаём — кроме корзины: у удалённых карточек видно превью
-        if (!file.startsWith(libraryDir) || path.includes('..') || (path.includes('/.') && !path.startsWith('/.trash/')) || !existsSync(file)) return next()
+        if (!resolve(file).startsWith(resolve(libraryDir) + sep) || path.includes('..') || (path.includes('/.') && !path.startsWith('/.trash/')) || !existsSync(file)) return next()
         res.setHeader('Content-Type', types[extname(file).toLowerCase()] ?? 'application/octet-stream')
         res.setHeader('Last-Modified', statSync(file).mtime.toUTCString()) // плитка холста по нему понимает, что превью свежее правки
         res.end(req.method === 'HEAD' ? undefined : readFileSync(file))
@@ -3408,7 +3431,11 @@ export function libraryPlugin(): Plugin {
             return res.end(JSON.stringify(graphState()))
           }
           // Расширение: GET /clip-key только с localhost-страницы Refkit показывает ключ для привязки; POST /clip — приём страницы
-          if (rawId === 'clip-key' && req.method === 'GET') return res.end(JSON.stringify({ key: clipKey() }))
+          if (rawId === 'clip-key' && req.method === 'GET') {
+            // Ключ показываем только странице самого Refkit: без заголовков браузера (локальный процесс) и с чужого сайта не отдаём
+            if (req.headers['sec-fetch-site'] !== 'same-origin') { res.statusCode = 403; return res.end(JSON.stringify({ error: 'Only the Refkit page may read the key' })) }
+            return res.end(JSON.stringify({ key: clipKey() }))
+          }
           const keyOk = () => {
             const given = Buffer.from(String(req.headers['x-refkit-key'] ?? ''))
             const real = Buffer.from(clipKey())
