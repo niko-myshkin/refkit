@@ -1,6 +1,6 @@
 # Refkit
 
-**A personal library with an agent.** Drop in images, videos, articles, notes and links. The agent gives you the gist the way you like it, remembers how, and your materials become chains on a canvas: references → style rules → brand directions → a screen, or an idea → market check → a landing page.
+**A personal library with an agent.** · [Website and interactive demo](https://niko-myshkin.github.io/refkit/) Drop in images, videos, articles, notes and links. The agent gives you the gist the way you like it, remembers how, and your materials become chains on a canvas: references → style rules → brand directions → a screen, or an idea → market check → a landing page.
 
 > ## ⚠️ Beta
 > Refkit is an early, unfinished beta that runs on your own Mac. Things will be rough. **I'm looking for honest feedback**: what worked, what confused you, what you'd use it for. Please [open a feedback issue](../../issues/new/choose) or start a [discussion](../../discussions). Thank you!
