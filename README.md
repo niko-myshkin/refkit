@@ -35,8 +35,6 @@ To keep your own materials in a separate folder:
 REFKIT_LIBRARY=~/RefkitLibrary npm run dev
 ```
 
-The interface is in English. Russian: `VITE_LANG=ru npm run dev` (parts of the code and comments are in Russian; the project grew up that way).
-
 ## Connect your agent (MCP)
 In the app, open the agent connection and copy the ready command for Claude Code or Codex. After that your agent can search the library, follow concept links, read memory and canvases, and propose saves and edits. It cannot run nodes.
 
