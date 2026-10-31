@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Share feedback or ask a question
+    url: https://github.com/niko-myshkin/refkit/discussions
+    about: Impressions, ideas, "this confused me", "I'd use it for..." — all welcome.

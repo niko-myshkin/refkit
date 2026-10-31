@@ -1,0 +1,22 @@
+name: Bug report
+description: Something is broken
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected and what happened instead
+    validations: { required: true }
+  - type: textarea
+    id: logs
+    attributes:
+      label: Terminal output or screenshot
+  - type: input
+    id: setup
+    attributes:
+      label: macOS version, Node version, agent (Claude Code or Codex)

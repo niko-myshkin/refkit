@@ -1,0 +1,24 @@
+{
+  "title": "Colour (GOV.UK)",
+  "titleEdited": true,
+  "source": "https://design-system.service.gov.uk/styles/colour/",
+  "author": "GOV.UK Design System team",
+  "license": "Open Government Licence v3.0 (© Crown copyright); the example area only, without the site header, crown logo or Transport font",
+  "format": "image",
+  "ratio": "1620 / 1080",
+  "technique": "",
+  "collections": [
+    "Color"
+  ],
+  "folder": "f-pal",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947066",
+  "createdAt": 1792777947066,
+  "image": "/library/ref-1792777947066/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A restrained palette with named roles: text, links, borders, focus and status colours.",
+  "via": "hand",
+  "boards": []
+}

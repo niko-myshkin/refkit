@@ -1,0 +1,27 @@
+{
+  "title": "Check answers pattern (GOV.UK)",
+  "titleEdited": true,
+  "source": "https://design-system.service.gov.uk/patterns/check-answers/",
+  "author": "GOV.UK Design System team",
+  "license": "Open Government Licence v3.0 (© Crown copyright); the example area only, without the site header, crown logo or Transport font",
+  "format": "image",
+  "ratio": "1618 / 1080",
+  "technique": "",
+  "collections": [
+    "Onboarding",
+    "Layout"
+  ],
+  "folder": "f-onb",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947061",
+  "createdAt": 1792777947061,
+  "image": "/library/ref-1792777947061/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A summary list of everything entered, each row with a Change link, and one confirm button.",
+  "via": "hand",
+  "boards": [],
+  "opens": 10,
+  "openedAt": 1793268755867
+}

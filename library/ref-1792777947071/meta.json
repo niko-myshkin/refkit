@@ -1,0 +1,25 @@
+{
+  "title": "Card (shadcn/ui)",
+  "titleEdited": true,
+  "source": "https://ui.shadcn.com/docs/components/card",
+  "author": "shadcn",
+  "license": "MIT License (© 2023 shadcn)",
+  "format": "image",
+  "ratio": "1276 / 960",
+  "technique": "",
+  "collections": [
+    "Layout",
+    "Interaction"
+  ],
+  "folder": "f-comp",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947071",
+  "createdAt": 1792777947071,
+  "image": "/library/ref-1792777947071/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A login card: title, description, two fields, a primary and a secondary action.",
+  "via": "hand",
+  "boards": []
+}

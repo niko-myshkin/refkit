@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dotted Ring</title>
+<style>
+  /* ── 1. Токены проекта. В новом проекте этого блока не будет: тут свои. ────────── */
+  :root {
+    --color-bg: #111214;
+    --color-surface: #1c1d20;
+    --color-surface-light: #f4f4f5;
+    --color-accent: #7fb3ff;
+    --color-accent-on-light: #2f6fd6;
+    --color-fg: #f2f2f3;
+    --color-fg-subtle: #3a3b40;
+    --color-fg-muted: #8b8d94;
+    --color-fg-light: #16171a;
+    --color-fg-light-muted: #6b6d74;
+    --color-fg-on-accent: #0d0e10;
+    --radius-card: 28px;
+    --space: 16px;
+    --font: system-ui, -apple-system, sans-serif;
+  }
+
+  /* ── 2. Адаптер. Единственное, что правится в новом проекте. ───────────────────── */
+  .ring {
+    --ring-dot-on: var(--color-accent);
+    --ring-dot-off: var(--color-fg-subtle);
+    --ring-center: var(--color-fg);
+    --ring-center-muted: var(--color-fg-muted);
+    --ring-font: var(--font);
+    --ring-size: 160px;
+  }
+  .ring[data-tone="on-light"] {
+    --ring-dot-on: var(--color-accent-on-light);
+    /* доля подобрана под порог 1.5:1 к подложке — правило 6 */
+    --ring-dot-off: color-mix(in srgb, var(--color-fg-light) 22%, transparent);
+    --ring-center: var(--color-fg-light);
+    --ring-center-muted: var(--color-fg-light-muted);
+  }
+  .ring[data-tone="on-accent"] {
+    --ring-dot-on: var(--color-fg-on-accent);
+    --ring-dot-off: color-mix(in srgb, var(--color-fg-on-accent) 30%, transparent);
+    --ring-center: var(--color-fg-on-accent);
+    --ring-center-muted: color-mix(in srgb, var(--color-fg-on-accent) 75%, transparent);
+  }
+
+  /* ── 3. Компонент. Не трогается при переносе. ──────────────────────────────────── */
+  .ring {
+    --ring-dot-ratio: 0.45;
+    position: relative;
+    flex: none;
+    align-self: center;
+    inline-size: var(--ring-size);
+    block-size: var(--ring-size);
+    display: grid;
+    place-items: center;
+  }
+  .ring svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
+  .ring circle { fill: var(--ring-dot-off); }
+  .ring circle.on { fill: var(--ring-dot-on); }
+
+  .ring__value {
+    font: 600 calc(var(--ring-size) * 0.3) / 1 var(--ring-font);
+    font-variant-numeric: tabular-nums lining-nums;
+    color: var(--ring-center);
+    text-align: center;
+  }
+  .ring__label {
+    display: block;
+    font-size: 0.34em;
+    font-weight: 400;
+    color: var(--ring-center-muted);
+    margin-block-start: 0.2em;
+  }
+  /* Название метрики — под кольцом, не мельче 12px (правило 8) */
+  .ring-field { display: flex; flex-direction: column; align-items: center; gap: var(--space); }
+  .ring-field__name { font: 400 13px/1 var(--ring-font, var(--font)); color: var(--color-fg-muted); }
+  .card--light .ring-field__name { color: var(--color-fg-light-muted); }
+
+  /* Появление — не из рефа, наше решение (см. recipe.md → Движение). */
+  @media (prefers-reduced-motion: no-preference) {
+    .ring circle.on {
+      animation: dot-in 160ms ease-out both;
+      animation-delay: calc(var(--i) * 12ms);
+    }
+    @keyframes dot-in { from { fill: var(--ring-dot-off); } }
+  }
+
+  /* ── 4. Демо-раскладка ─────────────────────────────────────────────────────────── */
+  body {
+    margin: 0; min-height: 100vh; background: var(--color-bg);
+    font-family: var(--font); color: var(--color-fg);
+    display: grid; place-content: center; gap: var(--space); padding: var(--space);
+  }
+  .demo { display: flex; flex-wrap: wrap; gap: var(--space); justify-content: center; align-items: center; }
+  .card { background: var(--color-surface); border-radius: var(--radius-card); padding: calc(var(--space) * 1.5); display: flex; gap: var(--space); }
+  .card--accent { background: var(--color-accent); padding: 18px; }
+  .card--light { background: var(--color-surface-light); }
+  .card .ring { --ring-size: 88px; }
+  .card--accent .ring { --ring-size: 180px; }
+</style>
+</head>
+<body>
+  <div class="demo">
+    <div class="card card--accent">
+      <div class="ring" data-tone="on-accent" data-count="24" data-total="30" data-unit="дней" aria-label="Осталось дней тарифа">
+        <span class="ring__value">24<span class="ring__label">Days</span></span>
+      </div>
+    </div>
+    <div class="card card--accent">
+      <div class="ring" data-tone="on-accent" data-count="7" data-total="10" data-unit="дней" aria-label="Серия дней">
+        <span class="ring__value">7<span class="ring__label">дней</span></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ring-field"><div class="ring" data-value="0.62" data-dots="24" aria-label="Интернет"><span class="ring__value">62</span></div><span class="ring-field__name">Интернет</span></div>
+      <div class="ring-field"><div class="ring" data-value="0.75" data-dots="24" aria-label="Минуты"><span class="ring__value">75</span></div><span class="ring-field__name">Минуты</span></div>
+      <div class="ring-field"><div class="ring" data-value="0.45" data-dots="24" aria-label="SMS"><span class="ring__value">45</span></div><span class="ring-field__name">SMS</span></div>
+    </div>
+    <div class="card card--light">
+      <div class="ring-field"><div class="ring" data-tone="on-light" data-value="0.62" data-dots="24" aria-label="Интернет"><span class="ring__value">62</span></div><span class="ring-field__name">Интернет</span></div>
+      <div class="ring-field"><div class="ring" data-tone="on-light" data-value="0.75" data-dots="24" aria-label="Минуты"><span class="ring__value">75</span></div><span class="ring-field__name">Минуты</span></div>
+      <div class="ring-field"><div class="ring" data-tone="on-light" data-value="0.45" data-dots="24" aria-label="SMS"><span class="ring__value">45</span></div><span class="ring-field__name">SMS</span></div>
+    </div>
+  </div>
+
+<script>
+  // Рисует N точек по окружности, заполнение — от 12 часов против часовой (правило 2).
+  // Непрерывная величина (data-value 0…1): N = data-dots, закрашено round(value × N).
+  // Штуки (data-count + data-total): на штуку k точек, k = max(1, floor(N по размеру / штук)) —
+  // ритм кольца важнее счёта, правило 1.
+  function renderRing(el) {
+    const total = Number(el.dataset.total);
+    const isCount = total > 0;
+    const baseDots = Number(el.dataset.dots) || (parseFloat(getComputedStyle(el).inlineSize) >= 140 ? 48 : 24);
+
+    let dots, filled, value;
+    if (isCount) {
+      const count = Math.min(total, Math.max(0, Number(el.dataset.count) || 0));
+      const k = Math.max(1, Math.floor(baseDots / total));
+      dots = total * k;
+      filled = count * k;
+      value = count / total;
+      el.dataset.k = k;
+    } else {
+      value = Math.min(1, Math.max(0, Number(el.dataset.value) || 0));
+      dots = baseDots;
+      filled = Math.round(value * dots);
+    }
+
+    const ratio = parseFloat(getComputedStyle(el).getPropertyValue('--ring-dot-ratio')) || 0.45;
+    const r = 50;                                  // радиус в единицах viewBox
+    const pitch = (2 * Math.PI * r) / dots;        // шаг между центрами точек
+    const dotR = Math.min((pitch * ratio) / 2, 0.14 * r); // точка ≤ 14 % диаметра (правило 4)
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    const pad = dotR;
+    svg.setAttribute('viewBox', `${-r - pad} ${-r - pad} ${2 * (r + pad)} ${2 * (r + pad)}`);
+    svg.setAttribute('aria-hidden', 'true');
+
+    for (let i = 0; i < dots; i++) {
+      const a = -Math.PI / 2 - (i * 2 * Math.PI) / dots;
+      const c = document.createElementNS(ns, 'circle');
+      c.setAttribute('cx', (r * Math.cos(a)).toFixed(3));
+      c.setAttribute('cy', (r * Math.sin(a)).toFixed(3));
+      c.setAttribute('r', dotR.toFixed(3));
+      if (i < filled) { c.classList.add('on'); c.style.setProperty('--i', i); }
+      svg.append(c);
+    }
+
+    el.setAttribute('role', 'progressbar');
+    el.setAttribute('aria-valuemin', '0');
+    if (isCount) {
+      const count = Number(el.dataset.count) || 0;
+      el.setAttribute('aria-valuemax', total);
+      el.setAttribute('aria-valuenow', count);
+      el.setAttribute('aria-valuetext', `${count} из ${total}${el.dataset.unit ? ' ' + el.dataset.unit : ''}`);
+    } else {
+      el.setAttribute('aria-valuemax', '100');
+      el.setAttribute('aria-valuenow', Math.round(value * 100));
+    }
+    el.querySelector('svg')?.remove();
+    el.prepend(svg);
+  }
+
+  document.querySelectorAll('.ring').forEach(renderRing);
+</script>
+</body>
+</html>

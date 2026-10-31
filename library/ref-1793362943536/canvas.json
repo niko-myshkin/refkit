@@ -1,0 +1,572 @@
+{
+  "nodes": [
+    {
+      "id": "f-check-mvuxzs1c",
+      "type": "frame",
+      "position": {
+        "x": 591.5,
+        "y": 440
+      },
+      "width": 2760,
+      "height": 760,
+      "data": {
+        "label": "1 · Check the idea",
+        "hue": 0,
+        "hug": true,
+        "members": [
+          "t-idea-mvuxzs1c",
+          "a-problem-mvuxzs1c",
+          "a-competitors-mvuxzs1c",
+          "a-demand-mvuxzs1c",
+          "a-verdict-mvuxzs1c"
+        ]
+      }
+    },
+    {
+      "id": "f-define-mvuxzs1c",
+      "type": "frame",
+      "position": {
+        "x": 3431.5,
+        "y": 440
+      },
+      "width": 1100,
+      "height": 760,
+      "data": {
+        "label": "2 · Define",
+        "hue": 1,
+        "hug": true,
+        "members": [
+          "a-brief-mvuxzs1c",
+          "a-screens-mvuxzs1c"
+        ]
+      }
+    },
+    {
+      "id": "f-design-mvuxzs1c",
+      "type": "frame",
+      "position": {
+        "x": 4651.5,
+        "y": 440
+      },
+      "width": 1740,
+      "height": 2240,
+      "data": {
+        "label": "3 · Design",
+        "hue": 2,
+        "hug": true,
+        "members": [
+          "a-directions-mvuxzs1c",
+          "a-copy-mvuxzs1c",
+          "m-canvas-mvuxzs1c",
+          "m-memory-mvuxzs1c",
+          "m-library-mvuxzs1c",
+          "g-frames-mvuxzs1c"
+        ]
+      }
+    },
+    {
+      "id": "f-get-mvuxzs1c",
+      "type": "frame",
+      "position": {
+        "x": 6551.5,
+        "y": 440
+      },
+      "width": 2520,
+      "height": 840,
+      "data": {
+        "label": "4 · Get",
+        "hue": 5,
+        "hug": true,
+        "members": [
+          "r-report-mvuxzs1c",
+          "s-landing-mvuxzs1c",
+          "a-mvp-mvuxzs1c"
+        ]
+      }
+    },
+    {
+      "id": "t-idea-mvuxzs1c",
+      "type": "text",
+      "position": {
+        "x": 631.5,
+        "y": 480
+      },
+      "width": 440,
+      "height": 280,
+      "data": {
+        "title": "Idea",
+        "text": "Describe the idea in a few sentences: what it is, for whom, what it does."
+      }
+    },
+    {
+      "id": "a-problem-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 1131.5,
+        "y": 480
+      },
+      "width": 480,
+      "height": 680,
+      "data": {
+        "title": "Problem & audience",
+        "fit": true,
+        "sized": true,
+        "instr": "From the idea only, write the problem and the audience, in exactly this form, one field per line, nothing else:\nProblem: (one sentence, the pain in the user's words)\nWho has it: (one specific segment, not everyone)\nToday they: (how they solve it now and what it costs them in time or effort)\nJob: (what they would hire the product to do)\nAssumptions: (up to 3 things the idea takes for granted, each marked: assumption)\nUse only what the idea says; where it is silent write: not stated. No numbers, no invented users, no market claims: the market is checked in the next steps."
+      }
+    },
+    {
+      "id": "a-competitors-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 1691.5,
+        "y": 480
+      },
+      "width": 520,
+      "height": 680,
+      "data": {
+        "title": "Competitors (web)",
+        "fit": true,
+        "web": true,
+        "sized": true,
+        "instr": "Using web search, find the real products that already solve this problem for this audience. List 5 products as a table: name with URL, what it does, price, what it lacks compared to the idea. Every claim needs a source URL; where you find none, write: no source found. No guessing."
+      }
+    },
+    {
+      "id": "a-demand-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 2271.5,
+        "y": 480
+      },
+      "width": 520,
+      "height": 680,
+      "data": {
+        "title": "Demand signals (web)",
+        "fit": true,
+        "web": true,
+        "sized": true,
+        "instr": "Using web search, find concrete demand signals for this idea from the last 24 months: discussions, launches, repositories, search interest. List 4 to 6 signals, each with the date, the number (votes, stars, mentions) and the URL. Where you find none, write: no source found. No guessing. Finish with one last line: Actions: followed by 2 or 3 short follow-ups the owner could ask this node to do next, separated by semicolons (for example: Check the pricing sources; Go deeper on one competitor)."
+      }
+    },
+    {
+      "id": "a-verdict-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 2851.5,
+        "y": 480
+      },
+      "width": 460,
+      "height": 680,
+      "data": {
+        "title": "Verdict",
+        "fit": true,
+        "gate": "weak",
+        "sized": true,
+        "instr": "From the competitors and the demand signals only, write the verdict. Attractiveness: attractive, mixed or weak. Three reasons, each with the evidence it rests on. The main risk. The one thing to check first. Add no facts that are not in the inputs. Finish with one last line: Actions: followed by 2 or 3 short follow-ups the owner could ask this node to do next, separated by semicolons (for example: Check the pricing sources; Go deeper on one competitor)."
+      }
+    },
+    {
+      "id": "a-brief-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 3471.5,
+        "y": 480
+      },
+      "width": 480,
+      "height": 680,
+      "data": {
+        "title": "Brief",
+        "fit": true,
+        "sized": true,
+        "instr": "Write the Brief of the product from the idea and the market verdict, in exactly this form, one field per line, nothing else:\nName: (from Constraints; without Constraints, the product name the idea itself gives, usually the first words before the first full stop, copied exactly as written; only if the idea gives no name, a short plain working name)\nWhat it is: (2 sentences)\nFor whom: (the segment the verdict finds most promising)\nEdge: (what the idea offers that the competitors do not, from the verdict)\nCharacter: (from Constraints as written; without Constraints, three plain words that fit the audience)\nNever: (from Constraints as written; without Constraints, what this product must never be or say)\nFacts: (from Constraints as written; without Constraints, only facts the idea states)\nOnly facts from the inputs, nothing invented."
+      }
+    },
+    {
+      "id": "a-screens-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 4011.5,
+        "y": 480
+      },
+      "width": 480,
+      "height": 680,
+      "data": {
+        "title": "Screens plan",
+        "fit": true,
+        "sized": true,
+        "instr": "Plan the three screens of the product that best prove the idea, from the brief: screen 1 is the main screen where the owner spends the time; screen 2 shows what makes the product different (the edge); screen 3 shows the value of the first day. Answer with exactly three numbered items and nothing else, each as: **Screen name** — what it shows: the layout in one sentence, then \"Navigation:\" the same 4 to 6 menu labels in all three items (decide them once in item 1 and repeat them word for word), then \"Content:\" 5 to 8 concrete entries written out (real-sounding titles, tags, statuses, short texts taken from the brief, no placeholders). Rules: Content entries are sample DATA, not interface labels: write each one as a specific item with a descriptive title, a tag or kind, and a status or date, for example a saved item called \"Onboarding checklist, first run\" with its tag and when it was added, never the name of a component or a type such as \"Image material\" or \"Source video\". Use plain descriptive titles, no brand names, no numbers beyond dates and counts the brief gives. The main block of each screen holds real text of at least three sentences (the result, the summary, the trace), written out in the entry. At least 6 entries per screen, each with at least two facts, so that no card on the screen stays mostly empty. The three screens show different content, no block or entry repeats across them; menu labels and slogans are not content; the screen name matches what the screen shows; one primary action per screen."
+      }
+    },
+    {
+      "id": "r-report-mvuxzs1c",
+      "type": "screen",
+      "position": {
+        "x": 6591.5,
+        "y": 480
+      },
+      "width": 900,
+      "height": 760,
+      "data": {
+        "title": "Hypothesis result",
+        "fit": true,
+        "designSystem": "report",
+        "sized": true,
+        "instr": "Build the hypothesis result page for the product in the brief: the verdict first, then the evidence (competitors and demand signals, transcribed from the market nodes), the product frames, and the next steps. Theme: take Accent, Pair and Corners from the chosen direction exactly as written. The product name is exactly the Name from the brief. Product frames are attached as page assets (see their descriptions): use all of them in the Frames section."
+      }
+    },
+    {
+      "id": "a-directions-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 4691.5,
+        "y": 480
+      },
+      "width": 460,
+      "height": 760,
+      "data": {
+        "title": "Brand directions",
+        "fit": true,
+        "pick": true,
+        "autoPick": true,
+        "sized": true,
+        "instr": "Come up with 4 genuinely different brand directions for the product within the brief (name and the product stay as they are). Vary what the brief leaves open: the accent hue, the character of the display type, the corner style, the composition of the landing hero. Order the directions from the one you recommend most to the least: the first one is used when the owner has not chosen. Answer as a numbered list, one item per direction, in exactly this shape (the owner picks by looking at a card built from the fields, so keep the field names):\n1. **Short name** — the idea in one sentence.\nAccent: #RRGGBB\nPair: exactly one of these pairs, headline face + text face, and vary the pairs between directions: Newsreader + Hanken Grotesk; Funnel Display + Funnel Sans; Host Grotesk + IBM Plex Mono; Young Serif + Onest; Schibsted Grotesk + Newsreader; Brygada 1918 + Albert Sans; Literata + Familjen Grotesk; Gloock + Public Sans; Atkinson Hyperlegible Next + DM Mono; Libre Caslon Display + Radio Canada Big; Radio Canada Big + Newsreader; Hanken Grotesk + Literata\nHeadline: the hero headline in this direction's voice, under 8 words\nLayout: one of centered, split, left (the hero composition: text centred above the frame, text beside the frame, or large left-aligned text above it; vary it between directions)\nCorners: one of sharp, soft, pill (the corner style of buttons and cards in this direction; vary it between directions)\nVerdict: does it read in 5 seconds as \"drop anything, get the gist\", does the mark live at 16 px, how it differs from the closest products. No other text."
+      }
+    },
+    {
+      "id": "a-copy-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 5211.5,
+        "y": 480
+      },
+      "width": 440,
+      "height": 760,
+      "data": {
+        "title": "Landing copy",
+        "fit": true,
+        "sized": true,
+        "instr": "Write all the text of the landing page for the product in the brief, section by section, in exactly this form (the page is assembled from these fields, so keep the labels and the order):\nHeader: product name (exactly the Name from the brief); tagline (up to 6 words)\nHero: headline (up to 8 words: the promise, a verb and a result); sub (one sentence); button (2 to 3 words)\nSteps: title; step 1 as Title: one line; step 2 as Title: one line; step 3 as Title: one line\nSplit: title (the key feature of the product, taken from What it is); point 1; point 2; point 3 (optional); note (an honest limitation, only if the brief states one)\nStatement: one short line (at most 18 words) made of the most important Facts, parts joined with \" · \"\nCta: title; field 1 as label | hint; field 2 as label | hint; button; note (honest: this is a request, not a sign-up)\nFooter: product name (exactly the Name from the brief); tagline\nRules: the product name is exactly the Name from the brief, and the name of the chosen direction never appears in the text; the voice follows Character; nothing from Never; only facts from the brief, nothing invented: no numbers, no customers, no features the brief does not state; normal sentence case; short plain sentences, second person; no filler openers, no exclamation marks, no words like seamless, powerful, unlock. Take the way of writing from the notes on the moodboard references and the idea of the chosen direction. No other text, no commentary."
+      }
+    },
+    {
+      "id": "m-canvas-mvuxzs1c",
+      "type": "screen",
+      "position": {
+        "x": 5711.5,
+        "y": 480
+      },
+      "width": 640,
+      "height": 520,
+      "data": {
+        "title": "Screen 1",
+        "designSystem": "brandapp",
+        "asFrame": true,
+        "frameIndex": 0,
+        "frameTitle": "Product frame: screen 1",
+        "frameFolder": "f-1793362944435",
+        "sized": true,
+        "instr": "Draw screen number 1 from the Screens plan as the real screen of the product, exactly as the plan describes it. The product name shown in the interface is exactly the Name from the brief. Use only the content listed for this screen in the plan (the same menu labels in the navigation, the listed entries as the content); no invented brands and no invented numbers. Do not caption the obvious, do not repeat a section name or a phrase twice on the screen, one primary button. The screen fills the whole 1440×900 window like a real screenshot of the product."
+      }
+    },
+    {
+      "id": "m-memory-mvuxzs1c",
+      "type": "screen",
+      "position": {
+        "x": 5711.5,
+        "y": 1060
+      },
+      "width": 640,
+      "height": 520,
+      "data": {
+        "title": "Screen 2",
+        "designSystem": "brandapp",
+        "asFrame": true,
+        "frameIndex": 1,
+        "frameTitle": "Product frame: screen 2",
+        "frameFolder": "f-1793362944435",
+        "sized": true,
+        "instr": "Draw screen number 2 from the Screens plan as the real screen of the product, exactly as the plan describes it. The product name shown in the interface is exactly the Name from the brief. Use only the content listed for this screen in the plan (the same menu labels in the navigation, the listed entries as the content); no invented brands and no invented numbers. Do not caption the obvious, do not repeat a section name or a phrase twice on the screen, one primary button. The screen fills the whole 1440×900 window like a real screenshot of the product."
+      }
+    },
+    {
+      "id": "m-library-mvuxzs1c",
+      "type": "screen",
+      "position": {
+        "x": 5711.5,
+        "y": 1640
+      },
+      "width": 640,
+      "height": 520,
+      "data": {
+        "title": "Screen 3",
+        "designSystem": "brandapp",
+        "asFrame": true,
+        "frameIndex": 2,
+        "frameTitle": "Product frame: screen 3",
+        "frameFolder": "f-1793362944435",
+        "sized": true,
+        "instr": "Draw screen number 3 from the Screens plan as the real screen of the product, exactly as the plan describes it. The product name shown in the interface is exactly the Name from the brief. Use only the content listed for this screen in the plan (the same menu labels in the navigation, the listed entries as the content); no invented brands and no invented numbers. Do not caption the obvious, do not repeat a section name or a phrase twice on the screen, one primary button. The screen fills the whole 1440×900 window like a real screenshot of the product."
+      }
+    },
+    {
+      "id": "g-frames-mvuxzs1c",
+      "type": "group",
+      "position": {
+        "x": 5711.5,
+        "y": 2240
+      },
+      "width": 400,
+      "height": 400,
+      "data": {
+        "groupKind": "folder",
+        "key": "f-1793362944435",
+        "name": "Product frames",
+        "view": "grid",
+        "asAssets": true
+      }
+    },
+    {
+      "id": "s-landing-mvuxzs1c",
+      "type": "screen",
+      "position": {
+        "x": 7551.5,
+        "y": 480
+      },
+      "width": 900,
+      "height": 760,
+      "data": {
+        "title": "Landing",
+        "fit": true,
+        "designSystem": "landing",
+        "sized": true,
+        "instr": "Build the landing page from the section kit and the Landing copy, in this order: Header, Hero, Steps, Split, Statement, Cta, Footer. Use the copy exactly as written: every field of the copy goes into the matching property, with no rewriting and no additions. Theme: take Accent, Pair and Corners, and the Hero layout, from the chosen direction exactly as written. The product name is exactly the Name from the brief (it is also the first field of the Header and Footer copy); never invent another name. Product frames are attached as page assets (see their descriptions): put the most overview-like frame (the main screen) in the Hero, a second one as the wide image under the Steps, the third in the Split, choosing by their descriptions; use no other images; steps without an image have none."
+      }
+    },
+    {
+      "id": "a-mvp-mvuxzs1c",
+      "type": "agent",
+      "position": {
+        "x": 8511.5,
+        "y": 480
+      },
+      "width": 520,
+      "height": 760,
+      "data": {
+        "title": "MVP build prompt",
+        "fit": true,
+        "sized": true,
+        "instr": "Write the build prompt for a coding agent (Claude Code, Codex, Lovable or v0) from the brief, the Screens plan, the problem and the verdict, in exactly this form, one field per line, nothing else:\nGoal: (one sentence)\nStack: React, TypeScript, Tailwind and shadcn/ui, unless the brief says otherwise\nIn scope: (up to 5 features, taken from the screens plan)\nOut of scope: (up to 5 things to leave out for now)\nScreens: (the three screens of the plan, one line each: what is on it and what the person does)\nData: (what is stored and where; local by default)\nDone when: (3 checks a person can do in the browser)\nDo not invent: (names, users, numbers, prices and features that are not in the inputs)\nCheck first: (the one thing the verdict says to check before building)\nUse only facts from the inputs. No code, no long prose."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-mvuxzs1c-t-idea-a-problem",
+      "source": "t-idea-mvuxzs1c",
+      "target": "a-problem-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-t-idea-a-competitors",
+      "source": "t-idea-mvuxzs1c",
+      "target": "a-competitors-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-a-competitors",
+      "source": "a-problem-mvuxzs1c",
+      "target": "a-competitors-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-t-idea-a-demand",
+      "source": "t-idea-mvuxzs1c",
+      "target": "a-demand-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-a-demand",
+      "source": "a-problem-mvuxzs1c",
+      "target": "a-demand-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-t-idea-a-verdict",
+      "source": "t-idea-mvuxzs1c",
+      "target": "a-verdict-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-a-verdict",
+      "source": "a-problem-mvuxzs1c",
+      "target": "a-verdict-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-competitors-a-verdict",
+      "source": "a-competitors-mvuxzs1c",
+      "target": "a-verdict-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-demand-a-verdict",
+      "source": "a-demand-mvuxzs1c",
+      "target": "a-verdict-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-t-idea-a-brief",
+      "source": "t-idea-mvuxzs1c",
+      "target": "a-brief-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-a-brief",
+      "source": "a-problem-mvuxzs1c",
+      "target": "a-brief-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-verdict-a-brief",
+      "source": "a-verdict-mvuxzs1c",
+      "target": "a-brief-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-a-screens",
+      "source": "a-brief-mvuxzs1c",
+      "target": "a-screens-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-a-directions",
+      "source": "a-brief-mvuxzs1c",
+      "target": "a-directions-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-a-copy",
+      "source": "a-brief-mvuxzs1c",
+      "target": "a-copy-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-a-copy",
+      "source": "a-directions-mvuxzs1c",
+      "target": "a-copy-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-m-canvas",
+      "source": "a-brief-mvuxzs1c",
+      "target": "m-canvas-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-m-canvas",
+      "source": "a-directions-mvuxzs1c",
+      "target": "m-canvas-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-screens-m-canvas",
+      "source": "a-screens-mvuxzs1c",
+      "target": "m-canvas-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-m-memory",
+      "source": "a-brief-mvuxzs1c",
+      "target": "m-memory-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-m-memory",
+      "source": "a-directions-mvuxzs1c",
+      "target": "m-memory-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-screens-m-memory",
+      "source": "a-screens-mvuxzs1c",
+      "target": "m-memory-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-m-library",
+      "source": "a-brief-mvuxzs1c",
+      "target": "m-library-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-m-library",
+      "source": "a-directions-mvuxzs1c",
+      "target": "m-library-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-screens-m-library",
+      "source": "a-screens-mvuxzs1c",
+      "target": "m-library-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-copy-s-landing",
+      "source": "a-copy-mvuxzs1c",
+      "target": "s-landing-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-s-landing",
+      "source": "a-brief-mvuxzs1c",
+      "target": "s-landing-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-s-landing",
+      "source": "a-directions-mvuxzs1c",
+      "target": "s-landing-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-g-frames-s-landing",
+      "source": "g-frames-mvuxzs1c",
+      "target": "s-landing-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-a-mvp",
+      "source": "a-problem-mvuxzs1c",
+      "target": "a-mvp-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-verdict-a-mvp",
+      "source": "a-verdict-mvuxzs1c",
+      "target": "a-mvp-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-a-mvp",
+      "source": "a-brief-mvuxzs1c",
+      "target": "a-mvp-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-screens-a-mvp",
+      "source": "a-screens-mvuxzs1c",
+      "target": "a-mvp-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-t-idea-r-report",
+      "source": "t-idea-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-problem-r-report",
+      "source": "a-problem-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-competitors-r-report",
+      "source": "a-competitors-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-demand-r-report",
+      "source": "a-demand-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-verdict-r-report",
+      "source": "a-verdict-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-brief-r-report",
+      "source": "a-brief-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-a-directions-r-report",
+      "source": "a-directions-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    },
+    {
+      "id": "e-mvuxzs1c-g-frames-r-report",
+      "source": "g-frames-mvuxzs1c",
+      "target": "r-report-mvuxzs1c"
+    }
+  ],
+  "trash": {},
+  "rev": 2,
+  "proposals": []
+}

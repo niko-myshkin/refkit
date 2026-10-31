@@ -1,0 +1,35 @@
+{
+  "title": "Plan cards in a row",
+  "titleEdited": true,
+  "source": "",
+  "format": "image",
+  "ratio": "3 / 2",
+  "technique": "",
+  "collections": [
+    "Pricing",
+    "Layout"
+  ],
+  "folder": "f-price",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947062",
+  "createdAt": 1792777947062,
+  "image": "/library/ref-1792777947062/source.jpg",
+  "describing": false,
+  "colors": [
+    "#f0e7d6",
+    "#d3b98a"
+  ],
+  "description": "Three cards, the middle one is outlined and marked “Popular”.",
+  "via": "hand",
+  "boards": [],
+  "thread": [
+    {
+      "command": "Make a summary",
+      "answer": "- Three plan cards side by side; the middle one carries the emphasis.\n- The “Popular” badge plus an outline does the selling, not a bigger price.\n- Cards share one structure so the rows line up.\n\nSections:\n- Plan header\n- Price\n- Feature list\n- Call to action\n\nTerms:\n- Anchor plan: the highlighted middle tier.\n\nHow to apply:\n- Highlight exactly one plan.\n- Keep feature lists the same length across cards.",
+      "at": 1792777948062,
+      "via": "digest"
+    }
+  ],
+  "digestedAt": 1792777948062
+}

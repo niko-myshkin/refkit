@@ -1,0 +1,67 @@
+[
+  {
+    "name": "Onboarding",
+    "types": [
+      "refs",
+      "note"
+    ],
+    "hint": "first run, empty states, checklists, welcome screens; onboarding, empty state, checklist"
+  },
+  {
+    "name": "Pricing",
+    "types": [
+      "refs"
+    ],
+    "hint": "plans, tiers, comparison tables, billing toggles; pricing, plans, subscription"
+  },
+  {
+    "name": "Color",
+    "types": [
+      "refs",
+      "note"
+    ],
+    "hint": "palettes, accents, contrast, themes; color, palette, accent, dark mode"
+  },
+  {
+    "name": "Typography",
+    "types": [
+      "refs",
+      "note",
+      "article"
+    ],
+    "hint": "fonts, hierarchy, numbers, tables; typography, font, typeface, lettering"
+  },
+  {
+    "name": "Layout",
+    "types": [
+      "refs"
+    ],
+    "hint": "grids, density, spacing, composition; layout, grid, spacing, density"
+  },
+  {
+    "name": "Interaction",
+    "types": [
+      "refs",
+      "video",
+      "youtube",
+      "article",
+      "note",
+      "music",
+      "canvas"
+    ],
+    "hint": "controls, toggles, motion and feedback; interaction, motion, animation, controls"
+  },
+  {
+    "name": "CRM",
+    "types": [
+      "refs",
+      "video",
+      "youtube",
+      "article",
+      "note",
+      "music",
+      "canvas"
+    ],
+    "hint": ""
+  }
+]

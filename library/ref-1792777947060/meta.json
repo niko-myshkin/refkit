@@ -1,0 +1,25 @@
+{
+  "title": "Task list (GOV.UK)",
+  "titleEdited": true,
+  "source": "https://design-system.service.gov.uk/components/task-list/",
+  "author": "GOV.UK Design System team",
+  "license": "Open Government Licence v3.0 (© Crown copyright); the example area only, without the site header, crown logo or Transport font",
+  "format": "image",
+  "ratio": "1618 / 1080",
+  "technique": "",
+  "collections": [
+    "Onboarding",
+    "Layout"
+  ],
+  "folder": "f-onb",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947060",
+  "createdAt": 1792777947060,
+  "image": "/library/ref-1792777947060/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A list of tasks with a status tag on each row: completed, in progress or cannot start yet.",
+  "via": "hand",
+  "boards": []
+}

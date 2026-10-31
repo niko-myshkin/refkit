@@ -1,0 +1,35 @@
+{
+  "title": "Step indicator (USWDS)",
+  "titleEdited": true,
+  "source": "https://designsystem.digital.gov/components/step-indicator/",
+  "author": "U.S. General Services Administration",
+  "license": "Public domain / CC0 1.0 (U.S. Web Design System, GSA); fonts SIL OFL 1.1, icons Apache 2.0",
+  "format": "image",
+  "ratio": "1600 / 1066",
+  "technique": "",
+  "collections": [
+    "Onboarding"
+  ],
+  "folder": "f-onb",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947059",
+  "createdAt": 1792777947059,
+  "image": "/library/ref-1792777947059/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A segmented progress bar with numbered steps and the current step labeled above it.",
+  "via": "hand",
+  "boards": [],
+  "thread": [
+    {
+      "command": "Make a summary",
+      "answer": "- A segmented bar shows every step at once, so nobody wonders how long the form is.\n- The current step is named above the bar and counted as “3 of 5”.\n- Finished steps are dark, upcoming ones gray: status without a legend.\n\nSections:\n- Segmented bar\n- Step labels\n- Counter and current step\n\nTerms:\n- Step indicator: a progress display for a multi-step process.\n- Counter: the “3 of 5” prefix before the step name.\n\nHow to apply:\n- Use the compact counter on small screens and the labeled bar on wide ones.\n- Keep step names to two words.",
+      "at": 1792777948059,
+      "via": "digest"
+    }
+  ],
+  "digestedAt": 1792777948059,
+  "opens": 11,
+  "openedAt": 1793289972235
+}

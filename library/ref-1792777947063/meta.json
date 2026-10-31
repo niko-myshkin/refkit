@@ -1,0 +1,28 @@
+{
+  "title": "Monthly / yearly toggle",
+  "titleEdited": true,
+  "source": "",
+  "format": "image",
+  "ratio": "3 / 2",
+  "technique": "",
+  "collections": [
+    "Pricing",
+    "Interaction"
+  ],
+  "folder": "f-price",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947063",
+  "createdAt": 1792777947063,
+  "image": "/library/ref-1792777947063/source.jpg",
+  "describing": false,
+  "colors": [
+    "#e3e8f0",
+    "#9fb0cc"
+  ],
+  "description": "A pill toggle above the plan grid, the discount is labeled next to it.",
+  "via": "hand",
+  "boards": [],
+  "opens": 1,
+  "openedAt": 1793232801549
+}

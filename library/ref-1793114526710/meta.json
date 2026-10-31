@@ -1,0 +1,64 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793114526710/source.webp",
+  "tags": [],
+  "collections": [],
+  "meaning": "Orange as the character of a precise instrument: play inside strictness. Take: an orange that is not \"startup orange\".",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "folder": "f-moodboard",
+  "title": "teenage engineering",
+  "source": "https://teenage.engineering",
+  "ratio": "1024 / 1365",
+  "fetching": false,
+  "id": "ref-1793114526710",
+  "createdAt": 1793114526710,
+  "comments": [
+    {
+      "id": "c1793114526713",
+      "text": "Orange as the character of a precise instrument: play inside strictness. Take: an orange that is not \"startup orange\".",
+      "at": 1793114526713
+    }
+  ],
+  "updatedAt": 1793114526713,
+  "kind": "article",
+  "author": "",
+  "describing": false,
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
+  "colors": [
+    "#121212",
+    "#474747",
+    "#6b6b6b",
+    "#969696"
+  ],
+  "opens": 3,
+  "openedAt": 1793330723065,
+  "digesting": false,
+  "thread": [
+    {
+      "command": "Разбери",
+      "answer": "- The text uses an implausibly long shadow to spark curiosity about what might be hidden.\n- It raises the possibility of additional features without saying what they are.\n- A playful, demanding aside insists on a full product description before purchase.\n- The promised surprise remains unspecified.\n- The invitation offers weekly emails and requires confirmation of age and consent to the privacy policy.\n- For the intended orange concept, this provides a way to put play inside clear, exact copy; it provides no evidence about the orange itself.\n\nSections:\n- “hold on...” — pause before the invitation.\n- “enter your email” — subscription prompt.\n- “by signing up” — age confirmation and privacy consent.\n- “THIS SHADOW IS unrealistically LONG” — the visual hook stated in copy.\n- “ARE YOU HIDING SOMETHING?” — a playful challenge.\n- “PERHAPS EVEN MORE FEATURES” — possibility of undisclosed features.\n- “I NEED A FULL PRODUCT DESCRIPTION” — demand for purchase information.\n- “we still have a surprise for you” — unspecified reveal.\n- “subscribe to receive information” — weekly email offer.\n- “hold on...” — the same sequence repeats.\n\nHow to apply:\n- Draft a caption for the orange concept that pairs one exact, supportable statement with one playful question; the result is a restrained voice with room for surprise.\n- Write a parenthetical buyer objection asking for concrete details before purchase; the result is playful copy that still values precision.\n- Separate confirmed product facts from unanswered questions in the draft; the result is curiosity without invented features.\n- Keep any subscription invitation beside its weekly frequency and consent language; the result is a clear offer.",
+      "at": 1793332445038,
+      "usage": [
+        {
+          "kind": "digest",
+          "model": "gpt-6-sol",
+          "seconds": 31,
+          "input": 14753,
+          "cached": 0,
+          "output": 885
+        }
+      ],
+      "via": "digest",
+      "usedMemory": [
+        "Brief: answer first, then an explanation if needed.",
+        "Look for the technique and what can be put to work, not a description of what's in the picture."
+      ]
+    }
+  ],
+  "suggestions": [
+    "Draft precise, playful copy for the orange concept.",
+    "Separate the teaser’s facts from its open questions."
+  ]
+}

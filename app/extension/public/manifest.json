@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Refkit",
+  "version": "0.1.0",
+  "description": "Сохранить открытую страницу в Refkit",
+  "action": {
+    "default_title": "Сохранить в Refkit",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "storage",
+    "alarms"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

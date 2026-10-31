@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "f-mvve54kg-analysis",
+      "type": "frame",
+      "position": {
+        "x": 215,
+        "y": 408
+      },
+      "width": 752,
+      "height": 384,
+      "data": {
+        "label": "Analysis",
+        "hue": 1,
+        "members": [
+          "a-mvve54kg0",
+          "a-mvve54kg1"
+        ]
+      }
+    },
+    {
+      "id": "f-mvve54kg-result",
+      "type": "frame",
+      "position": {
+        "x": 1015,
+        "y": 408
+      },
+      "width": 384,
+      "height": 384,
+      "data": {
+        "label": "Result",
+        "members": [
+          "a-mvve54kg2"
+        ]
+      }
+    },
+    {
+      "id": "a-mvve54kg0",
+      "type": "agent",
+      "position": {
+        "x": 247,
+        "y": 440
+      },
+      "width": 320,
+      "height": 320,
+      "data": {
+        "title": "What they share",
+        "instr": "What these materials have in common: 3–5 points — techniques, patterns, taste. Brief, no preamble."
+      }
+    },
+    {
+      "id": "a-mvve54kg1",
+      "type": "agent",
+      "position": {
+        "x": 615,
+        "y": 440
+      },
+      "width": 320,
+      "height": 320,
+      "data": {
+        "title": "What is missing",
+        "instr": "What is missing from this collection: which techniques, examples and contrasts are worth adding. A list of up to 5 points."
+      }
+    },
+    {
+      "id": "a-mvve54kg2",
+      "type": "agent",
+      "position": {
+        "x": 1047,
+        "y": 440
+      },
+      "width": 320,
+      "height": 320,
+      "data": {
+        "title": "What to apply",
+        "instr": "What of this to apply this week: three steps, each one action in the project."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-mvve54kg-a-mvve54kg0-a-mvve54kg1",
+      "source": "a-mvve54kg0",
+      "target": "a-mvve54kg1"
+    },
+    {
+      "id": "e-mvve54kg-a-mvve54kg1-a-mvve54kg2",
+      "source": "a-mvve54kg1",
+      "target": "a-mvve54kg2"
+    }
+  ],
+  "trash": {},
+  "rev": 1,
+  "proposals": []
+}

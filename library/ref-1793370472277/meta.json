@@ -1,0 +1,65 @@
+{
+  "format": "image",
+  "image": "",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "hand",
+  "kind": "canvas",
+  "title": "Refkit landing · brand",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "4 / 3",
+  "folder": "inbox",
+  "id": "ref-1793370472277",
+  "createdAt": 1793370472277,
+  "canvasBoxes": [
+    {
+      "x": 0,
+      "y": 60,
+      "w": 400,
+      "h": 400,
+      "k": "group"
+    },
+    {
+      "x": 0,
+      "y": 1500,
+      "w": 380,
+      "h": 300,
+      "k": "text"
+    },
+    {
+      "x": 480,
+      "y": 0,
+      "w": 440,
+      "h": 720,
+      "k": "agent"
+    },
+    {
+      "x": 480,
+      "y": 1520,
+      "w": 440,
+      "h": 478,
+      "k": "agent"
+    },
+    {
+      "x": 1020,
+      "y": 1500,
+      "w": 400,
+      "h": 400,
+      "k": "group"
+    },
+    {
+      "x": 1020,
+      "y": 0,
+      "w": 620,
+      "h": 700,
+      "k": "screen"
+    }
+  ],
+  "canvasEdges": 9,
+  "updatedAt": 1793390895358,
+  "thumbAt": 1793390906093
+}

@@ -1,0 +1,55 @@
+[
+  {
+    "id": "inbox",
+    "name": "Inbox",
+    "inbox": true,
+    "description": "All incoming materials"
+  },
+  {
+    "id": "f-onb",
+    "name": "Onboarding",
+    "icon": "🎬"
+  },
+  {
+    "id": "f-price",
+    "name": "Pricing",
+    "icon": "🍦"
+  },
+  {
+    "id": "f-pal",
+    "name": "Palettes",
+    "icon": "🚀"
+  },
+  {
+    "id": "f-type",
+    "name": "Typography"
+  },
+  {
+    "id": "f-comp",
+    "name": "Components"
+  },
+  {
+    "id": "f-canvas",
+    "name": "Canvases"
+  },
+  {
+    "id": "f-moodboard",
+    "name": "Refkit Moodboard"
+  },
+  {
+    "id": "f-frames",
+    "name": "Product frames"
+  },
+  {
+    "id": "f-1793215134861",
+    "name": "Refkit frames"
+  },
+  {
+    "id": "f-1793327671261",
+    "name": "Product frames"
+  },
+  {
+    "id": "f-pl-shots",
+    "name": "Refkit screenshots"
+  }
+]

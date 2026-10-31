@@ -1,0 +1,26 @@
+name: Beta feedback
+description: What worked, what didn't, what was confusing
+labels: [feedback]
+body:
+  - type: markdown
+    attributes:
+      value: Refkit is an early beta. Honest feedback is the whole point, thank you.
+  - type: textarea
+    id: tried
+    attributes:
+      label: What did you try to do?
+    validations: { required: true }
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened, and what did you expect?
+    validations: { required: true }
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Which agent did you use?
+      options: [Claude Code, Codex, Both, Neither (just looked around)]
+  - type: input
+    id: setup
+    attributes:
+      label: macOS version and Node version

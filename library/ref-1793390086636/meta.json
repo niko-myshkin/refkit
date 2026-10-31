@@ -1,0 +1,51 @@
+{
+  "format": "image",
+  "image": "",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "hand",
+  "title": "Style rules → image",
+  "kind": "canvas",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "4 / 3",
+  "folder": "inbox",
+  "id": "ref-1793390086636",
+  "createdAt": 1793390086637,
+  "canvasBoxes": [
+    {
+      "x": 215,
+      "y": 408,
+      "w": 384,
+      "h": 384,
+      "k": "frame"
+    },
+    {
+      "x": 647,
+      "y": 408,
+      "w": 384,
+      "h": 384,
+      "k": "frame"
+    },
+    {
+      "x": 247,
+      "y": 440,
+      "w": 320,
+      "h": 320,
+      "k": "agent"
+    },
+    {
+      "x": 679,
+      "y": 440,
+      "w": 320,
+      "h": 320,
+      "k": "image"
+    }
+  ],
+  "canvasEdges": 1,
+  "updatedAt": 1793390088297,
+  "thumbAt": 1793390099709
+}

@@ -1,0 +1,397 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  /* Бумага — плитка заметки «лист» (владелец 2026-09-28): тёплая, чуть темнее фона; уголок — загиб */
+  --paper: oklch(0.955 0.008 85);
+  --paper-foreground: oklch(0.2 0.005 85);
+  --paper-muted: oklch(0.45 0.01 85);
+  --paper-fold: oklch(0.89 0.012 85);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0); /* потерялся при переезде на Fluid (fea6549): в светлой теме у меню и ghost-кнопок не было фона при наведении */
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.627 0.17 149.2); /* добавленное в диффе правки агента */
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --brand: #F97316; /* бренд 2026-10-27 (04_brand/brand-kit.md): знак и один акцент на экран; текст на нём — графит #141414 */
+  --brand-ink: #C2410C; /* акцент как текст на светлом: 5,2:1 на белом */
+  --font-display: var(--font-sans); /* роль под заголовки: сменится одной строкой, если появится свой шрифт с лицензией */
+  --port-material: oklch(0.78 0.14 75);
+  --port-text: oklch(0.72 0.14 255);
+  --port-screen: oklch(0.72 0.14 305);
+  --port-image: oklch(0.74 0.14 160);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  /* Сообщества на графе понятий (страница «Граф»): пять различимых, но приглушённых цветов — смысл несёт не цвет, а
+     соседство, поэтому насыщенность низкая. Только для точек и связей графа */
+  --community-1: oklch(0.62 0.13 25);
+  --community-2: oklch(0.6 0.12 285);
+  --community-3: oklch(0.64 0.1 195);
+  --community-4: oklch(0.72 0.12 85);
+  --community-5: oklch(0.6 0.1 150);
+  --radius: 0.625rem;
+  /* Шкала слоёв, снизу вверх. Использовать как z-(--z-имя). Мелкие слои внутри одного компонента (z-1, z-10, z-20) — обычные числа, шкалой не управляются */
+  --z-sticky: 30; /* прилипшие полосы страницы (полка под шапкой) */
+  --z-marquee: 40; /* рамка выделения мышью */
+  --z-backdrop: 50; /* затемнение под окном карточки */
+  --z-card: 60; /* окно карточки / раскрытая картинка */
+  --z-agent: 70; /* панель агента */
+  --z-toolbar: 80; /* нижняя плавающая панель (действия / выделение) */
+  --z-panels: 90; /* доп. панели поверх карточки (слой panels в ImageModal) */
+  --z-dialog-overlay: 100; /* затемнение под диалогом поверх всего */
+  --z-dialog: 110; /* диалог и sheet */
+  --z-popup: 120; /* поповеры, меню, подсказки: всегда выше диалога, из которого открыты */
+  --z-toast: 130; /* всплывающие уведомления: над всем */
+  --glass-bg: var(--popover); /* look & feel 2026-10-27: стекла нет — висящие панели сплошные, как у Doop (blur давал пятна). Токены оставлены: общая поверхность glass работает без правок */ /* «стекло» висящих панелей: цвет попапа на 70% и размытие фона за ним */
+  --glass-blur: 0px;
+  --sidebar: oklch(0.985 0 0);
+  --canvas-bg: var(--background); /* фон холста нод: тот же цвет, что у шапки над ним, без шва */
+  --bar-width: min(560px, 80vw); /* поле поиска в нижней панели */
+  --canvas-gutter: 16px; /* боковой отступ канваса: шапки и лента на одной линии; на телефоне уже, см. ниже */
+  --canvas-gutter: round(down, clamp(16px, 3vw, 64px), 8px); /* на большом экране шире (1920 → 56 px), шаг 8; браузер без round() оставит 16 строкой выше */
+  --shell: oklch(0.965 0 0); /* рамка окна вокруг колонок и канваса: светлее/темнее канваса, чтобы читались края поверхностей */
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: transparent;
+  --border: transparent;
+  --line: oklch(0 0 0 / 15%);
+  --scrollbar: oklch(0 0 0 / 18%);
+  --sidebar-ring: oklch(0.708 0 0)
+;
+}
+
+/* Телефон: боковой отступ канваса уже (бывший max-compact:px-[18px] по всему коду) */
+@media (width < theme(--breakpoint-compact)) {
+  :root { --canvas-gutter: 16px; }
+}
+
+.dark {
+  --background: oklch(0.191 0 0); /* look & feel 2026-10-27 (замер Doop): #141414 */
+  --foreground: oklch(0.961 0 0); /* #f2f2f2 */
+  --card: oklch(0.226 0 0); /* панели и карточки — #1c1c1c */
+  --card-foreground: oklch(0.985 0 0);
+  /* Текстовая плитка (владелец 2026-10-03, реф «Memory as Mirror»): тёмная поверхность чуть светлее фона, без загиба;
+     иконка типа и название сверху, текст моноширинным */
+  --paper: oklch(0.226 0 0);
+  --paper-foreground: oklch(0.985 0 0);
+  --paper-muted: oklch(0.75 0 0);
+  --paper-fold: oklch(0.84 0.016 85);
+  --popover: oklch(0.255 0 0); /* меню и выпадашки чуть светлее панелей (#212121 против #1c1c1c): на тёмном тени не видно, край читается по тону */
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.285 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.285 0 0);
+  --muted-foreground: oklch(0.732 0 0); /* #a9a8a5 */
+  --accent: oklch(0.285 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --success: oklch(0.723 0.19 149.6);
+  /* Без тонких линий (владелец 2026-10-02): границы блоков прозрачны, их держат фон и отступы.
+     --line — только линия со смыслом: пунктир заготовки («Новый space», плитка «создать»), ручка ширины */
+  --border: transparent;
+  --line: oklch(1 0 0 / 13%);
+  --scrollbar: oklch(1 0 0 / 18%); /* ползунок прокрутки; дорожки нет */
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --brand: #F97316;
+  --brand-ink: #F97316;
+  --port-material: oklch(0.78 0.14 75);
+  --port-text: oklch(0.72 0.14 255);
+  --port-screen: oklch(0.72 0.14 305);
+  --port-image: oklch(0.74 0.14 160);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  /* Сообщества на графе понятий (страница «Граф»): пять различимых, но приглушённых цветов — смысл несёт не цвет, а
+     соседство, поэтому насыщенность низкая. Только для точек и связей графа */
+  --community-1: oklch(0.72 0.13 25);
+  --community-2: oklch(0.72 0.12 285);
+  --community-3: oklch(0.74 0.1 195);
+  --community-4: oklch(0.8 0.12 85);
+  --community-5: oklch(0.72 0.1 150);
+  --sidebar: oklch(0.226 0 0);
+  --shell: oklch(0.165 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.285 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: transparent;
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  /* Узкий экран (телефон): ниже этой ширины боковые отступы 18px, карточка и панели перестраиваются. Класс max-compact:, в CSS — theme(--breakpoint-compact).
+     Равен md: у shadcn (сайдбар-шторка) и compact в lib/breakpoints.ts — менять вместе */
+  --breakpoint-compact: 768px;
+  /* Колонка агента уже этого — подписи у кнопок строки ввода прячутся, остаются иконки */
+  --container-agent-narrow: 25rem;
+  /* Пружины Fluid Sidebar (ветка fluid, lib/springs.ts), пересчитанные в CSS linear() через motion-dom:
+     slow — 240 мс, отскок 0.12 (раскрытие); moderate — 160 мс, без отскока (сворачивание) */
+  --ease-spring-slow: linear(0, 0.0778, 0.2399, 0.4179, 0.5786, 0.7094, 0.8086, 0.8798, 0.9286, 0.9606, 0.9804, 0.9921, 0.9985, 1.0016, 1.0028, 1.0029, 1.0026, 1.0021, 1.0016, 1);
+  --ease-spring-moderate: linear(0, 0.1803, 0.4551, 0.6711, 0.8122, 0.8966, 0.9445, 0.9708, 0.9848, 0.9922, 0.996, 0.998, 1);
+  --font-heading: var(--font-sans);
+  --font-sans: 'Inter Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-shell: var(--shell);
+  --color-community-1: var(--community-1);
+  --color-community-2: var(--community-2);
+  --color-community-3: var(--community-3);
+  --color-community-4: var(--community-4);
+  --color-community-5: var(--community-5);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-port-material: var(--port-material);
+  --color-port-text: var(--port-text);
+  --color-port-screen: var(--port-screen);
+  --color-port-image: var(--port-image);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-line: var(--line);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-fold: var(--paper-fold);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  /* Роли скругления. В коде — rounded-<роль>, числа (md/lg/xl) — только внутри shadcn-компонентов.
+     Новая роль → дописать в lib/utils.ts, иначе cn не сможет её вытеснять */
+  --radius-control: var(--radius-md); /* строки, поля, чипы-прямоугольники, миниатюры, аватары */
+  --radius-surface: var(--radius-lg); /* картинка и видео в плитке, вложенные блоки, всплывающие списки */
+  --radius-container: var(--radius-xl); /* самостоятельные карточки, плитки, панели, плавающая панель */
+  /* Размеры текста сверх стандартных (xs 12 · sm 14 · base 16 · xl 20 · 3xl 30). Новый размер → дописать в lib/utils.ts */
+  /* Шкала плотности Doop (замер 2026-10-27): подписи 11 px, строки и вкладки 12 px, кнопки и поля 12,5 px */
+  --default-transition-duration: 120ms; /* hover и фоны как у Doop (0,12 с); кривая Tailwind по умолчанию та же, cubic-bezier(.4,0,.2,1) */
+  --text-xs: 0.6875rem; /* 11px */
+  --text-xs--line-height: 1rem; /* 16px: целая высота строки (11 px × 1,45 давало дробные) */
+  --text-sm: 0.78125rem; /* 12,5px */
+  --text-sm--line-height: 1.125rem; /* 18px */
+  --text-micro: 0.625rem; /* 10px: метки капсом («Дубль»), буква в логотипе */
+  --text-micro--line-height: 0.875rem;
+  --text-body: 0.78125rem; /* 12,5px (было 13): обычный текст — описание, комментарии, ответы агента, текст материала (владелец 2026-10-13); поля ввода и кнопки — свои размеры */
+  --text-body--line-height: 1.25rem; /* 20px */
+  --text-note: clamp(0.75rem, 5.67cqw, 1.0625rem); /* 12–17px: заголовок листа-заметки на плитке, растёт с шириной плитки (cqw — от PaperNote как контейнера); на полке — sm, в мини — note-mini */
+  --text-note--line-height: 1.35;
+  --text-note-body: clamp(0.625rem, 4.33cqw, 0.8125rem); /* 10–13px: текст заметки под заголовком (превью), тем же шрифтом, что весь интерфейс */
+  --text-note-body--line-height: 1.6;
+  --text-note-mini: 0.4375rem; /* 7px: заголовок листа-заметки в миниатюре (ячейка набора) — масштабная копия, не интерфейсный текст */
+  --text-note-mini--line-height: 1.2;
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Линия связи прорисовывается от центра к карточке за 0,35 с; штрих по ней стартует, когда она дошла */
+@keyframes link-draw {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+.link-draw {
+  stroke-dasharray: 100;
+  animation: link-draw 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-draw { animation: none; }
+}
+
+/* Штрих, бегущий по линии связи в фокусе графа: дашем длиной 10% линии (pathLength=100) сдвигаем от начала к концу */
+@keyframes link-pulse {
+  from { stroke-dashoffset: 10; }
+  to { stroke-dashoffset: -100; }
+}
+.link-pulse {
+  stroke-dasharray: 10 90;
+  animation: link-pulse 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.35s infinite backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-pulse { display: none; }
+}
+
+/* Стекло: висящая панель (нижняя панель, уведомление, подпись в полёте) — полупрозрачная, фон за ней размыт. Значения — токены --glass-* */
+@utility glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Подпись: мелкий приглушённый текст под названием, метаданные, подсказки в списках. Размер и цвет вместе */
+@utility caption {
+  @apply text-xs text-muted-foreground;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    /* Полосы прокрутки везде одни (владелец 2026-10-03): тонкий полупрозрачный ползунок, без светлой системной дорожки */
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+  }
+  /* Картинки и видео не тащатся системным перетаскиванием: иначе отпущенная внутри приложения картинка становилась новой карточкой */
+  img, video { -webkit-user-drag: none; }
+  body {
+    /* antialiased — без него macOS рисует светлый текст на тёмном толще, regular выглядит полужирным */
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Всплывающие слои на пружинах сайдбара (2026-10-09, принцип Fluid без самой библиотеки): появление — slow с отскоком,
+   уход — moderate. Подменяем длительность и кривую tw-animate-css. Вне @layer нарочно: у shadcn в разметке duration-100,
+   а пружина рассчитана на свои 240/160 мс — сжатая, она теряет форму. Новый всплывающий слой → дописать его data-slot сюда */
+:where([data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-sub-content"], [data-slot="context-menu-content"],
+  [data-slot="context-menu-sub-content"], [data-slot="popover-content"], [data-slot="select-content"], [data-slot="tooltip-content"],
+  [data-slot="dialog-content"], [data-slot="dialog-overlay"], [data-slot="alert-dialog-content"], [data-slot="alert-dialog-overlay"],
+  [data-slot="sheet-content"], [data-slot="sheet-overlay"]) {
+  &:where([data-state="open"], [data-state="delayed-open"], [data-state="instant-open"]) { --tw-duration: 240ms; --tw-ease: var(--ease-spring-slow); }
+  &:where([data-state="closed"]) { --tw-duration: 160ms; --tw-ease: var(--ease-spring-moderate); }
+}
+
+/* Подсветка кода в ответах агента (Shiki, тема на переменных): тихо, из токенов проекта — код основным цветом,
+   ключевые слова, строки и знаки приглушённым, комментарии ещё тише. Светлая и тёмная — сами, через токены */
+.code-highlight pre { background: transparent !important; }
+.code-highlight {
+  --code-foreground: var(--foreground);
+  --code-background: transparent;
+  --code-token-constant: var(--foreground);
+  --code-token-function: var(--foreground);
+  --code-token-parameter: var(--foreground);
+  --code-token-keyword: var(--muted-foreground);
+  --code-token-string: var(--muted-foreground);
+  --code-token-string-expression: var(--muted-foreground);
+  --code-token-punctuation: var(--muted-foreground);
+  --code-token-link: var(--muted-foreground);
+  --code-token-comment: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+  --code-token-inserted: var(--foreground);
+  --code-token-deleted: var(--muted-foreground);
+  --code-token-changed: var(--foreground);
+}
+
+
+/* Пока тащат плитку, остальная лента гаснет: яркими остаются плитка «в руке» и места, куда её можно бросить (папки, пины, корзина) */
+html[data-dragging] .library-main [data-tile-id]:not([data-drag-self]) { opacity: 0.4; }
+
+/* Плавные затемнения краёв: сплошной цвет фона, дальше fade-зона с мягкой кривой (не линейная — у линейной на светлом виден жёсткий переход).
+   Длина зоны — переменная --fade (по умолчанию 56px). scrim-down — затемнение сверху (низ слоя гаснет), scrim-up — снизу; scrim-mask — та же кривая маской (под блюр) */
+@utility scrim-down {
+  --fade: 56px;
+  background-image: linear-gradient(to bottom, var(--background) calc(100% - var(--fade) * 1.00), color-mix(in oklab, var(--background) 97%, transparent) calc(100% - var(--fade) * 0.90), color-mix(in oklab, var(--background) 90%, transparent) calc(100% - var(--fade) * 0.80), color-mix(in oklab, var(--background) 80%, transparent) calc(100% - var(--fade) * 0.70), color-mix(in oklab, var(--background) 66%, transparent) calc(100% - var(--fade) * 0.60), color-mix(in oklab, var(--background) 50%, transparent) calc(100% - var(--fade) * 0.50), color-mix(in oklab, var(--background) 34%, transparent) calc(100% - var(--fade) * 0.40), color-mix(in oklab, var(--background) 20%, transparent) calc(100% - var(--fade) * 0.30), color-mix(in oklab, var(--background) 10%, transparent) calc(100% - var(--fade) * 0.20), color-mix(in oklab, var(--background) 3%, transparent) calc(100% - var(--fade) * 0.10), transparent 100%);
+}
+@utility scrim-up {
+  --fade: 56px;
+  background-image: linear-gradient(to top, var(--background) calc(100% - var(--fade) * 1.00), color-mix(in oklab, var(--background) 97%, transparent) calc(100% - var(--fade) * 0.90), color-mix(in oklab, var(--background) 90%, transparent) calc(100% - var(--fade) * 0.80), color-mix(in oklab, var(--background) 80%, transparent) calc(100% - var(--fade) * 0.70), color-mix(in oklab, var(--background) 66%, transparent) calc(100% - var(--fade) * 0.60), color-mix(in oklab, var(--background) 50%, transparent) calc(100% - var(--fade) * 0.50), color-mix(in oklab, var(--background) 34%, transparent) calc(100% - var(--fade) * 0.40), color-mix(in oklab, var(--background) 20%, transparent) calc(100% - var(--fade) * 0.30), color-mix(in oklab, var(--background) 10%, transparent) calc(100% - var(--fade) * 0.20), color-mix(in oklab, var(--background) 3%, transparent) calc(100% - var(--fade) * 0.10), transparent 100%);
+}
+@utility scrim-mask {
+  --fade: 56px;
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 1) calc(100% - var(--fade) * 1.00), rgb(0 0 0 / 0.97) calc(100% - var(--fade) * 0.90), rgb(0 0 0 / 0.9) calc(100% - var(--fade) * 0.80), rgb(0 0 0 / 0.8) calc(100% - var(--fade) * 0.70), rgb(0 0 0 / 0.66) calc(100% - var(--fade) * 0.60), rgb(0 0 0 / 0.5) calc(100% - var(--fade) * 0.50), rgb(0 0 0 / 0.34) calc(100% - var(--fade) * 0.40), rgb(0 0 0 / 0.2) calc(100% - var(--fade) * 0.30), rgb(0 0 0 / 0.1) calc(100% - var(--fade) * 0.20), rgb(0 0 0 / 0.03) calc(100% - var(--fade) * 0.10), rgb(0 0 0 / 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 1) calc(100% - var(--fade) * 1.00), rgb(0 0 0 / 0.97) calc(100% - var(--fade) * 0.90), rgb(0 0 0 / 0.9) calc(100% - var(--fade) * 0.80), rgb(0 0 0 / 0.8) calc(100% - var(--fade) * 0.70), rgb(0 0 0 / 0.66) calc(100% - var(--fade) * 0.60), rgb(0 0 0 / 0.5) calc(100% - var(--fade) * 0.50), rgb(0 0 0 / 0.34) calc(100% - var(--fade) * 0.40), rgb(0 0 0 / 0.2) calc(100% - var(--fade) * 0.30), rgb(0 0 0 / 0.1) calc(100% - var(--fade) * 0.20), rgb(0 0 0 / 0.03) calc(100% - var(--fade) * 0.10), rgb(0 0 0 / 0) 100%);
+}
+
+/* Плоское «стекло» без размытия — для значков на каждой плитке ленты: десятки backdrop-filter на экране роняют прокрутку
+   (замер 2026-10-15: 155 значков — 80 кадров/с и провалы до 30 мс против 100 и 11 мс без размытия) */
+@utility glass-lite {
+  background-color: var(--glass-bg);
+}
+
+/* Единая поверхность всплывающих панелей: меню, контекстное меню, поповер, select, подсказка, окна. Менять вид — только здесь.
+   Радиус можно перебить на месте (окна — rounded-xl, подсказка — rounded-md) */
+@utility float-panel {
+  @apply glass rounded-lg shadow-2xl shadow-black/50 ring-1 ring-foreground/10; /* кольцо: на тёмном тени мало, край панели на плитке того же цвета не читался */
+}
+
+/* Ступенчатый ползунок (StepSlider): бегунок и заливка переезжают на новую ступень плавно, а не прыжком */
+/* Переход — только когда не тянут: во время хода бегунок точно под курсором */
+.step-slider:not([data-dragging]) [data-slot='slider'] > span:has(> [data-slot='slider-thumb']) { transition: left 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+.step-slider:not([data-dragging]) [data-slot='slider-range'] { transition: right 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .step-slider [data-slot='slider'] > span:has(> [data-slot='slider-thumb']), .step-slider [data-slot='slider-range'] { transition: none; }
+}
+
+/* React Flow красит ноды типа group серым фоном, рамкой и тонкой тенью выделения — у нас это своя нода «Папка/подборка», рисует себя сама */
+.react-flow .react-flow__node-group, .react-flow .react-flow__node-group.selectable:hover, .react-flow .react-flow__node-group.selectable:focus, .react-flow .react-flow__node-group.selectable:focus-visible, .react-flow .react-flow__node-group.selectable.selected { background: transparent !important; border: 0 !important; padding: 0; border-radius: 0; width: auto; color: inherit; text-align: left; font-size: inherit; box-shadow: none !important; outline: none !important; }
+
+/* Режим снимка (VITE_SNAPSHOT=1, html[data-snapshot]): холст только для просмотра. Всё, что меняет данные или зовёт агента, прячется или гасится.
+   Подписи берутся из английского интерфейса: снимок собирается с VITE_LANG=en. */
+html[data-snapshot] [data-slot="sidebar"], html[data-snapshot] [data-slot="sidebar-gap"], html[data-snapshot] [data-slot="sidebar-trigger"],
+html[data-snapshot] .glass.bottom-2.left-1\/2,
+html[data-snapshot] button[aria-label="Insert a node between"], html[data-snapshot] button[aria-label="Back"], html[data-snapshot] button[aria-label="Undo"], html[data-snapshot] button[aria-label="Redo"],
+html[data-snapshot] button[aria-label="Align the chain"], html[data-snapshot] button[aria-label="Copy for agent"], html[data-snapshot] button[aria-label="Canvas actions"],
+html[data-snapshot] button[aria-label="Duplicate"], html[data-snapshot] button[aria-label="Delete"], html[data-snapshot] button[aria-label="More"], html[data-snapshot] button[aria-label="Run modes"], html[data-snapshot] button[aria-label="Run"],
+html[data-snapshot] button[aria-label="Rerun"], html[data-snapshot] button[aria-label="Add to context"], html[data-snapshot] [aria-label="Node model"] { display: none !important; }
+html[data-snapshot] input[aria-label="Canvas name"], html[data-snapshot] input[aria-label="Node name"], html[data-snapshot] input[aria-label="Frame name"] { pointer-events: none; }
+
+/* Бегущий блик по тексту (Fluid thinking-indicator): статус «думает» у агента */
+@keyframes shimmer{0%{background-position:0% 0}100%{background-position:100% 0}}
+.shimmer-text{color:transparent;background:linear-gradient(90deg,#a3a3a3 0%,#a3a3a3 35%,#e5e5e5 50%,#a3a3a3 65%,#a3a3a3 100%);background-size:300% 100%;background-clip:text;-webkit-background-clip:text;animation:shimmer 1.5s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.shimmer-text{animation:none}}
+
+/* Холст на весь экран (план 01_strategy/islands-plan-2026-10-29.md): рейка и окно агента лежат поверх него, зазор рейки в потоке убран */
+html[data-canvas-open] [data-slot="sidebar-gap"] { width: 0 !important; }
+html[data-canvas-open] { --canvas-gutter: 16px; /* на холсте острова у края, как на экране; широкий отступ — только у ленты */ --canvas-left: var(--rail-w, 56px); --canvas-inset: calc(var(--rail-w, 56px) + var(--canvas-gutter)); }
+@media (max-width: 767px) { html[data-canvas-open] { --canvas-left: 8px; --canvas-inset: var(--canvas-gutter); } }
+
+/* Пробел зажат — на холсте только двигаемся (владелец 2026-10-30): ничего не хватается, ни ноды, ни их кнопки, ни связи, ни углы.
+   У нод React Flow pointer-events стоит прямо в стиле, поэтому здесь important; двойное подчёркивание в классах Tailwind-вариантом не записать */
+.react-flow[data-space-pan] .react-flow__node,
+.react-flow[data-space-pan] .react-flow__node *,
+.react-flow[data-space-pan] .react-flow__handle,
+.react-flow[data-space-pan] .react-flow__edge,
+.react-flow[data-space-pan] .react-flow__nodesselection-rect,
+.react-flow[data-space-pan] .react-flow__resize-control { pointer-events: none !important; }

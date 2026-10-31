@@ -1,0 +1,33 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793114526638/source.jpg",
+  "tags": [],
+  "collections": [],
+  "meaning": "One saturated accent on dark holds the whole site; a coherent icon system. Take: how a single colour carries everything.",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "folder": "f-moodboard",
+  "title": "Raycast - Your shortcut to everything",
+  "source": "https://www.raycast.com",
+  "ratio": "16 / 10",
+  "fetching": false,
+  "id": "ref-1793114526638",
+  "createdAt": 1793114526638,
+  "comments": [
+    {
+      "id": "c1793114526675",
+      "text": "One saturated accent on dark holds the whole site; a coherent icon system. Take: how a single colour carries everything.",
+      "at": 1793114526675
+    }
+  ],
+  "updatedAt": 1793115014836,
+  "kind": "article",
+  "author": "",
+  "describing": false,
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
+  "colors": [
+    "#070a0b",
+    "#3d4041"
+  ]
+}

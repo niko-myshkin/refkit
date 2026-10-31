@@ -1,0 +1,52 @@
+# Refkit
+
+**A personal library with an agent.** Drop in images, videos, articles, notes and links. The agent gives you the gist the way you like it, remembers how, and your materials become chains on a canvas: references → style rules → brand directions → a screen, or an idea → market check → a landing page.
+
+> ## ⚠️ Beta
+> Refkit is an early, unfinished beta that runs on your own Mac. Things will be rough. **I'm looking for honest feedback**: what worked, what confused you, what you'd use it for. Please [open a feedback issue](../../issues/new/choose) or start a [discussion](../../discussions). Thank you!
+
+## What it does
+- **One library for anything you save.** Links, images, videos, articles, notes, music. Every card keeps where it came from.
+- **A canvas of connected steps.** Materials, agent steps, screens, choices. Run one step or the whole chain, pick a model per step, see every result and its versions.
+- **Templates.** Brand directions from a moodboard, an idea check with market sources, a technique turned into a recipe, and more.
+- **Find by meaning.** Build a concept graph over your cards and follow an idea from one card to the next.
+- **Works with your agent.** A local MCP server lets Claude Code or Codex read your library, search it, and save into it. Edits are proposals you accept.
+- **Memory that stays with you.** What the agent learns about how you work is stored as files in your library, not inside any one agent.
+- **Nothing runs in the background.** The agent acts only when you press a button or ask it from Claude Code or Codex.
+
+## Requirements
+- **macOS** (some features use `sips`; Linux and Windows are not tested)
+- **Node.js 20+** (developed on 22)
+- **Google Chrome** installed (used headless to render screens and PDFs)
+- **Claude Code and/or Codex CLI**, signed in. AI steps use your subscription; there is no API key and no cloud.
+- Optional: `yt-dlp` for YouTube subtitles. Image generation currently works through Codex only.
+
+## Quick start
+```bash
+git clone https://github.com/niko-myshkin/refkit.git
+cd refkit/app
+npm install
+npm run dev
+```
+Open http://localhost:5173. You'll see the demo library (`library/`), so there is something to look at right away.
+
+To keep your own materials in a separate folder:
+```bash
+REFKIT_LIBRARY=~/RefkitLibrary npm run dev
+```
+
+The interface is in English. Russian: `VITE_LANG=ru npm run dev` (parts of the code and comments are in Russian; the project grew up that way).
+
+## Connect your agent (MCP)
+In the app, open the agent connection and copy the ready command for Claude Code or Codex. After that your agent can search the library, follow concept links, read memory and canvases, and propose saves and edits. It cannot run nodes.
+
+## How it works, honestly
+- It's a **local web app**: a Vite dev server plus a plugin that reads and writes files in the library folder and launches your agent CLI. Not a packaged app yet.
+- Your library is plain files in one folder. Local storage does not mean local AI: when you run an AI step, its prompt and inputs go to your model provider through your agent.
+- The demo's saved chain results are real recorded runs; running them again uses your agent.
+
+## Demo library
+About 50 cards, a few canvases with saved results, a graph. See [`library/README.md`](library/README.md) for sources and licenses. The moodboard contains screenshots of third-party sites that belong to their authors and are not MIT-licensed; they will be removed on request.
+
+## License
+MIT, see [LICENSE](LICENSE). Third-party notices: [NOTICE.md](NOTICE.md).

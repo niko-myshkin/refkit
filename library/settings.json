@@ -1,0 +1,8 @@
+{
+  "models": {
+    "sort": "gpt6-sol",
+    "digest": "gpt6-sol",
+    "ask": "gpt6-sol"
+  },
+  "depth": "medium"
+}

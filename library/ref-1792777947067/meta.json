@@ -1,0 +1,24 @@
+{
+  "title": "Typesetting tokens (USWDS)",
+  "titleEdited": true,
+  "source": "https://designsystem.digital.gov/design-tokens/typesetting/overview/",
+  "author": "U.S. General Services Administration",
+  "license": "Public domain / CC0 1.0 (U.S. Web Design System, GSA); fonts SIL OFL 1.1, icons Apache 2.0",
+  "format": "image",
+  "ratio": "1600 / 1066",
+  "technique": "",
+  "collections": [
+    "Typography"
+  ],
+  "folder": "f-type",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947067",
+  "createdAt": 1792777947067,
+  "image": "/library/ref-1792777947067/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "Type scale, line height and font families expressed as tokens.",
+  "via": "hand",
+  "boards": []
+}

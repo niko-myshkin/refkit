@@ -1,0 +1,60 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793215548275/source.jpg",
+  "tags": [
+    "trace",
+    "contribution",
+    "chain",
+    "status indicators",
+    "transparency"
+  ],
+  "collections": [
+    "Interaction",
+    "CRM",
+    "Layout"
+  ],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "title": "Product frame: Chain Trace — what it shows: A source-to-result view places each material beside the agent step and its contribution, with one primary action, Review result. Navigation: Canvas · Materials · Runs · Memory · Settings. Con",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "1440 / 900",
+  "via": "canvas",
+  "folder": "f-1793215134861",
+  "id": "ref-1793215548275",
+  "createdAt": 1791715548276,
+  "description": "A source-to-result view placing each input material beside the agent step that processed it, showing contribution status (Included, Applied, Awaiting, Unproven) with a primary Review result action.",
+  "fetching": false,
+  "describing": false,
+  "colors": [
+    "#1a1a1a"
+  ],
+  "opens": 15,
+  "openedAt": 1793272412229,
+  "digesting": false,
+  "updatedAt": 1793272203775,
+  "thread": [
+    {
+      "command": "Разбери",
+      "answer": "- A traceability frame showing how an AI system combined multiple sources (image, text, connected notes) to form a single result\n- Card-based layout displays each contribution with type (visual context, written context, instruction, suggestion), source, and status (Included, Applied, Awaiting acceptance, Unproven)\n- Uses a single accent color (teal) on dark background with subtle icons—visual restraint that helps focus attention on understanding the chain, not the interface\n- Each card includes a trace-back capability: pointing back to the source (image, article, note) to verify where that contribution came from\n- Primary action 'Review result' is positioned as invitation to validate, not approve automatically—result stays as suggestion until owner accepts it\n- Sidebar navigation (Canvas, Materials, Runs, Memory, Settings) keeps context accessible without cluttering the trace view\n\nHow to apply:\n- Extract the card-based pattern for your own processes: each contribution gets status, explanation, and a way back to its source\n- Adopt the single-accent-color approach in dark mode to reduce noise when users need to understand complex multi-step formations\n- Create status vocabulary (Included, Applied, Awaiting acceptance, Unproven) that maps to different roles: materials vs. agent suggestions vs. unresolved claims\n- Position primary actions near summary explanations—invite decision after showing the chain, not before\n- Use icons and brief labels to help users quickly identify contribution type without reading full descriptions",
+      "at": 1793272196191,
+      "usage": [
+        {
+          "kind": "digest",
+          "model": "claude-haiku-4-5-20251001",
+          "seconds": 20,
+          "input": 7862,
+          "cached": 0,
+          "output": 1639
+        }
+      ],
+      "via": "digest"
+    }
+  ],
+  "suggestions": [
+    "Compare how different inputs would change the result",
+    "Show which step had most impact on the final output",
+    "Export the trace as a checklist or audit trail"
+  ]
+}

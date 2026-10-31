@@ -1,0 +1,34 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793114526748/source.png",
+  "tags": [],
+  "collections": [],
+  "meaning": "A crafted, playful product that stays precise. Take: the rule that a living character reacts to what happens, it does not decorate.",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "folder": "f-moodboard",
+  "title": "A farewell to Arc",
+  "source": "https://arc.net",
+  "ratio": "1200 / 630",
+  "fetching": false,
+  "id": "ref-1793114526748",
+  "createdAt": 1793114526748,
+  "comments": [
+    {
+      "id": "c1793114526755",
+      "text": "A crafted, playful product that stays precise. Take: the rule that a living character reacts to what happens, it does not decorate.",
+      "at": 1793114526755
+    }
+  ],
+  "updatedAt": 1793114526755,
+  "kind": "article",
+  "author": "",
+  "describing": false,
+  "colors": [
+    "#010101",
+    "#5e5d5f",
+    "#2e2e2e"
+  ],
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже"
+}

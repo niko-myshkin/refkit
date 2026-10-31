@@ -1,0 +1,29 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793118357313/source.jpg",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "title": "Higgsfield AI — AI-native creative suite",
+  "source": "https://higgsfield.ai/",
+  "ratio": "1200 / 675",
+  "fetching": false,
+  "folder": "f-moodboard",
+  "id": "ref-1793118357313",
+  "createdAt": 1793118357314,
+  "kind": "article",
+  "author": "Higgsfield.AI Team",
+  "describing": false,
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
+  "updatedAt": 1793118375549,
+  "colors": [
+    "#443728",
+    "#776653",
+    "#161410",
+    "#968a7a",
+    "#a16a35"
+  ]
+}

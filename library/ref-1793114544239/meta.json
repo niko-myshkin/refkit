@@ -1,0 +1,63 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793114544239/source.png",
+  "tags": [],
+  "collections": [],
+  "meaning": "Quiet dark surface, almost no colour, the type carries the brand, a tiny mark. Take: restraint, and the product itself as the advertising frame.",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "folder": "f-moodboard",
+  "title": "Features – Linear",
+  "source": "https://linear.app/features",
+  "ratio": "1200 / 628",
+  "fetching": false,
+  "id": "ref-1793114544239",
+  "createdAt": 1793114544239,
+  "comments": [
+    {
+      "id": "c1793114544246",
+      "text": "Quiet dark surface, almost no colour, the type carries the brand, a tiny mark. Take: restraint, and the product itself as the advertising frame.",
+      "at": 1793114544246
+    }
+  ],
+  "updatedAt": 1793114544246,
+  "kind": "article",
+  "author": "",
+  "describing": false,
+  "colors": [
+    "#08090a",
+    "#626364"
+  ],
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
+  "digesting": false,
+  "thread": [
+    {
+      "command": "Разбери",
+      "answer": "- Linear presents the product development cycle, from roadmap to release, as its central message.\n- Planning uses projects and initiatives to set direction; building uses issues and cycles to track progress.\n- AI workflows and agents, analytics, and mobile access extend that core workflow.\n- Customer Requests and Linear Asks connect incoming requests to product work.\n- The closing line, “Plan the present. Build the future,” compresses the product promise into a short statement.\n- Claimed, not demonstrated: “best-in-class” security and building what customers actually want.\n\nSections:\n- The system for modern product development — the roadmap-to-release promise.\n- Planning — projects and initiatives set direction.\n- Building — issue tracking and cycle planning.\n- Artificial intelligence — AI-powered workflows and agents.\n- Insights — analytics for streams of work.\n- Mobile — product work from anywhere.\n- Customer Requests — requests inform what gets built.\n- Linear Asks — workplace requests become issues.\n- Security — a claim about security practices.\n- Plan the present. Build the future. — closing line and calls to action.\n\nTerms:\n- Projects and initiatives — the planning structures named for setting product direction.\n- Issue tracking — the way building work is followed.\n- Cycle planning — the planning method paired with issue tracking.\n- AI-powered workflows and agents — the named means of streamlining product development.\n- Customer Requests — the feature for bringing customer wants into product work.\n- Linear Asks — the feature that turns workplace requests into issues.\n\nHow to apply:\n- Write one sentence that spans your product’s full workflow; the result is a clear central promise.\n- Arrange feature copy from direction-setting through day-to-day work; the result is a product-led page outline.\n- Give each feature a short name and one concrete outcome; the result is copy that can carry a restrained layout.\n- Check superlatives such as “best-in-class” against available evidence; the result is a page without unsupported claims.",
+      "at": 1793332497829,
+      "usage": [
+        {
+          "kind": "digest",
+          "model": "gpt-6-sol",
+          "seconds": 32,
+          "input": 14679,
+          "cached": 0,
+          "output": 1215
+        }
+      ],
+      "via": "digest",
+      "usedMemory": [
+        "Brief: answer first, then an explanation if needed.",
+        "Look for the technique and what can be put to work, not a description of what's in the picture."
+      ]
+    }
+  ],
+  "suggestions": [
+    "Draft a restrained page outline from these sections.",
+    "Condense the feature list into one product promise.",
+    "Separate supported copy ideas from visual assumptions."
+  ],
+  "opens": 5,
+  "openedAt": 1793372750243
+}

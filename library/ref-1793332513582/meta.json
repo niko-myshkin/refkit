@@ -1,0 +1,65 @@
+{
+  "format": "image",
+  "image": "",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "hand",
+  "kind": "canvas",
+  "title": "Moodboard → style rules",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "4 / 3",
+  "folder": "inbox",
+  "id": "ref-1793332513582",
+  "createdAt": 1793332513583,
+  "canvasBoxes": [
+    {
+      "x": 0,
+      "y": 0,
+      "w": 400,
+      "h": 400,
+      "k": "group"
+    },
+    {
+      "x": 480,
+      "y": 0,
+      "w": 460,
+      "h": 410,
+      "k": "agent"
+    },
+    {
+      "x": 1020,
+      "y": 0,
+      "w": 460,
+      "h": 694,
+      "k": "agent"
+    },
+    {
+      "x": 1560,
+      "y": 0,
+      "w": 460,
+      "h": 570,
+      "k": "agent"
+    },
+    {
+      "x": 2100,
+      "y": 0,
+      "w": 640,
+      "h": 520,
+      "k": "screen"
+    },
+    {
+      "x": 2833,
+      "y": -3,
+      "w": 460,
+      "h": 560,
+      "k": "agent"
+    }
+  ],
+  "canvasEdges": 7,
+  "updatedAt": 1793365468248,
+  "thumbAt": 1793365481673
+}

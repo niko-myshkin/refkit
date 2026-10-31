@@ -1,0 +1,44 @@
+{
+  "format": "image",
+  "image": "",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "hand",
+  "folder": "f-canvas",
+  "kind": "canvas",
+  "title": "References → analysis → screen",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "4 / 3",
+  "id": "ref-1793109866233",
+  "createdAt": 1791609866233,
+  "canvasBoxes": [
+    {
+      "x": 20,
+      "y": 0,
+      "w": 400,
+      "h": 400,
+      "k": "group"
+    },
+    {
+      "x": 566,
+      "y": 4,
+      "w": 440,
+      "h": 520,
+      "k": "agent"
+    },
+    {
+      "x": 1146,
+      "y": -4,
+      "w": 800,
+      "h": 560,
+      "k": "screen"
+    }
+  ],
+  "canvasEdges": 3,
+  "updatedAt": 1793318628828,
+  "thumbAt": 1793318638675
+}

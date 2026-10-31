@@ -1,0 +1,25 @@
+{
+  "title": "Table (GOV.UK)",
+  "titleEdited": true,
+  "source": "https://design-system.service.gov.uk/components/table/",
+  "author": "GOV.UK Design System team",
+  "license": "Open Government Licence v3.0 (© Crown copyright); the example area only, without the site header, crown logo or Transport font",
+  "format": "image",
+  "ratio": "1618 / 638",
+  "technique": "",
+  "collections": [
+    "Typography",
+    "Layout"
+  ],
+  "folder": "f-type",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947069",
+  "createdAt": 1792777947069,
+  "image": "/library/ref-1792777947069/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A plain table: bold header, numbers aligned right, hairline row dividers.",
+  "via": "hand",
+  "boards": []
+}

@@ -1,0 +1,24 @@
+{
+  "title": "Switch (shadcn/ui)",
+  "titleEdited": true,
+  "source": "https://ui.shadcn.com/docs/components/switch",
+  "author": "shadcn",
+  "license": "MIT License (© 2023 shadcn)",
+  "format": "image",
+  "ratio": "1200 / 576",
+  "technique": "",
+  "collections": [
+    "Interaction"
+  ],
+  "folder": "f-comp",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947072",
+  "createdAt": 1792777947072,
+  "image": "/library/ref-1792777947072/source.jpg",
+  "describing": false,
+  "colors": [],
+  "description": "A toggle switch with its label.",
+  "via": "hand",
+  "boards": []
+}

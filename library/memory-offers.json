@@ -1,0 +1,56 @@
+[
+  {
+    "id": "s-1793109888075-0",
+    "text": "When you rely on a material from the library, name it. If there is no suitable material, say so — don’t make things up.",
+    "at": 1793109888075,
+    "from": "Refkit starter set"
+  },
+  {
+    "id": "s-1793109888075-1",
+    "text": "If you’re not sure, say how sure, rather than writing confidently.",
+    "at": 1793109888075,
+    "from": "Refkit starter set"
+  },
+  {
+    "id": "s-1793109888075-2",
+    "text": "Connect it to what is already in the library: “similar to … from the folder …”.",
+    "at": 1793109888075,
+    "from": "Refkit starter set"
+  },
+  {
+    "id": "c-1793363735687-0",
+    "text": "In my interfaces: flat near-black #08090a ground, off-white #f5f5ed text, one accent #f89997 only on a small mark, no gradients, 1px #2e2e2e borders, 12px rounded corners.",
+    "at": 1793363735687,
+    "from": "canvas «Moodboard → style rules»"
+  },
+  {
+    "id": "c-1793363735687-1",
+    "text": "In my interfaces: Newsreader serif for the headline, Hanken Grotesk for all other text; one large headline sets hierarchy, the rest stays small, with wide empty margins.",
+    "at": 1793363735687,
+    "from": "canvas «Moodboard → style rules»"
+  },
+  {
+    "id": "c-1793363887432-0",
+    "text": "In my interfaces: cream #f5f5ed background, near-black #08090a text, one coral accent #f89997 used once per screen, no gradients; Newsreader for display, Hanken Grotesk for UI text.",
+    "at": 1793363887432,
+    "from": "canvas «Moodboard → style rules»"
+  },
+  {
+    "id": "c-1793363887432-1",
+    "text": "In my interfaces: centred element with wide empty margins, hierarchy by size and position, soft 0.75rem corners, 1px #dbc7bb hairlines instead of fills or shadows.",
+    "at": 1793363887432,
+    "from": "canvas «Moodboard → style rules»"
+  },
+  {
+    "id": "c-1793364030465-0",
+    "text": "In my interfaces: flat cream #f5f5ed ground, one accent #a16a35 on a single element, no gradients or shadows, 1px #cfcfcf hairlines, soft rounded corners, generous empty space.",
+    "at": 1793364030465,
+    "from": "canvas «Moodboard → style rules»"
+  },
+  {
+    "id": "c-1793364030465-1",
+    "text": "In my interfaces: Newsreader serif for headlines in human voices, Hanken Grotesk for tool voices; one large centred headline, small secondary text, no middle sizes.",
+    "at": 1793364030465,
+    "from": "canvas «Moodboard → style rules»"
+  }
+]

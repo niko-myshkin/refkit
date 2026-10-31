@@ -1,0 +1,25 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793133185192/source.jpg",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "title": "Product frame: Connections and Control — A side panel shows MCP connections for Claude Code, Codex, or your own key, while the canvas shows exactly which step is running. A suggestion appears with an Accept action, making “the agent su",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "1440 / 900",
+  "via": "canvas",
+  "folder": "f-frames",
+  "id": "ref-1793133185192",
+  "createdAt": 1791633185192,
+  "description": "Product frame: Connections and Control — A side panel shows MCP connections for Claude Code, Codex, or your own key, while the canvas shows exactly which step is running. A suggestion appears with an Accept action, making “the agent su",
+  "fetching": false,
+  "describing": false,
+  "colors": [
+    "#1a1a1a"
+  ],
+  "opens": 2,
+  "openedAt": 1793289393842
+}

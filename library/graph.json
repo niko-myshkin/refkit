@@ -1,0 +1,1446 @@
+{
+  "items": {
+    "ref-1792777947059": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "step indicator",
+        "progress",
+        "onboarding",
+        "one action"
+      ],
+      "relations": [
+        {
+          "from": "step indicator",
+          "to": "progress",
+          "label": "shows"
+        },
+        {
+          "from": "step indicator",
+          "to": "onboarding",
+          "label": "guides"
+        },
+        {
+          "from": "onboarding",
+          "to": "one action",
+          "label": "reduces to"
+        }
+      ],
+      "hash": "e5eed0efedac2a8f"
+    },
+    "ref-1792777947060": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "task list",
+        "status tag",
+        "checklist",
+        "onboarding"
+      ],
+      "relations": [
+        {
+          "from": "task list",
+          "to": "status tag",
+          "label": "marks rows with"
+        },
+        {
+          "from": "task list",
+          "to": "checklist",
+          "label": "is a"
+        },
+        {
+          "from": "checklist",
+          "to": "onboarding",
+          "label": "drives"
+        }
+      ],
+      "hash": "e8d699a6d68b786a"
+    },
+    "ref-1792777947061": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "summary list",
+        "check answers",
+        "one action"
+      ],
+      "relations": [
+        {
+          "from": "check answers",
+          "to": "summary list",
+          "label": "is built as"
+        },
+        {
+          "from": "check answers",
+          "to": "one action",
+          "label": "ends with"
+        }
+      ],
+      "hash": "0a62db7b20e913bd"
+    },
+    "ref-1792777947062": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "pricing",
+        "accent",
+        "popular plan"
+      ],
+      "relations": [
+        {
+          "from": "pricing",
+          "to": "popular plan",
+          "label": "highlights"
+        },
+        {
+          "from": "popular plan",
+          "to": "accent",
+          "label": "gets"
+        }
+      ],
+      "hash": "fd54ba1cf4d9c410"
+    },
+    "ref-1792777947063": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "pricing",
+        "toggle",
+        "discount"
+      ],
+      "relations": [
+        {
+          "from": "toggle",
+          "to": "pricing",
+          "label": "switches"
+        },
+        {
+          "from": "toggle",
+          "to": "discount",
+          "label": "labels"
+        }
+      ],
+      "hash": "46d2fc673b6ebac5"
+    },
+    "ref-1792777947064": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "pricing",
+        "plan comparison",
+        "table"
+      ],
+      "relations": [
+        {
+          "from": "plan comparison",
+          "to": "table",
+          "label": "is built as"
+        },
+        {
+          "from": "plan comparison",
+          "to": "pricing",
+          "label": "unpacks"
+        }
+      ],
+      "hash": "5f413c6901c2f771"
+    },
+    "ref-1792777947065": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "color tokens",
+        "palette",
+        "accent"
+      ],
+      "relations": [
+        {
+          "from": "palette",
+          "to": "color tokens",
+          "label": "is named by"
+        },
+        {
+          "from": "palette",
+          "to": "accent",
+          "label": "is limited to one"
+        }
+      ],
+      "hash": "ee365f8d1a327417"
+    },
+    "ref-1792777947066": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "palette",
+        "contrast",
+        "functional colours"
+      ],
+      "relations": [
+        {
+          "from": "palette",
+          "to": "functional colours",
+          "label": "assigns roles to"
+        },
+        {
+          "from": "functional colours",
+          "to": "contrast",
+          "label": "must pass"
+        }
+      ],
+      "hash": "0244be550221f4d5"
+    },
+    "ref-1792777947067": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "typography",
+        "type scale",
+        "font family"
+      ],
+      "relations": [
+        {
+          "from": "typography",
+          "to": "type scale",
+          "label": "defines"
+        },
+        {
+          "from": "type scale",
+          "to": "font family",
+          "label": "pairs"
+        }
+      ],
+      "hash": "f69282f8c461a3ab"
+    },
+    "ref-1792777947068": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "table",
+        "typography",
+        "numbers"
+      ],
+      "relations": [
+        {
+          "from": "table",
+          "to": "numbers",
+          "label": "aligns right"
+        },
+        {
+          "from": "typography",
+          "to": "table",
+          "label": "tightens"
+        }
+      ],
+      "hash": "ea6a1b58b407ff2c"
+    },
+    "ref-1792777947069": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "table",
+        "numbers",
+        "typography"
+      ],
+      "relations": [
+        {
+          "from": "table",
+          "to": "numbers",
+          "label": "aligns right"
+        },
+        {
+          "from": "typography",
+          "to": "table",
+          "label": "tightens"
+        }
+      ],
+      "hash": "500f3da891c3533c"
+    },
+    "ref-1792777947070": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "card",
+        "call to action",
+        "layout"
+      ],
+      "relations": [
+        {
+          "from": "card",
+          "to": "call to action",
+          "label": "ends with"
+        },
+        {
+          "from": "layout",
+          "to": "card",
+          "label": "repeats"
+        }
+      ],
+      "hash": "9c3a89b89b8e749d"
+    },
+    "ref-1792777947071": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "card",
+        "form fields",
+        "call to action"
+      ],
+      "relations": [
+        {
+          "from": "card",
+          "to": "form fields",
+          "label": "holds"
+        },
+        {
+          "from": "card",
+          "to": "call to action",
+          "label": "ends with"
+        }
+      ],
+      "hash": "c58135beb0dce49d"
+    },
+    "ref-1792777947072": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "toggle",
+        "label",
+        "interaction"
+      ],
+      "relations": [
+        {
+          "from": "toggle",
+          "to": "label",
+          "label": "pairs with"
+        },
+        {
+          "from": "interaction",
+          "to": "toggle",
+          "label": "includes"
+        }
+      ],
+      "hash": "5c9eb210c0ff417b"
+    },
+    "ref-1792777947159": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "empty state",
+        "one action",
+        "technique"
+      ],
+      "relations": [
+        {
+          "from": "technique",
+          "to": "empty state",
+          "label": "describes"
+        },
+        {
+          "from": "empty state",
+          "to": "one action",
+          "label": "leads to"
+        }
+      ],
+      "hash": "f6038dcda9004687"
+    },
+    "ref-1792777947160": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "palette",
+        "accent",
+        "neutral background",
+        "style rules"
+      ],
+      "relations": [
+        {
+          "from": "style rules",
+          "to": "palette",
+          "label": "define"
+        },
+        {
+          "from": "palette",
+          "to": "accent",
+          "label": "is limited to one"
+        }
+      ],
+      "hash": "9d6050b0f400e411"
+    },
+    "ref-1792777947161": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "contrast",
+        "typography",
+        "captions"
+      ],
+      "relations": [
+        {
+          "from": "contrast",
+          "to": "captions",
+          "label": "is checked on"
+        },
+        {
+          "from": "typography",
+          "to": "contrast",
+          "label": "depends on"
+        }
+      ],
+      "hash": "16217d30fa216af8"
+    },
+    "ref-1792777947162": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "typography",
+        "type scale",
+        "font family"
+      ],
+      "relations": [
+        {
+          "from": "typography",
+          "to": "type scale",
+          "label": "defines"
+        },
+        {
+          "from": "typography",
+          "to": "font family",
+          "label": "includes"
+        }
+      ],
+      "hash": "cf36cceef4a36815"
+    },
+    "ref-1792777947163": {
+      "at": 1793109851441,
+      "model": "claude-haiku-5-5",
+      "concepts": [
+        "palette",
+        "color tokens",
+        "contrast"
+      ],
+      "relations": [
+        {
+          "from": "palette",
+          "to": "color tokens",
+          "label": "is named by"
+        },
+        {
+          "from": "palette",
+          "to": "contrast",
+          "label": "must pass"
+        }
+      ],
+      "hash": "20a6066f0e1c2914"
+    },
+    "ref-1793118357313": {
+      "at": 1793372755109,
+      "model": "gpt-6-sol",
+      "hash": "c0eb05e6455821c9",
+      "concepts": [
+        "visual reference",
+        "prompt",
+        "asset",
+        "motion transfer",
+        "element replacement",
+        "project breakdown"
+      ],
+      "relations": [
+        {
+          "from": "visual reference",
+          "to": "motion transfer",
+          "label": "пример"
+        },
+        {
+          "from": "motion transfer",
+          "to": "element replacement",
+          "label": "включает"
+        },
+        {
+          "from": "project breakdown",
+          "to": "prompt",
+          "label": "показывает"
+        },
+        {
+          "from": "project breakdown",
+          "to": "asset",
+          "label": "показывает"
+        }
+      ],
+      "usage": {
+        "input": 14227,
+        "output": 97
+      }
+    },
+    "ref-1793115826744": {
+      "at": 1793372761450,
+      "model": "gpt-6-sol",
+      "hash": "6287110228794053",
+      "concepts": [
+        "node-based workflow",
+        "multi-model generation",
+        "image editing",
+        "inpainting",
+        "outpainting",
+        "upscaling",
+        "relighting",
+        "simplified ui"
+      ],
+      "relations": [
+        {
+          "from": "multi-model generation",
+          "to": "node-based workflow",
+          "label": "part of"
+        },
+        {
+          "from": "image editing",
+          "to": "node-based workflow",
+          "label": "part of"
+        },
+        {
+          "from": "inpainting",
+          "to": "image editing",
+          "label": "technique"
+        },
+        {
+          "from": "outpainting",
+          "to": "image editing",
+          "label": "technique"
+        },
+        {
+          "from": "upscaling",
+          "to": "image editing",
+          "label": "technique"
+        },
+        {
+          "from": "relighting",
+          "to": "image editing",
+          "label": "technique"
+        }
+      ],
+      "usage": {
+        "input": 14285,
+        "output": 193
+      }
+    },
+    "ref-1793114544239": {
+      "at": 1793372763184,
+      "model": "gpt-6-sol",
+      "hash": "4b51f2405ffb60d9",
+      "concepts": [
+        "project breakdown",
+        "issue tracking",
+        "cycle planning",
+        "agent context",
+        "analytics",
+        "customer requests",
+        "mobile workflow",
+        "security"
+      ],
+      "relations": [
+        {
+          "from": "project breakdown",
+          "to": "issue tracking",
+          "label": "направляет"
+        },
+        {
+          "from": "cycle planning",
+          "to": "issue tracking",
+          "label": "дополняет"
+        },
+        {
+          "from": "customer requests",
+          "to": "issue tracking",
+          "label": "превращаются в"
+        }
+      ],
+      "usage": {
+        "input": 14206,
+        "output": 92
+      }
+    },
+    "ref-1793114526748": {
+      "at": 1793372770542,
+      "model": "gpt-6-sol",
+      "hash": "4b040acc26fda998",
+      "concepts": [
+        "browser sunsetting",
+        "data migration",
+        "security",
+        "account deactivation",
+        "profile",
+        "vertical tabs",
+        "tab groups",
+        "optional ai"
+      ],
+      "relations": [
+        {
+          "from": "browser sunsetting",
+          "to": "account deactivation",
+          "label": "includes"
+        },
+        {
+          "from": "data migration",
+          "to": "profile",
+          "label": "includes"
+        },
+        {
+          "from": "data migration",
+          "to": "tab groups",
+          "label": "includes"
+        },
+        {
+          "from": "security",
+          "to": "browser sunsetting",
+          "label": "reason for"
+        }
+      ],
+      "usage": {
+        "input": 14900,
+        "output": 146
+      }
+    },
+    "ref-1793114526786": {
+      "at": 1793372772710,
+      "model": "gpt-6-sol",
+      "hash": "868bdbca81455034",
+      "concepts": [
+        "ai assistant",
+        "pricing",
+        "plan comparison",
+        "discount",
+        "mcp integration",
+        "personal memory",
+        "extended thinking",
+        "code generation"
+      ],
+      "relations": [
+        {
+          "from": "pricing",
+          "to": "plan comparison",
+          "label": "часть"
+        },
+        {
+          "from": "discount",
+          "to": "pricing",
+          "label": "влияет на"
+        },
+        {
+          "from": "mcp integration",
+          "to": "ai assistant",
+          "label": "расширяет"
+        },
+        {
+          "from": "personal memory",
+          "to": "ai assistant",
+          "label": "функция"
+        },
+        {
+          "from": "extended thinking",
+          "to": "ai assistant",
+          "label": "функция"
+        },
+        {
+          "from": "code generation",
+          "to": "ai assistant",
+          "label": "функция"
+        }
+      ],
+      "usage": {
+        "input": 14506,
+        "output": 200
+      }
+    },
+    "ref-1793114526710": {
+      "at": 1793372779367,
+      "model": "gpt-6-sol",
+      "hash": "735befdd4136e95b",
+      "concepts": [
+        "email subscription",
+        "call to action",
+        "privacy consent",
+        "age verification",
+        "product description",
+        "typography"
+      ],
+      "relations": [
+        {
+          "from": "email subscription",
+          "to": "call to action",
+          "label": "uses"
+        },
+        {
+          "from": "email subscription",
+          "to": "privacy consent",
+          "label": "requires"
+        },
+        {
+          "from": "email subscription",
+          "to": "age verification",
+          "label": "requires"
+        },
+        {
+          "from": "product description",
+          "to": "call to action",
+          "label": "supports"
+        }
+      ],
+      "usage": {
+        "input": 14362,
+        "output": 96
+      }
+    },
+    "ref-1793114526728": {
+      "at": 1793372780978,
+      "model": "gpt-6-sol",
+      "hash": "0546ca7b6487d2ea",
+      "concepts": [
+        "personal memory",
+        "reference collection",
+        "one-click capture",
+        "automatic organization",
+        "associative search",
+        "visual cue",
+        "note taking",
+        "privacy"
+      ],
+      "relations": [
+        {
+          "from": "one-click capture",
+          "to": "personal memory",
+          "label": "наполняет"
+        },
+        {
+          "from": "automatic organization",
+          "to": "personal memory",
+          "label": "упорядочивает"
+        },
+        {
+          "from": "associative search",
+          "to": "personal memory",
+          "label": "помогает находить"
+        },
+        {
+          "from": "visual cue",
+          "to": "associative search",
+          "label": "помогает"
+        },
+        {
+          "from": "note taking",
+          "to": "personal memory",
+          "label": "наполняет"
+        },
+        {
+          "from": "reference collection",
+          "to": "personal memory",
+          "label": "часть"
+        }
+      ],
+      "usage": {
+        "input": 14898,
+        "output": 217
+      }
+    },
+    "ref-1793114526690": {
+      "at": 1793372786808,
+      "model": "gpt-6-sol",
+      "hash": "007ed9050ad2b1a1",
+      "concepts": [
+        "independent platform",
+        "premium subscription",
+        "open api",
+        "rabbit hole",
+        "reference collection",
+        "personal classification",
+        "creative connection"
+      ],
+      "relations": [
+        {
+          "from": "premium subscription",
+          "to": "independent platform",
+          "label": "supports"
+        },
+        {
+          "from": "open api",
+          "to": "reference collection",
+          "label": "enables"
+        },
+        {
+          "from": "rabbit hole",
+          "to": "reference collection",
+          "label": "prompts"
+        },
+        {
+          "from": "reference collection",
+          "to": "personal classification",
+          "label": "enables"
+        },
+        {
+          "from": "personal classification",
+          "to": "creative connection",
+          "label": "supports"
+        }
+      ],
+      "usage": {
+        "input": 14456,
+        "output": 115
+      }
+    },
+    "ref-1793114526638": {
+      "at": 1793372789744,
+      "model": "gpt-6-sol",
+      "hash": "ab63ce404b4918d5",
+      "concepts": [
+        "product description",
+        "ai assistant",
+        "keyboard first",
+        "extension",
+        "workflow automation",
+        "snippet",
+        "quicklink",
+        "note taking"
+      ],
+      "relations": [
+        {
+          "from": "keyboard first",
+          "to": "product description",
+          "label": "часть"
+        },
+        {
+          "from": "extension",
+          "to": "ai assistant",
+          "label": "подключает инструменты"
+        },
+        {
+          "from": "snippet",
+          "to": "workflow automation",
+          "label": "пример"
+        },
+        {
+          "from": "quicklink",
+          "to": "workflow automation",
+          "label": "пример"
+        },
+        {
+          "from": "note taking",
+          "to": "product description",
+          "label": "возможность"
+        }
+      ],
+      "usage": {
+        "input": 15070,
+        "output": 116
+      }
+    },
+    "ref-1793328002040": {
+      "at": 1793372793871,
+      "model": "gpt-6-sol",
+      "hash": "080090a195c0f246",
+      "concepts": [
+        "workflow trace",
+        "market check",
+        "screen plan",
+        "landing page",
+        "prompt",
+        "canvas",
+        "source link",
+        "run state"
+      ],
+      "relations": [
+        {
+          "from": "workflow trace",
+          "to": "market check",
+          "label": "includes"
+        },
+        {
+          "from": "workflow trace",
+          "to": "screen plan",
+          "label": "includes"
+        },
+        {
+          "from": "workflow trace",
+          "to": "landing page",
+          "label": "includes"
+        },
+        {
+          "from": "workflow trace",
+          "to": "prompt",
+          "label": "includes"
+        },
+        {
+          "from": "workflow trace",
+          "to": "source link",
+          "label": "shows"
+        },
+        {
+          "from": "workflow trace",
+          "to": "run state",
+          "label": "shows"
+        }
+      ],
+      "usage": {
+        "input": 14348,
+        "output": 179
+      }
+    },
+    "ref-1793327982013": {
+      "at": 1793372798781,
+      "model": "gpt-6-sol",
+      "hash": "c0390e8c3d2639a0",
+      "concepts": [
+        "canvas",
+        "market check",
+        "screen",
+        "landing page",
+        "build prompt",
+        "reading order",
+        "one action",
+        "draft review"
+      ],
+      "relations": [
+        {
+          "from": "draft review",
+          "to": "reading order",
+          "label": "uses"
+        },
+        {
+          "from": "draft review",
+          "to": "one action",
+          "label": "has"
+        },
+        {
+          "from": "one action",
+          "to": "build prompt",
+          "label": "copies"
+        },
+        {
+          "from": "canvas",
+          "to": "draft review",
+          "label": "part of"
+        },
+        {
+          "from": "market check",
+          "to": "draft review",
+          "label": "part of"
+        },
+        {
+          "from": "landing page",
+          "to": "draft review",
+          "label": "part of"
+        }
+      ],
+      "usage": {
+        "input": 14361,
+        "output": 182
+      }
+    },
+    "ref-1793327899575": {
+      "at": 1793372800982,
+      "model": "gpt-6-sol",
+      "hash": "818b9ff9d527985a",
+      "concepts": [
+        "canvas",
+        "product description",
+        "market check",
+        "screen plan",
+        "landing page",
+        "prompt",
+        "call to action"
+      ],
+      "relations": [
+        {
+          "from": "canvas",
+          "to": "product description",
+          "label": "содержит"
+        },
+        {
+          "from": "canvas",
+          "to": "call to action",
+          "label": "содержит"
+        },
+        {
+          "from": "canvas",
+          "to": "market check",
+          "label": "ведёт к"
+        },
+        {
+          "from": "canvas",
+          "to": "screen plan",
+          "label": "ведёт к"
+        },
+        {
+          "from": "canvas",
+          "to": "landing page",
+          "label": "ведёт к"
+        },
+        {
+          "from": "canvas",
+          "to": "prompt",
+          "label": "ведёт к"
+        }
+      ],
+      "usage": {
+        "input": 14385,
+        "output": 129
+      }
+    },
+    "ref-pl-p07-palette": {
+      "at": 1793372805669,
+      "model": "gpt-6-sol",
+      "hash": "03c1e585a337057a",
+      "concepts": [
+        "node-based workflow",
+        "palette",
+        "agent context",
+        "screen",
+        "asset",
+        "captions",
+        "reference collection"
+      ],
+      "relations": [
+        {
+          "from": "palette",
+          "to": "node-based workflow",
+          "label": "supports"
+        },
+        {
+          "from": "agent context",
+          "to": "palette",
+          "label": "node type"
+        },
+        {
+          "from": "screen",
+          "to": "palette",
+          "label": "node type"
+        },
+        {
+          "from": "asset",
+          "to": "palette",
+          "label": "node type"
+        },
+        {
+          "from": "captions",
+          "to": "palette",
+          "label": "node type"
+        },
+        {
+          "from": "reference collection",
+          "to": "palette",
+          "label": "source material"
+        }
+      ],
+      "usage": {
+        "input": 14306,
+        "output": 120
+      }
+    },
+    "ref-pl-p06-canvas": {
+      "at": 1793372812156,
+      "model": "gpt-6-sol",
+      "hash": "ca72719d59b5ef3a",
+      "concepts": [
+        "canvas",
+        "reference collection",
+        "technique",
+        "style rules",
+        "color tokens",
+        "screen"
+      ],
+      "relations": [
+        {
+          "from": "canvas",
+          "to": "reference collection",
+          "label": "contains"
+        },
+        {
+          "from": "reference collection",
+          "to": "technique",
+          "label": "informs"
+        },
+        {
+          "from": "technique",
+          "to": "style rules",
+          "label": "informs"
+        },
+        {
+          "from": "style rules",
+          "to": "color tokens",
+          "label": "defines"
+        },
+        {
+          "from": "color tokens",
+          "to": "screen",
+          "label": "applied to"
+        }
+      ],
+      "usage": {
+        "input": 14334,
+        "output": 107
+      }
+    },
+    "ref-pl-p05-memory": {
+      "at": 1793372816710,
+      "model": "gpt-6-sol",
+      "hash": "e4f472914033c5e2",
+      "concepts": [
+        "personal memory",
+        "style rules",
+        "profile",
+        "memory confirmation",
+        "one-click capture"
+      ],
+      "relations": [
+        {
+          "from": "style rules",
+          "to": "personal memory",
+          "label": "stored in"
+        },
+        {
+          "from": "profile",
+          "to": "personal memory",
+          "label": "provides context"
+        },
+        {
+          "from": "memory confirmation",
+          "to": "personal memory",
+          "label": "adds to"
+        },
+        {
+          "from": "one-click capture",
+          "to": "memory confirmation",
+          "label": "enables"
+        }
+      ],
+      "usage": {
+        "input": 14303,
+        "output": 95
+      }
+    },
+    "ref-pl-p03-graph": {
+      "at": 1793372821593,
+      "model": "gpt-6-sol",
+      "hash": "0e09d0b99888b9db",
+      "concepts": [
+        "agent context",
+        "associative search",
+        "creative connection",
+        "source link"
+      ],
+      "relations": [
+        {
+          "from": "agent context",
+          "to": "associative search",
+          "label": "supports"
+        },
+        {
+          "from": "associative search",
+          "to": "creative connection",
+          "label": "enables"
+        },
+        {
+          "from": "creative connection",
+          "to": "source link",
+          "label": "traced by"
+        }
+      ],
+      "usage": {
+        "input": 14283,
+        "output": 82
+      }
+    },
+    "ref-pl-p02-card": {
+      "at": 1793372823352,
+      "model": "gpt-6-sol",
+      "hash": "c8a7ed4efdee6338",
+      "concepts": [
+        "card",
+        "reference collection",
+        "agent context",
+        "summary",
+        "task list"
+      ],
+      "relations": [
+        {
+          "from": "card",
+          "to": "reference collection",
+          "label": "part of"
+        },
+        {
+          "from": "agent context",
+          "to": "summary",
+          "label": "informs"
+        },
+        {
+          "from": "summary",
+          "to": "task list",
+          "label": "leads to"
+        }
+      ],
+      "usage": {
+        "input": 14344,
+        "output": 75
+      }
+    },
+    "ref-pl-p01-home": {
+      "at": 1793372828973,
+      "model": "gpt-6-sol",
+      "hash": "21adc1193759d5b9",
+      "concepts": [
+        "greeting",
+        "canvas",
+        "canvas template",
+        "timeline",
+        "reference collection"
+      ],
+      "relations": [
+        {
+          "from": "canvas template",
+          "to": "canvas",
+          "label": "creates"
+        },
+        {
+          "from": "timeline",
+          "to": "reference collection",
+          "label": "shows"
+        }
+      ],
+      "usage": {
+        "input": 14293,
+        "output": 107
+      }
+    },
+    "ref-1793215548275": {
+      "at": 1793372855841,
+      "model": "gpt-6-sol",
+      "hash": "9360a486e1e62535",
+      "concepts": [
+        "workflow trace",
+        "step indicator",
+        "status tag",
+        "source link",
+        "call to action"
+      ],
+      "relations": [
+        {
+          "from": "workflow trace",
+          "to": "step indicator",
+          "label": "показывает шаг"
+        },
+        {
+          "from": "workflow trace",
+          "to": "status tag",
+          "label": "показывает вклад"
+        },
+        {
+          "from": "workflow trace",
+          "to": "source link",
+          "label": "связывает источник"
+        },
+        {
+          "from": "workflow trace",
+          "to": "call to action",
+          "label": "ведёт к результату"
+        }
+      ],
+      "usage": {
+        "input": 14395,
+        "output": 108
+      }
+    },
+    "ref-1793215546752": {
+      "at": 1793372856553,
+      "model": "gpt-6-sol",
+      "hash": "cb59e66cbc6ea8a9",
+      "concepts": [
+        "canvas",
+        "source link",
+        "memory confirmation",
+        "one action",
+        "user approval"
+      ],
+      "relations": [
+        {
+          "from": "source link",
+          "to": "canvas",
+          "label": "рядом с"
+        },
+        {
+          "from": "memory confirmation",
+          "to": "canvas",
+          "label": "рядом с"
+        },
+        {
+          "from": "one action",
+          "to": "user approval",
+          "label": "ведёт к"
+        }
+      ],
+      "usage": {
+        "input": 14405,
+        "output": 79
+      }
+    },
+    "ref-1793215498949": {
+      "at": 1793372863853,
+      "model": "gpt-6-sol",
+      "hash": "4f37b08b548d5322",
+      "concepts": [
+        "canvas",
+        "node-based workflow",
+        "ai assistant",
+        "accent",
+        "step indicator",
+        "one action",
+        "call to action"
+      ],
+      "relations": [
+        {
+          "from": "canvas",
+          "to": "node-based workflow",
+          "label": "показывает"
+        },
+        {
+          "from": "node-based workflow",
+          "to": "ai assistant",
+          "label": "включает"
+        },
+        {
+          "from": "accent",
+          "to": "step indicator",
+          "label": "выделяет"
+        },
+        {
+          "from": "one action",
+          "to": "call to action",
+          "label": "реализуется через"
+        }
+      ],
+      "usage": {
+        "input": 14411,
+        "output": 107
+      }
+    },
+    "ref-1793133236811": {
+      "at": 1793372933244,
+      "model": "gpt-6-sol",
+      "hash": "e500479f1f9d8970",
+      "concepts": [
+        "onboarding",
+        "screen",
+        "source link",
+        "summary",
+        "local processing",
+        "workflow trace"
+      ],
+      "relations": [
+        {
+          "from": "screen",
+          "to": "onboarding",
+          "label": "часть"
+        },
+        {
+          "from": "source link",
+          "to": "summary",
+          "label": "источник для"
+        },
+        {
+          "from": "workflow trace",
+          "to": "summary",
+          "label": "ведёт к"
+        }
+      ],
+      "usage": {
+        "input": 14463,
+        "output": 79
+      }
+    },
+    "ref-1793133185192": {
+      "at": 1793372936619,
+      "model": "gpt-6-sol",
+      "hash": "9a8ca0b749717c8d",
+      "concepts": [
+        "mcp integration",
+        "local agent connection",
+        "api key",
+        "canvas",
+        "step indicator",
+        "run state",
+        "user approval"
+      ],
+      "relations": [
+        {
+          "from": "local agent connection",
+          "to": "mcp integration",
+          "label": "через"
+        },
+        {
+          "from": "api key",
+          "to": "mcp integration",
+          "label": "вариант доступа"
+        },
+        {
+          "from": "step indicator",
+          "to": "run state",
+          "label": "показывает"
+        },
+        {
+          "from": "step indicator",
+          "to": "canvas",
+          "label": "находится на"
+        },
+        {
+          "from": "user approval",
+          "to": "run state",
+          "label": "управляет"
+        }
+      ],
+      "usage": {
+        "input": 14463,
+        "output": 124
+      }
+    },
+    "ref-1793133147133": {
+      "at": 1793372944889,
+      "model": "gpt-6-sol",
+      "hash": "2d1c6dd6583eaea1",
+      "concepts": [
+        "canvas",
+        "mixed media input",
+        "node-based workflow",
+        "ai assistant",
+        "screen",
+        "draft review"
+      ],
+      "relations": [
+        {
+          "from": "canvas",
+          "to": "mixed media input",
+          "label": "содержит"
+        },
+        {
+          "from": "canvas",
+          "to": "node-based workflow",
+          "label": "поддерживает"
+        },
+        {
+          "from": "node-based workflow",
+          "to": "ai assistant",
+          "label": "включает"
+        },
+        {
+          "from": "node-based workflow",
+          "to": "screen",
+          "label": "включает"
+        },
+        {
+          "from": "node-based workflow",
+          "to": "draft review",
+          "label": "сопровождается"
+        }
+      ],
+      "usage": {
+        "input": 14459,
+        "output": 167
+      }
+    }
+  },
+  "report": {}
+}

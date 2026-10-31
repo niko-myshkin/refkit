@@ -1,0 +1,24 @@
+{
+  "title": "How to check contrast",
+  "titleEdited": true,
+  "format": "image",
+  "image": "",
+  "kind": "note",
+  "source": "",
+  "ratio": "4 / 3",
+  "technique": "",
+  "collections": [
+    "Typography",
+    "Color"
+  ],
+  "folder": "f-type",
+  "stage": "new",
+  "tags": [],
+  "id": "ref-1792777947161",
+  "createdAt": 1792777947161,
+  "describing": false,
+  "via": "hand",
+  "text": "Body text no weaker than 4.5:1, large text from 3:1. Check gray captions against the lightest background on the page.",
+  "description": "Body text no weaker than 4.5:1, large text from 3:1. Check gray captions against the lightest background on the page.",
+  "boards": []
+}

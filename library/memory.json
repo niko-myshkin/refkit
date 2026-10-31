@@ -1,0 +1,25 @@
+{
+  "user": [
+    {
+      "id": "m-1",
+      "text": "Brief: answer first, then an explanation if needed.",
+      "at": 1792850651441,
+      "from": "answer correction",
+      "scope": "all"
+    },
+    {
+      "id": "m-2",
+      "text": "Look for the technique and what can be put to work, not a description of what's in the picture.",
+      "at": 1792937051441,
+      "from": "library agent",
+      "scope": "all"
+    },
+    {
+      "id": "m-3",
+      "text": "Calm interface: one accent color, no gradients.",
+      "at": 1793023451441,
+      "from": "collection “Palettes”",
+      "scope": "all"
+    }
+  ]
+}

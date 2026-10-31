@@ -1,0 +1,438 @@
+{
+  "AlignHorizontalDistributeCenter": [
+    "align-horizontal-center-linear",
+    "align-horizontal-spacing-linear"
+  ],
+  "ArrowDown": [
+    "arrow-down-linear"
+  ],
+  "ArrowLeft": [
+    "arrow-left-linear"
+  ],
+  "ArrowRight": [
+    "arrow-right-linear"
+  ],
+  "ArrowUp": [
+    "arrow-up-linear"
+  ],
+  "ArrowUpRight": [
+    "arrow-right-up-linear"
+  ],
+  "Book": [
+    "book-linear"
+  ],
+  "BookOpen": [
+    "book-2-linear",
+    "book-bookmark-linear"
+  ],
+  "BookmarkPlus": [
+    "bookmark-linear",
+    "bookmark-square-linear"
+  ],
+  "Bot": [
+    "chat-round-dots-linear",
+    "cpu-bolt-linear"
+  ],
+  "Brain": [
+    "brain-linear"
+  ],
+  "Calendar": [
+    "calendar-linear"
+  ],
+  "ChartColumn": [
+    "chart-2-linear",
+    "chart-linear"
+  ],
+  "Check": [
+    "check-linear",
+    "check-read-linear"
+  ],
+  "ChevronDown": [
+    "alt-arrow-down-linear"
+  ],
+  "ChevronLeft": [
+    "alt-arrow-left-linear"
+  ],
+  "ChevronRight": [
+    "alt-arrow-right-linear"
+  ],
+  "ChevronUp": [
+    "alt-arrow-up-linear"
+  ],
+  "CircleDashed": [
+    "dashed-circle-linear",
+    "record-circle-linear"
+  ],
+  "CircleHelp": [
+    "question-circle-linear"
+  ],
+  "CirclePlus": [
+    "add-circle-linear"
+  ],
+  "CircleStop": [
+    "stop-circle-linear"
+  ],
+  "ClipboardCopy": [
+    "clipboard-linear"
+  ],
+  "CodeXml": [
+    "code-linear"
+  ],
+  "Copy": [
+    "copy-linear"
+  ],
+  "CornerDownRight": [
+    "round-arrow-right-down-linear",
+    "arrow-right-down-linear"
+  ],
+  "Database": [
+    "database-linear"
+  ],
+  "Dices": [
+    "shuffle-linear"
+  ],
+  "Download": [
+    "download-minimalistic-linear",
+    "download-linear"
+  ],
+  "Ellipsis": [
+    "menu-dots-linear"
+  ],
+  "EllipsisVertical": [
+    "menu-dots-vertical-linear"
+  ],
+  "Expand": [
+    "maximize-square-minimalistic-linear"
+  ],
+  "ExternalLink": [
+    "square-top-down-linear",
+    "link-round-linear"
+  ],
+  "Eye": [
+    "eye-linear"
+  ],
+  "FileQuestion": [
+    "file-linear"
+  ],
+  "FileText": [
+    "document-text-linear",
+    "file-text-linear"
+  ],
+  "FileUp": [
+    "file-send-linear",
+    "upload-linear"
+  ],
+  "Film": [
+    "clapperboard-play-linear",
+    "videocamera-record-linear"
+  ],
+  "Focus": [
+    "target-linear",
+    "gps-linear"
+  ],
+  "Folder": [
+    "folder-linear"
+  ],
+  "FolderInput": [
+    "folder-with-files-linear",
+    "add-folder-linear"
+  ],
+  "FolderOpen": [
+    "folder-open-linear"
+  ],
+  "FolderPlus": [
+    "add-folder-linear"
+  ],
+  "FolderTree": [
+    "folder-with-files-linear",
+    "hierarchy-linear"
+  ],
+  "Globe": [
+    "globe-linear"
+  ],
+  "HelpCircle": [
+    "question-circle-linear"
+  ],
+  "History": [
+    "history-linear"
+  ],
+  "Image": [
+    "gallery-linear"
+  ],
+  "ImagePlus": [
+    "gallery-add-linear"
+  ],
+  "Images": [
+    "gallery-wide-linear",
+    "gallery-linear"
+  ],
+  "Inbox": [
+    "inbox-linear"
+  ],
+  "Info": [
+    "info-circle-linear"
+  ],
+  "Layers": [
+    "layers-linear",
+    "layers-minimalistic-linear"
+  ],
+  "LayoutDashboard": [
+    "widget-linear",
+    "window-frame-linear"
+  ],
+  "LayoutGrid": [
+    "widget-4-linear",
+    "widget-linear"
+  ],
+  "Library": [
+    "library-linear",
+    "books-linear"
+  ],
+  "Link2": [
+    "link-round-linear",
+    "link-linear"
+  ],
+  "List": [
+    "list-linear"
+  ],
+  "ListChecks": [
+    "checklist-minimalistic-linear",
+    "list-check-linear"
+  ],
+  "ListFilter": [
+    "filter-linear"
+  ],
+  "ListPlus": [
+    "list-plus-linear"
+  ],
+  "Loader2": [
+    "refresh-circle-linear",
+    "restart-linear"
+  ],
+  "LoaderCircle": [
+    "refresh-circle-linear"
+  ],
+  "LocateFixed": [
+    "target-linear",
+    "gps-linear"
+  ],
+  "Map": [
+    "map-linear"
+  ],
+  "MapPin": [
+    "map-point-linear"
+  ],
+  "Maximize": [
+    "maximize-square-linear",
+    "full-screen-linear"
+  ],
+  "Maximize2": [
+    "maximize-linear",
+    "full-screen-linear"
+  ],
+  "MessageCircle": [
+    "chat-round-linear"
+  ],
+  "MessageSquare": [
+    "chat-square-linear"
+  ],
+  "MessageSquarePlus": [
+    "chat-square-add-linear",
+    "add-square-linear"
+  ],
+  "MessageSquareWarning": [
+    "chat-square-linear"
+  ],
+  "Minimize2": [
+    "minimize-linear",
+    "minimize-square-linear"
+  ],
+  "Minus": [
+    "minus-linear"
+  ],
+  "Moon": [
+    "moon-linear"
+  ],
+  "MoreHorizontal": [
+    "menu-dots-linear"
+  ],
+  "MousePointer2": [
+    "cursor-linear"
+  ],
+  "MousePointerClick": [
+    "cursor-square-linear",
+    "cursor-linear"
+  ],
+  "Music": [
+    "music-note-linear",
+    "music-notes-linear"
+  ],
+  "Network": [
+    "structure-linear"
+  ],
+  "NotebookPen": [
+    "notebook-linear",
+    "pen-new-square-linear"
+  ],
+  "OctagonX": [
+    "close-circle-linear"
+  ],
+  "Orbit": [
+    "planet-linear"
+  ],
+  "Palette": [
+    "pallete-2-linear",
+    "palette-linear"
+  ],
+  "PanelLeft": [
+    "sidebar-minimalistic-linear",
+    "hamburger-menu-linear"
+  ],
+  "PanelRightClose": [
+    "sidebar-code-linear",
+    "sidebar-minimalistic-linear"
+  ],
+  "PanelRightOpen": [
+    "sidebar-code-linear"
+  ],
+  "PanelTop": [
+    "window-frame-linear",
+    "monitor-linear"
+  ],
+  "Paperclip": [
+    "paperclip-linear"
+  ],
+  "Pencil": [
+    "pen-linear"
+  ],
+  "Pin": [
+    "pin-linear"
+  ],
+  "PinOff": [
+    "slash:pin-linear"
+  ],
+  "Play": [
+    "play-linear"
+  ],
+  "Plus": [
+    "add-linear"
+  ],
+  "Redo2": [
+    "undo-right-linear",
+    "forward-linear",
+    "square-forward-linear"
+  ],
+  "RefreshCw": [
+    "refresh-linear"
+  ],
+  "Rocket": [
+    "rocket-linear"
+  ],
+  "RotateCcw": [
+    "flip:restart-linear",
+    "flip:refresh-linear"
+  ],
+  "RotateCw": [
+    "restart-linear",
+    "refresh-linear"
+  ],
+  "Route": [
+    "routing-linear",
+    "route-linear"
+  ],
+  "Save": [
+    "diskette-linear",
+    "download-square-linear"
+  ],
+  "ScanSearch": [
+    "scanner-linear",
+    "magnifer-zoom-in-linear"
+  ],
+  "Scissors": [
+    "scissors-linear"
+  ],
+  "ScrollText": [
+    "document-text-linear"
+  ],
+  "Search": [
+    "magnifier-linear"
+  ],
+  "Settings": [
+    "settings-linear"
+  ],
+  "Shapes": [
+    "presentation-graph-linear"
+  ],
+  "Shield": [
+    "shield-linear"
+  ],
+  "ShieldCheck": [
+    "shield-check-linear"
+  ],
+  "SlidersHorizontal": [
+    "tuning-2-linear",
+    "tuning-linear"
+  ],
+  "SmilePlus": [
+    "smile-circle-linear",
+    "emoji-funny-circle-linear"
+  ],
+  "Square": [
+    "stop-linear",
+    "square-linear"
+  ],
+  "SquareArrowUpRight": [
+    "square-arrow-right-up-linear"
+  ],
+  "SquarePen": [
+    "pen-new-square-linear"
+  ],
+  "SquarePlay": [
+    "play-circle-linear"
+  ],
+  "SquareX": [
+    "close-square-linear"
+  ],
+  "StickyNote": [
+    "notes-linear",
+    "clipboard-text-linear"
+  ],
+  "Sun": [
+    "sun-linear"
+  ],
+  "Tag": [
+    "tag-linear"
+  ],
+  "Trash2": [
+    "trash-bin-minimalistic-linear",
+    "trash-bin-2-linear"
+  ],
+  "TriangleAlert": [
+    "danger-triangle-linear"
+  ],
+  "Type": [
+    "text-field-linear",
+    "text-linear"
+  ],
+  "Undo2": [
+    "undo-left-linear",
+    "square-backward-linear"
+  ],
+  "Ungroup": [
+    "layers-minimalistic-linear",
+    "scissors-linear"
+  ],
+  "Upload": [
+    "upload-minimalistic-linear",
+    "upload-linear"
+  ],
+  "Wind": [
+    "wind-linear"
+  ],
+  "X": [
+    "close-linear"
+  ],
+  "Zap": [
+    "bolt-linear"
+  ]
+}

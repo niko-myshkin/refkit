@@ -1,0 +1,27 @@
+@reference "../index.css";
+@layer components {
+body { overflow: hidden; }
+
+.library-canvas { height: 100svh; overflow: hidden; }
+.library-main { min-height: 0; flex: 1; overflow-y: auto; scrollbar-width: none; padding: 0 var(--canvas-gutter) 56px; }
+.library-main::-webkit-scrollbar { display: none; }
+/* Граф: страница не прокручивается — фильтры сверху и шар на месте, колесо крутит шар */
+.library-main[data-fixed] { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0; }
+.collection-filter { padding: 16px 0; }
+
+@media (width < theme(--breakpoint-compact)) {
+  .library-main { padding: 0 var(--canvas-gutter) 40px; }
+}
+}
+
+/* Блик по плитке, пока агент работает (TileWorking): проходит слева направо и повторяется */
+@keyframes tile-shine { from { transform: translateX(0); } to { transform: translateX(400%); } }
+.tile-shine { animation: tile-shine 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .tile-shine { animation: none; display: none; } }
+
+/* Карта (React Flow): фон — ленты, связи — цветом границы из токенов */
+.mind-map .react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke: var(--border);
+  --xy-edge-stroke-width: 1.5;
+}

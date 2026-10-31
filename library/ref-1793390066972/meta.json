@@ -1,0 +1,58 @@
+{
+  "format": "image",
+  "image": "",
+  "tags": [],
+  "collections": [],
+  "meaning": "",
+  "technique": "",
+  "stage": "new",
+  "via": "hand",
+  "title": "Summary → gaps → steps",
+  "kind": "canvas",
+  "titleEdited": true,
+  "source": "",
+  "ratio": "4 / 3",
+  "folder": "inbox",
+  "id": "ref-1793390066972",
+  "createdAt": 1793390066972,
+  "canvasBoxes": [
+    {
+      "x": 215,
+      "y": 408,
+      "w": 752,
+      "h": 384,
+      "k": "frame"
+    },
+    {
+      "x": 1015,
+      "y": 408,
+      "w": 384,
+      "h": 384,
+      "k": "frame"
+    },
+    {
+      "x": 247,
+      "y": 440,
+      "w": 320,
+      "h": 320,
+      "k": "agent"
+    },
+    {
+      "x": 615,
+      "y": 440,
+      "w": 320,
+      "h": 320,
+      "k": "agent"
+    },
+    {
+      "x": 1047,
+      "y": 440,
+      "w": 320,
+      "h": 320,
+      "k": "agent"
+    }
+  ],
+  "canvasEdges": 2,
+  "updatedAt": 1793390068565,
+  "thumbAt": 1793390101036
+}

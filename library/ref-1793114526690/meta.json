@@ -1,0 +1,37 @@
+{
+  "format": "image",
+  "image": "/library/ref-1793114526690/source.png",
+  "tags": [],
+  "collections": [],
+  "meaning": "Paper-plain, mono plus grotesque, almost no decoration: a collector's library. Take: the \"library of someone who collects\" feel, our exact audience.",
+  "technique": "",
+  "stage": "new",
+  "via": "paste",
+  "folder": "f-moodboard",
+  "title": "Are.na",
+  "source": "https://www.are.na",
+  "ratio": "1200 / 1200",
+  "fetching": false,
+  "id": "ref-1793114526690",
+  "createdAt": 1793114526690,
+  "comments": [
+    {
+      "id": "c1793114526694",
+      "text": "Paper-plain, mono plus grotesque, almost no decoration: a collector's library. Take: the \"library of someone who collects\" feel, our exact audience.",
+      "at": 1793114526694
+    }
+  ],
+  "updatedAt": 1793114526694,
+  "kind": "article",
+  "author": "",
+  "describing": false,
+  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
+  "colors": [
+    "#ffffff",
+    "#cfcfcf",
+    "#5d5d5d",
+    "#040404"
+  ],
+  "opens": 1,
+  "openedAt": 1793117720530
+}

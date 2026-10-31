@@ -1,0 +1,76 @@
+{
+  "nodes": [
+    {
+      "id": "f-mvve5jsy-analysis",
+      "type": "frame",
+      "position": {
+        "x": 215,
+        "y": 408
+      },
+      "width": 384,
+      "height": 384,
+      "data": {
+        "label": "Analysis",
+        "hue": 1,
+        "members": [
+          "a-mvve5jsy0"
+        ]
+      }
+    },
+    {
+      "id": "f-mvve5jsy-result",
+      "type": "frame",
+      "position": {
+        "x": 647,
+        "y": 408
+      },
+      "width": 384,
+      "height": 384,
+      "data": {
+        "label": "Result",
+        "members": [
+          "a-mvve5jsy1"
+        ]
+      }
+    },
+    {
+      "id": "a-mvve5jsy0",
+      "type": "agent",
+      "position": {
+        "x": 247,
+        "y": 440
+      },
+      "width": 320,
+      "height": 320,
+      "data": {
+        "title": "Style rules",
+        "instr": "Write 5–7 short style rules from these references: what holds them together, what is worth taking, what to avoid. As a list, no preamble.",
+        "actionId": "a-1793111342046"
+      }
+    },
+    {
+      "id": "a-mvve5jsy1",
+      "type": "image",
+      "position": {
+        "x": 679,
+        "y": 440
+      },
+      "width": 320,
+      "height": 320,
+      "data": {
+        "title": "Image in the style",
+        "instr": "Draw an illustration in the spirit of these rules: a calm composition, one accent color, no text in the image."
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-mvve5jsy-a-mvve5jsy0-a-mvve5jsy1",
+      "source": "a-mvve5jsy0",
+      "target": "a-mvve5jsy1"
+    }
+  ],
+  "trash": {},
+  "rev": 1,
+  "proposals": []
+}

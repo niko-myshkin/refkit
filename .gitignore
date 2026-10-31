@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+dist/
+*.log
+
+# Your own library lives outside the repo (REFKIT_LIBRARY); these are service files the app writes into any library
+library/.trash/
+library/.queue*
+library/.sources.json
+library/*/.frames/
+library/favicons/
+library/.clip-key
+library/graphify-out/
+library/.mcp-log.jsonl
+library/.starter-memory
+library/provider-status.json
