@@ -12,7 +12,7 @@
 /** @typedef {'material' | 'text' | 'screen' | 'image'} Port */
 
 const AGENT_FIELDS = {
-  client: ['title', 'instr', 'actionId', 'model', 'designSystem', 'web', 'gate', 'autoPick', 'asFrame', 'frameIndex', 'frameTitle', 'frameFolder', 'pick', 'choice', 'sized', 'comments', 'closedComments', 'review', 'remember'],
+  client: ['brandConcepts', 'brandVisual', 'brandSeed', 'brandWordmark', 'brandMonogram', 'title', 'instr', 'actionId', 'model', 'designSystem', 'web', 'gate', 'autoPick', 'asAsset', 'asFrame', 'frameIndex', 'frameTitle', 'frameFolder', 'pick', 'choice', 'sized', 'comments', 'closedComments', 'review', 'remember'],
   server: ['status', 'result', 'screenSource', 'imageFile', 'error', 'ranAt', 'ranHash', 'usage', 'runStartedAt', 'history', 'appliedEdits', 'activeAt', 'frameRef', 'actions', 'held'],
   computed: ['stale', 'estimateK', 'estimateMin', 'modelLabel', 'inputNames', 'inputRefs', 'context', 'items', 'needsChoice', 'productName'],
 }

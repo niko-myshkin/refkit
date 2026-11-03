@@ -35,10 +35,14 @@ const show = (value: unknown) => Array.isArray(value) ? value.join(', ') || '—
 // Общий агент библиотеки (прожарка 01_strategy/grill-library-agent.md): панель справа поверх сетки, сетка видна.
 // Внутри — та же колонка агента, что в карточке. Правки приходят списком «было → стало», меняется только принятое.
 // Ширина — у зрителя в localStorage, тянется за левый край; двойной клик по краю — сброс
-export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCount = 0, canvasOpen = false, onCommentsSlot, onMemorySlot, onInfoSlot, cardOpen = false, autoAsk, onManageActions, open, onClose, cards, modelSettings, onModels, onDepth, onChanged, onOpenCard, context = [], contextName, onContext }: {
+// Самое узкое окно агента, px: уже панель ломает шапку с вкладками; тянется мышью за край и стрелками
+const AGENT_MIN = 260
+
+export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCount = 0, canvasOpen = false, onCommentsSlot, onMemorySlot, cardOpen = false, hideInfoTab = false, autoAsk, onManageActions, open, onClose, cards, modelSettings, onModels, onDepth, onChanged, onOpenCard, context = [], contextName, onContext }: {
   overlay?: boolean // на холсте окно лежит поверх него, а не сдвигает
   // Вкладки окна (как у Doop): разговор, комментарии холста (холст кладёт панель в слот порталом), журнал действий агента
-  tab?: AgentTab; onTab?: (tab: AgentTab) => void; commentsCount?: number; canvasOpen?: boolean; onCommentsSlot?: (element: HTMLElement | null) => void; onMemorySlot?: (element: HTMLElement | null) => void; onInfoSlot?: (element: HTMLElement | null) => void; cardOpen?: boolean
+  hideInfoTab?: boolean // сведения карточки показаны на странице под картинкой
+  tab?: AgentTab; onTab?: (tab: AgentTab) => void; commentsCount?: number; canvasOpen?: boolean; onCommentsSlot?: (element: HTMLElement | null) => void; onMemorySlot?: (element: HTMLElement | null) => void; cardOpen?: boolean
   onManageActions?: () => void // «Мои Actions» — страница Actions
   autoAsk?: { text: string; n: number } | null // просьба снаружи (Summary дня) — уходит сама, когда панель открыта
   open: boolean; onClose: () => void; cards: Array<{ id: string; title: string }>
@@ -112,7 +116,7 @@ export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCo
     const x = event.clientX
     let next = from
     event.currentTarget.setPointerCapture(event.pointerId)
-    const move = (e: PointerEvent) => { next = Math.round(Math.min(window.innerWidth * 0.9, Math.max(340, from + (mode === 'dock-left' ? 1 : -1) * (e.clientX - x)))); setWidth(next) }
+    const move = (e: PointerEvent) => { next = Math.round(Math.min(window.innerWidth * 0.9, Math.max(AGENT_MIN, from + (mode === 'dock-left' ? 1 : -1) * (e.clientX - x)))); setWidth(next) }
     const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); try { localStorage.setItem('refkit-agent-width', String(next)) } catch { /* без памяти */ } }
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up)
   }
@@ -125,7 +129,7 @@ export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCo
   const dockRight = eff === 'dock-right'
   const mini = eff === 'min'
   const floating = eff === 'float'
-  const shownTab: AgentTab = mini ? 'agent' : tab
+  const shownTab: AgentTab = mini ? 'agent' : tab === 'info' && hideInfoTab ? 'agent' : tab === 'comments' && !canvasOpen ? 'agent' : tab // «Правки» есть только на холсте
   useEffect(() => {
     document.documentElement.style.setProperty('--agent-w', open && wide && !overlay && dockRight ? `${width + 8}px` : '0px')
     document.documentElement.style.setProperty('--agent-overlay-w', open && overlay && wide && dockRight ? `${width + 8}px` : '0px')
@@ -164,7 +168,7 @@ export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCo
     const from = { ...rect, ...view2 }
     const x = event.clientX, y = event.clientY
     let next = from
-    const move = (e: PointerEvent) => { next = { ...from, w: Math.round(Math.min(window.innerWidth - from.x, Math.max(340, from.w + e.clientX - x))), h: Math.round(Math.min(window.innerHeight - from.y, Math.max(280, from.h + e.clientY - y))) }; setRect(next) }
+    const move = (e: PointerEvent) => { next = { ...from, w: Math.round(Math.min(window.innerWidth - from.x, Math.max(AGENT_MIN, from.w + e.clientX - x))), h: Math.round(Math.min(window.innerHeight - from.y, Math.max(280, from.h + e.clientY - y))) }; setRect(next) }
     const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); saveRect(next) }
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up)
   }
@@ -189,22 +193,22 @@ export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCo
         <aside aria-label={t('Агент библиотеки')} onKeyDown={(event) => { if (event.key === 'Escape' && !event.defaultPrevented) { event.stopPropagation(); onClose() } }} className={cn('relative flex overflow-hidden rounded-container bg-card ring-1 ring-foreground/10', wide && !overlay && dockRight ? 'my-2 mr-2 h-[calc(100svh-1rem)]' : floating ? 'h-full shadow-lg' : mini ? 'shadow-lg' : 'h-full shadow-lg')} style={{ width: !wide ? 'calc(100vw - 16px)' : floating ? rect.w : width, ...(floating ? { height: rect.h } : {}) }}>
           {/* Край тянет ширину (панель справа — левый, слева — правый; как у Doop); клик по краю ничего не делает. У плавающего — угол */}
           {floating ? <div aria-hidden="true" className="absolute right-0 bottom-0 z-10 size-4 cursor-nwse-resize" onPointerDown={resizeFloat} /> : null}
-          {!floating && !mini && <div role="separator" aria-orientation="vertical" aria-label={t('Ширина колонки агента')} aria-valuenow={width} aria-valuemin={340} tabIndex={0}
+          {!floating && !mini && <div role="separator" aria-orientation="vertical" aria-label={t('Ширина колонки агента')} aria-valuenow={width} aria-valuemin={AGENT_MIN} tabIndex={0}
             className={cn('absolute inset-y-4 z-10 w-2 cursor-ew-resize rounded-lg outline-none focus-visible:bg-ring/40', eff === 'dock-left' ? 'right-0' : 'left-0')}
             onPointerDown={resize} onDoubleClick={() => { setWidth(440); try { localStorage.removeItem('refkit-agent-width') } catch { /* без памяти */ } }}
             onKeyDown={(event) => {
               if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
               event.preventDefault()
-              const next = Math.round(Math.min(window.innerWidth * 0.9, Math.max(340, width + ((event.key === 'ArrowLeft') === (mode === 'dock-left') ? -16 : 16))))
+              const next = Math.round(Math.min(window.innerWidth * 0.9, Math.max(AGENT_MIN, width + ((event.key === 'ArrowLeft') === (mode === 'dock-left') ? -16 : 16))))
               setWidth(next)
               try { localStorage.setItem('refkit-agent-width', String(next)) } catch { /* без памяти */ }
             }} />}
           <div className="@container/agent flex min-w-0 flex-1 flex-col gap-3 px-3 pb-3">
             <div className={cn('-mt-px -mb-2 flex h-12 shrink-0 items-center gap-0.5', wide && !mini && 'cursor-grab active:cursor-grabbing')} onPointerDown={dragFloat}>
               {!mini && <span className="flex items-center gap-0.5" role="tablist" aria-label={t('Окно агента')}>
-                {cardOpen && <TabButton label={t('Сведения')} active={tab === 'info'} onClick={() => onTab?.('info')} labeled><Info /></TabButton>}
+                {cardOpen && !hideInfoTab && <TabButton label={t('Сведения')} active={tab === 'info'} onClick={() => onTab?.('info')} labeled><Info /></TabButton>}
                 <TabButton label={t('Агент')} active={tab === 'agent'} onClick={() => onTab?.('agent')} labeled><Zap /></TabButton>
-                <TabButton label={t('Комментарии')} active={tab === 'comments'} onClick={() => onTab?.('comments')} labeled badge={commentsCount}><MessageSquare /></TabButton>
+                {canvasOpen && <TabButton label={t('Правки')} active={tab === 'comments'} onClick={() => onTab?.('comments')} labeled badge={commentsCount}><MessageSquare /></TabButton>}
                 {canvasOpen && <TabButton label={t('Память')} active={tab === 'memory'} onClick={() => onTab?.('memory')} labeled><Brain /></TabButton>}
                 <TabButton label={t('Активность')} active={tab === 'activity'} onClick={() => onTab?.('activity')} labeled><ActivityIcon /></TabButton>
               </span>}
@@ -233,9 +237,7 @@ export function LibraryAgent({ overlay = false, tab = 'agent', onTab, commentsCo
             )}
             {/* Комментарии: слот для панели холста (она рисуется порталом из CanvasPage); слот живёт всегда, чтобы панель не пересоздавалась при смене вкладки */}
             <div ref={onCommentsSlot} className={shownTab === 'comments' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'} />
-            <div ref={onInfoSlot} className={shownTab === 'info' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'} />
             <div ref={onMemorySlot} className={shownTab === 'memory' ? 'flex min-h-0 flex-1 flex-col' : 'hidden'} />
-            {shownTab === 'comments' && !canvasOpen && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('Комментарии холста видны, когда открыт холст.')}</p>}
             {shownTab === 'activity' ? (
               <ActivityList turns={state?.thread ?? turns} />
             ) : shownTab !== 'agent' ? null : showList && !mini ? (

@@ -19,7 +19,7 @@ export function CommentsPanel({ groups, onFocus, onApply, onClose, onReopen, onH
   const shown = groups.filter((group) => (tab === 'open' ? group.open : group.closed).length > 0)
   const tabClass = (on: boolean) => cn('rounded-lg px-2.5 py-1 text-xs transition-colors', on ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground')
   return (
-    <div className="flex min-h-0 flex-1 flex-col" role="region" aria-label={t('Комментарии холста')}>
+    <div className="flex min-h-0 flex-1 flex-col" role="region" aria-label={t('Правки холста')}>
       <div className="flex items-center gap-1 p-2">
         <button type="button" className={tabClass(tab === 'open')} onClick={() => setTab('open')}>{t('Открытые')}</button>
         <button type="button" className={tabClass(tab === 'closed')} onClick={() => setTab('closed')}>{t('Закрытые')}</button>

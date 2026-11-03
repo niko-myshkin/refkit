@@ -1,6 +1,21 @@
+<p align="center">
+  <img src=".github/assets/banner.jpg" alt="Refkit: the home screen with the greeting 'Ideas get bolder at night' and a timeline of saved references" width="100%">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-111110" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/status-beta-F97316" alt="Status: beta">
+  <a href="https://niko-myshkin.github.io/refkit/"><img src="https://img.shields.io/badge/website-refkit-111110" alt="Website"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/feedback-welcome-111110" alt="Feedback welcome"></a>
+</p>
+
 # Refkit
 
-**A personal library with an agent.** · [Website and interactive demo](https://niko-myshkin.github.io/refkit/) Drop in images, videos, articles, notes and links. The agent gives you the gist the way you like it, remembers how, and your materials become chains on a canvas: references → style rules → brand directions → a screen, or an idea → market check → a landing page.
+**A personal library with an agent.** [Website and interactive demo](https://niko-myshkin.github.io/refkit/). Drop in images, videos, articles, notes and links. The agent gives you the gist the way you like it, and your materials become chains on a canvas: references → style rules → brand directions → a screen, or an idea → market check → a landing page.
+
+<p align="center">
+  <img src=".github/assets/canvas.jpg" alt="A Refkit canvas: a moodboard feeds a style-rules step, which feeds brand directions, with the agent window on the right" width="100%">
+</p>
 
 > ## ⚠️ Beta
 > Refkit is an early, unfinished beta that runs on your own Mac. Things will be rough. **I'm looking for honest feedback**: what worked, what confused you, what you'd use it for. Please [open a feedback issue](../../issues/new/choose) or start a [discussion](../../discussions). Thank you!

@@ -29,11 +29,10 @@
     "#08090a",
     "#626364"
   ],
-  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
   "digesting": false,
   "thread": [
     {
-      "command": "Разбери",
+      "command": "Analyze",
       "answer": "- Linear presents the product development cycle, from roadmap to release, as its central message.\n- Planning uses projects and initiatives to set direction; building uses issues and cycles to track progress.\n- AI workflows and agents, analytics, and mobile access extend that core workflow.\n- Customer Requests and Linear Asks connect incoming requests to product work.\n- The closing line, “Plan the present. Build the future,” compresses the product promise into a short statement.\n- Claimed, not demonstrated: “best-in-class” security and building what customers actually want.\n\nSections:\n- The system for modern product development — the roadmap-to-release promise.\n- Planning — projects and initiatives set direction.\n- Building — issue tracking and cycle planning.\n- Artificial intelligence — AI-powered workflows and agents.\n- Insights — analytics for streams of work.\n- Mobile — product work from anywhere.\n- Customer Requests — requests inform what gets built.\n- Linear Asks — workplace requests become issues.\n- Security — a claim about security practices.\n- Plan the present. Build the future. — closing line and calls to action.\n\nTerms:\n- Projects and initiatives — the planning structures named for setting product direction.\n- Issue tracking — the way building work is followed.\n- Cycle planning — the planning method paired with issue tracking.\n- AI-powered workflows and agents — the named means of streamlining product development.\n- Customer Requests — the feature for bringing customer wants into product work.\n- Linear Asks — the feature that turns workplace requests into issues.\n\nHow to apply:\n- Write one sentence that spans your product’s full workflow; the result is a clear central promise.\n- Arrange feature copy from direction-setting through day-to-day work; the result is a product-led page outline.\n- Give each feature a short name and one concrete outcome; the result is copy that can carry a restrained layout.\n- Check superlatives such as “best-in-class” against available evidence; the result is a page without unsupported claims.",
       "at": 1793332497829,
       "usage": [

@@ -1,5 +1,6 @@
 import { Fragment, startTransition, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { form, t, locale } from '@/lib/i18n'
+import { canDownload, downloadReference } from '@/lib/download'
 import { DndContext, DragOverlay, MeasuringStrategy, PointerSensor, TouchSensor, pointerWithin, useDndContext, useDraggable, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
 import { dragState, useDragging } from '@/lib/drag-state'
 import { snapCenterToCursor } from '@dnd-kit/modifiers'
@@ -8,7 +9,7 @@ import { CanvasCover } from '@/components/canvas-thumb'
 import { CanvasPage } from '@/components/canvas-page'
 import { TEMPLATES } from '@/components/canvas/nodes'
 import { HomeGreeting } from '@/components/home-greeting'
-import { Network, NotebookPen, ListChecks, LayoutGrid, SquarePen, FileQuestion, MessageSquarePlus, RotateCcw, SmilePlus, ArrowDown, ArrowLeft, ArrowUp, ScrollText, FolderPlus, Inbox, ArrowUpRight, BookOpen, ChevronDown, EllipsisVertical, ListFilter, ChevronUp, Palette, ScanSearch, Zap, ExternalLink, Link2, MessageSquare, Trash2, LoaderCircle, Plus, Bot, LayoutDashboard, List, Tag, Film, ChevronLeft, ChevronRight, Pin, PinOff, X, ChartColumn, CircleDashed, CodeXml, FileText, Folder, Image as ImageIcon, ImagePlus, Library, Loader2, MousePointerClick, Search, SlidersHorizontal, SquarePlay, StickyNote, Music, Type, Wind, Orbit, Rocket, Upload } from 'lucide-react'
+import { Download, Network, SquarePen, FileQuestion, RotateCcw, SmilePlus, ArrowDown, ArrowLeft, ArrowUp, ScrollText, FolderPlus, Inbox, ArrowUpRight, BookOpen, ChevronDown, EllipsisVertical, ListFilter, ChevronUp, Palette, ScanSearch, Zap, ExternalLink, Link2, MessageSquare, Trash2, LoaderCircle, Plus, Bot, LayoutDashboard, List, Tag, Film, ChevronLeft, ChevronRight, Pin, PinOff, X, ChartColumn, CircleDashed, CodeXml, FileText, Folder, Image as ImageIcon, ImagePlus, Library, Loader2, MousePointerClick, Search, SlidersHorizontal, SquarePlay, StickyNote, Music, Type, Wind, Orbit, Rocket, Upload } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn, sourceHref } from '@/lib/utils'
@@ -18,7 +19,9 @@ import { AddDialog, type AddDraft, type AddFields } from '@/components/add-dialo
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Skeleton } from '@/components/ui/skeleton'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { RailShell } from './RailShell'
+import { TemplateTabs } from '@/components/template-tabs'
 import { Island } from '@/components/ui/island'
 import ImageModal from '@/components/interaction-kit/ImageModal'
 import { FloatingBar } from '@/components/floating-bar'
@@ -254,7 +257,7 @@ function LibraryWireframe() {
   // template — ключ шаблона цепочки: холст сам разложит его при открытии (canvas-page читает метку из sessionStorage)
   const addCanvas = async (template?: string) => {
     let saved: Reference
-    try { saved = await library.createCanvas<Reference>({ folder: currentFolder?.id, ...(template ? { title: TEMPLATES.find((item) => item.key === template)?.label } : {}) }) } catch { notifyError(t('Не удалось создать холст')); return }
+    try { saved = await library.createCanvas<Reference>({ folder: currentFolder?.id, ...(template ? { title: TEMPLATES.find((item) => item.key === template)?.label, template } : {}) }) } catch { notifyError(t('Не удалось создать холст')); return }
     setReferences((list) => [saved, ...list])
     if (template) try { sessionStorage.setItem('refkit.pendingTemplate', JSON.stringify({ id: saved.id, key: template })) } catch { /* без метки холст просто откроется пустым */ }
     openCard(saved.id)
@@ -384,14 +387,6 @@ function LibraryWireframe() {
   const [actionsPage, setActionsPage] = useState(false)
   // Timeline (как у Fabric): всё по дням, у карточки — в каком она space; Summary дня — агент по клику
   const [timelinePage, setTimelinePage] = useState(true)
-  // Рейка слева (владелец 2026-10-29): узкая полоса иконок или раскрытая с подписями; ширина и состояние помнятся в браузере.
-  // --rail-w на <html> — для всего, что стоит рядом с рейкой (острова холста, окно агента): сдвигаются вместе с содержимым
-  const [railOpen, setRailOpen] = useState(() => { try { return localStorage.getItem('refkit.rail') === 'open' } catch { return false } })
-  const [railWidth, setRailWidth] = useState(() => { try { return Math.min(360, Math.max(160, Number(localStorage.getItem('refkit.railWidth')) || 224)) } catch { return 224 } })
-  useEffect(() => {
-    try { localStorage.setItem('refkit.rail', railOpen ? 'open' : 'closed'); localStorage.setItem('refkit.railWidth', String(railWidth)) } catch { /* без памяти — по умолчанию */ }
-    document.documentElement.style.setProperty('--rail-w', railOpen ? `${railWidth}px` : '56px')
-  }, [railOpen, railWidth])
   const [tagsPage, setTagsPage] = useState(false)
   // Страница «Граф» (grill-graph.md): понятия и связи между материалами; строит модель только по кнопке
   const [graphPage, setGraphPage] = useState(false)
@@ -419,11 +414,6 @@ function LibraryWireframe() {
   const [flyPage, setFlyPage] = useState(false) // раздел «Полёт»: летишь сквозь материалы (fly-page.tsx)
   // Открытая карточка — нижняя панель видна и над ней, агент из панели спрашивает про неё
   const [shownCard, setShownCard] = useState<string | null>(null)
-  // Комментарий на области картинки (как в Figma): кнопка в нижней панели, только у открытой карточки-картинки; C и Esc — в карточке
-  const [pinMode, setPinMode] = useState(false)
-  useEffect(() => { setPinMode(false) }, [shownCard])
-  const shownRef = shownCard ? references.find((item) => item.id === shownCard) : undefined
-  const canPinShown = Boolean(shownRef && !shownRef.kind && shownRef.format === 'image' && shownRef.image)
   const [agentAsk, setAgentAsk] = useState<{ text: string; n: number } | null>(null)
   useEffect(() => { library.folders().then(setFolders).catch(() => {}) }, [])
   // Материал без папки (создан мимо v2: v1, MCP, импорт) считаем лежащим во «Входящих»
@@ -716,7 +706,7 @@ function LibraryWireframe() {
   const navAuto = useRef(false)
   const [agentOpen, setAgentShown] = useState(false)
   const [agentTab, setAgentTab] = useState<AgentTab>('agent') // вкладка окна агента: разговор, комментарии холста, активность
-  const [infoSlot, setInfoSlot] = useState<HTMLElement | null>(null) // слот вкладки «Сведения»: туда карточка-страница кладёт описание, теги, комментарии
+  const [infoInPage, setInfoInPage] = useState(false) // у страницы-карточки сведения на самой странице — вкладка «Сведения» в окне агента не нужна
   const [memorySlot, setMemorySlot] = useState<HTMLElement | null>(null)
   const [commentsSlot, setCommentsSlot] = useState<HTMLElement | null>(null) // слот во вкладке «Комментарии», туда холст кладёт свою панель
   const [commentsCount, setCommentsCount] = useState(0)
@@ -808,7 +798,8 @@ function LibraryWireframe() {
   const shelfNoteRef = references.find((item) => item.id === shelfNote)
   const shelfBusy = Boolean(shelfNoteRef?.digesting || shelfNoteRef?.asking)
   // Скинуть всё с полки — × справа при наведении; полка временная — без подтверждения. Заметка полки остаётся в библиотеке
-  const shelfOverlay = !trashOpen && pinned.length > 0
+  // На главной полка не плавает сверху, а стоит рядом с контентом между хиро и «Хронологией» (владелец 2026-11-01); на остальных страницах полоской сверху
+  const shelfOverlay = !trashOpen && pinned.length > 0 && !(timelinePage && !currentFolder && !settingsPage)
   // Раздел «Холст» из меню: путь — просто «Холсты», как у Хронологии (без «Папки /»)
   const canvasSection = type === 'canvas' && !folder && !foldersPage && !board
   const filtersOn = showFilters && !trashOpen && !foldersPage && !actionsPage && !tagsPage && !graphPage && !flyPage && !memoryLike
@@ -839,10 +830,6 @@ function LibraryWireframe() {
   const clearShelf = <Button variant="ghost" size="icon-sm" className="shrink-0 opacity-0 transition-opacity group-hover/shelfbox:opacity-100 focus-visible:opacity-100" aria-label={t('Открепить все')} onClick={() => { pinned.forEach((item) => pin(item.id, false)); setShelfNote(null); setTimeout(() => void reload(), 500) }}><X /></Button>
   const currentType = types.find((item) => item.id === type) ?? types[0]
   // Лента сужена поиском или фильтром (а не просто пустой space)
-  // Кнопка быстрого действия на главной: одна строка высотой 40 с крупной иконкой, без превью — не спорит с лентой
-  const pill = 'h-10 gap-2 px-4'
-  // У каждого шаблона свой значок, а не один и тот же у всех семи (иначе значок ничего не говорит)
-  const templateIcons: Record<string, typeof Network> = { hypothesis: ScanSearch, 'rules-concepts': ScrollText, 'brand-directions': Palette, 'technique-recipe': NotebookPen, 'style-image': ImageIcon, 'collection-gaps': ListChecks, 'compare-choose': LayoutGrid }
   // Холсты по свежести — список под «Холстом» в рейке
   const canvasList = useMemo(() => references.filter((item) => item.kind === 'canvas').sort((a, b) => (b.openedAt ?? b.updatedAt ?? 0) - (a.openedAt ?? a.updatedAt ?? 0)).map((item) => ({ id: item.id, title: item.title })), [references])
   // Главная: приветствие, ряд действий, лента с фильтрами под ним; острова справа нет (владелец 2026-10-29)
@@ -942,7 +929,7 @@ function LibraryWireframe() {
   // Что показывает карточка на месте материала: плеер YouTube, встраивание, видео; иначе — картинка (у окна и страницы своя)
   const mediaOf = (reference: Reference, textOnly: boolean, noteCard: ReactNode) => textOnly ? noteCard : youtubeId(reference) ? <iframe src={`https://www.youtube-nocookie.com/embed/${youtubeId(reference)}?rel=0${seek?.id === reference.id ? `&start=${seek.t}&autoplay=1` : ''}`} title={reference.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="absolute inset-0 h-full w-full border-0" /> : reference.embed ? <iframe src={reference.embed} title={reference.title} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full rounded-surface border-0" /> : reference.video ? <video src={reference.video} poster={reference.image} controls autoPlay muted className="absolute inset-0 h-full w-full object-contain" /> : undefined
   // key — карточка заново на каждый материал: иначе название и теги прошлой карточки переезжали в следующую и автосохранялись (скептик 2026-10-14)
-  const cardView = (reference: Reference, media: ReactNode, close: () => void, page?: { crumbs: ReactNode }) => <RefCard key={reference.id} reference={reference} onDescribe={() => describeRef(reference.id)} onShown={setShownCard} pinMode={pinMode} onPinMode={setPinMode} onInfo={(patch) => setReferences((list) => list.map((item) => item.id === reference.id ? { ...item, ...patch } : item))} collections={collectionsFor(typeOf(reference))} onCreateCollection={createCollection} modelSettings={modelSettings} onDepth={(depth) => void chooseDepth(depth)} onModels={(models) => void chooseModels(models)} media={media} onClose={close} onUpdate={(patch) => update(reference.id, patch)} onConvert={(feedback) => convert(reference.id, feedback)} onDigest={() => makeDigest(reference.id)} onStop={() => stopAgent(reference.id)} onConversation={(to) => openConversation(reference.id, to)} onRemoveSource={(id) => removeSource(reference, id)} progress={progress[reference.id]} onAsk={(command, extra) => askAgent(reference.id, command, extra)} onSaveFound={(at, index) => saveFound(reference.id, at, index)} onSaveNote={(at) => saveNote(reference.id, at)} onMakeAction={(at, accept) => makeActionAt(reference.id, at, accept)} onTagOffer={(accept) => void answerTagOffer(reference.id, accept)} onEdit={(at, action) => void editAt(reference.id, at, action)} onRemember={(at, accept) => rememberAt(reference.id, at, accept)} library={references} onDelete={() => removeReference(reference.id)} page={Boolean(page)} crumbs={page?.crumbs} infoSlot={infoSlot} infoOn={agentOpen && agentTab === 'info'} onOpenInfo={() => { setAgentTab('info'); setAgentOpen(true) }} />
+  const cardView = (reference: Reference, media: ReactNode, close: () => void, page?: { crumbs: ReactNode }) => <RefCard key={reference.id} onStage={setInfoInPage} reference={reference} onDescribe={() => describeRef(reference.id)} onShown={setShownCard} onInfo={(patch) => setReferences((list) => list.map((item) => item.id === reference.id ? { ...item, ...patch } : item))} collections={collectionsFor(typeOf(reference))} onCreateCollection={createCollection} modelSettings={modelSettings} onDepth={(depth) => void chooseDepth(depth)} onModels={(models) => void chooseModels(models)} media={media} onClose={close} onUpdate={(patch) => update(reference.id, patch)} onConvert={(feedback) => convert(reference.id, feedback)} onDigest={() => makeDigest(reference.id)} onStop={() => stopAgent(reference.id)} onConversation={(to) => openConversation(reference.id, to)} onRemoveSource={(id) => removeSource(reference, id)} progress={progress[reference.id]} onAsk={(command, extra) => askAgent(reference.id, command, extra)} onSaveFound={(at, index) => saveFound(reference.id, at, index)} onSaveNote={(at) => saveNote(reference.id, at)} onMakeAction={(at, accept) => makeActionAt(reference.id, at, accept)} onTagOffer={(accept) => void answerTagOffer(reference.id, accept)} onEdit={(at, action) => void editAt(reference.id, at, action)} onRemember={(at, accept) => rememberAt(reference.id, at, accept)} library={references} onDelete={() => removeReference(reference.id)} page={Boolean(page)} crumbs={page?.crumbs} />
   const modal = (reference: Reference, prefix = 'ref-image', mini = false, face?: ReactNode) => {
     const { textOnly, noteCard } = faceOf(reference, prefix, mini)
     return <ImageModal
@@ -1085,6 +1072,7 @@ function LibraryWireframe() {
     return (
       <ContextMenuContent className="w-56">
         {!many && <ContextMenuItem onSelect={() => openLinked(reference.id)}><BookOpen />{t('Открыть')}</ContextMenuItem>}
+        {!many && canDownload(reference) && <ContextMenuItem onSelect={() => void downloadReference(reference)}><Download />{t('Скачать')}</ContextMenuItem>}
         <ContextMenuItem onSelect={() => workOn(ids)}><MessageSquare />{many ? t('Спросить агента про {n}', { n: ids.length }) : t('Спросить агента')}</ContextMenuItem>
         {!many && isRaw(reference) && <ContextMenuItem onSelect={() => { workOn(ids); makeDigest(reference.id) }}><FileText />{t('Сделать выжимку')}</ContextMenuItem>}
         {!many && <ContextMenuItem onSelect={() => { setSimilarTo(reference.id); setColor(null); setQuery(''); setCollection(null); setType('all'); setBoard(null) }}><ScanSearch />{t('Найти похожее')}</ContextMenuItem>}
@@ -1310,8 +1298,8 @@ function LibraryWireframe() {
     <DndContext sensors={sensors} collisionDetection={pointerWithin} measuring={{ droppable: { strategy: MeasuringStrategy.WhileDragging, frequency: 150 } }}
       onDragStart={onDragStart} onDragMove={(event) => { if (!draggingFolder) return; if (event.over?.id === 'trash') { setRowDrop(null); return } const target = rowTarget(event); setRowDrop((last) => target ?? (overGhost(event) ? last : null)) }} onDragEnd={onDragEnd} onDragCancel={endDrag}>
     {/* Каркас как у ChatGPT (2026-10-10): полоса разделов всегда; колонка Spaces — только в разделе Spaces */}
-    <SidebarProvider className="bg-background" open={railOpen} onOpenChange={setRailOpen} style={{ '--sidebar-width': `${railWidth}px` } as React.CSSProperties}>
-      <AppSidebar canvases={canvasList} currentCanvasId={cardId ?? null} onOpenCanvas={(id) => openCard(id)} folders={folders} currentFolderId={currentFolder?.id ?? null} onOpenFolder={openFolder} railWidth={railWidth} onRailWidth={setRailWidth} active={board || folder || foldersPage || trashOpen ? null : type} trashActive={trashOpen && !cardId} onTrash={openTrash} counts={counts}
+    <RailShell className="bg-background">
+      <AppSidebar canvases={canvasList} currentCanvasId={cardId ?? null} onOpenCanvas={(id) => openCard(id)} folders={folders} currentFolderId={currentFolder?.id ?? null} onOpenFolder={openFolder} active={board || folder || foldersPage || trashOpen ? null : type} trashActive={trashOpen && !cardId} onTrash={openTrash} counts={counts}
           
           allFoldersActive={foldersPage}        onAllFolders={() => openFolder(null)} onSettings={openSettings} tagsActive={tagsPage} graphActive={graphPage || flyPage} onGraph={() => { openFolder(null); setFoldersPage(false); if (spaceMode === 'fly') setFlyPage(true); else setGraphPage(true) }} flyActive={false} onFly={() => {}} onTags={() => { openFolder(null); setFoldersPage(false); setTagsPage(true) }} canvasActive={type === 'canvas' && !folder && !foldersPage} onCanvas={() => { openFolder(null); setFoldersPage(false); setType('canvas') }} timelineActive={timelinePage} onTimeline={() => { openFolder(null); setFoldersPage(false); setTimelinePage(true) }} actionsActive={actionsPage} onActions={() => { openFolder(null); setFoldersPage(false); setActionsPage(true) }}
            
@@ -1325,6 +1313,7 @@ function LibraryWireframe() {
       }} />
       <SidebarInset
         className={cn('library-canvas relative max-compact:m-0 max-compact:h-svh max-compact:rounded-none', 'm-0 h-svh rounded-none')}
+        data-home={(homePage && !cardId) || undefined}
         onDragOver={(event) => { if (innerDrag.current) return; const types = event.dataTransfer.types; if (types.includes('Files') || types.includes('text/uri-list')) { event.preventDefault(); setDragOver(true) } }}
         onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragOver(false) }}
         onDrop={(event) => {
@@ -1405,10 +1394,9 @@ function LibraryWireframe() {
               <>
                 <div className="flex flex-col items-center gap-6 pt-12">
                 <HomeGreeting />
-                <div className="flex flex-wrap justify-center gap-2" role="group" aria-label={t('Быстрые действия')}>
-                  {TEMPLATES.map((template) => { const Icon = templateIcons[template.key] ?? Network; return <Button key={template.key} variant="glass" className={pill} onClick={() => void addCanvas(template.key)}><Icon className="size-5" />{template.label}</Button> })}
+                <TemplateTabs items={TEMPLATES} onCreate={(key) => void addCanvas(key)} />
                 </div>
-                </div>
+                {pinned.length > 0 && !trashOpen && <div className="pt-12">{shelfBox(true)}</div>}
                 <div className="flex w-full items-center justify-between gap-4 pt-12"><h2 className="text-2xl font-semibold tracking-tight">{t('Хронология')}</h2>{viewControls}</div>
                 {filtersOn && <div className="pt-2">{chips}</div>}
               </>
@@ -1453,7 +1441,7 @@ function LibraryWireframe() {
                   // Соседи плавно разъезжаются (layout); вне перетаскивания layout выключен — не мешает открытию карточки
                   // Соседи плавно разъезжаются: сдвиг — анимацией transform; первая раскладка — без анимации
                   return <motion.div key={reference.id} className="absolute left-0 top-0" initial={false} animate={{ x, y, width, height }} transition={tileSpring}>
-                  <ContextMenu>
+                  <LazyContextMenu content={() => tileMenu(reference)}>
                   <ContextMenuTrigger asChild><div className="h-full" onContextMenu={(event) => event.stopPropagation()}>
                   <DraggableTile id={reference.id} picked={selected.includes(reference.id)} onClickCapture={(event) => pickTile(event, reference.id)}>
                     {view === 'list' ? <>
@@ -1509,8 +1497,7 @@ function LibraryWireframe() {
                     </>}
                   </DraggableTile>
                   </div></ContextMenuTrigger>
-                  {tileMenu(reference)}
-                  </ContextMenu>
+                  </LazyContextMenu>
                   </motion.div>
                 }) })()}
               </motion.div>
@@ -1602,7 +1589,7 @@ function LibraryWireframe() {
           </div>
         )}
       </SidebarInset>
-      <LibraryAgent overlay={canvasOpen || Boolean(cardRef)} tab={agentTab} onTab={setAgentTab} commentsCount={commentsCount} canvasOpen={canvasOpen} onCommentsSlot={setCommentsSlot} onMemorySlot={setMemorySlot} onInfoSlot={setInfoSlot} cardOpen={Boolean(cardRef) && !canvasOpen} autoAsk={agentAsk} onManageActions={() => { openFolder(null); setFoldersPage(false); setActionsPage(true) }} open={agentOpen} onClose={() => { setAgentOpen(false); askAbout([]) }} cards={references} modelSettings={modelSettings} onModels={(key) => void chooseModels({ digest: key, ask: key })} onDepth={(depth) => void chooseDepth(depth)} onChanged={() => { void reload(); void library.folders().then(setFolders).catch(() => {}) }} onOpenCard={openLinked} context={agentContext} contextName={agentContextName} onContext={(ids) => askAbout(ids)} />
+      <LibraryAgent overlay={canvasOpen || Boolean(cardRef)} tab={agentTab} onTab={setAgentTab} commentsCount={commentsCount} canvasOpen={canvasOpen} onCommentsSlot={setCommentsSlot} onMemorySlot={setMemorySlot} cardOpen={Boolean(cardRef) && !canvasOpen} hideInfoTab={infoInPage} autoAsk={agentAsk} onManageActions={() => { openFolder(null); setFoldersPage(false); setActionsPage(true) }} open={agentOpen} onClose={() => { setAgentOpen(false); askAbout([]) }} cards={references} modelSettings={modelSettings} onModels={(key) => void chooseModels({ digest: key, ask: key })} onDepth={(depth) => void chooseDepth(depth)} onChanged={() => { void reload(); void library.folders().then(setFolders).catch(() => {}) }} onOpenCard={openLinked} context={agentContext} contextName={agentContextName} onContext={(ids) => askAbout(ids)} />
       {/* Переименование тега: Enter — готово, Esc — отмена */}
       <Dialog open={tagRename !== null} onOpenChange={(open) => { if (!open) setTagRename(null) }}>
         <DialogContent className="sm:max-w-sm">
@@ -1632,7 +1619,7 @@ function LibraryWireframe() {
       <AddDialog hintsFor={tagHints} findExisting={(link) => { const found = references.find((item) => item.source && linkKey(item.source) === linkKey(link)); return found ? { id: found.id, title: found.title, place: folders.find((item) => item.id === placeOf(found))?.name ?? t('Папки') } : undefined }} onOpenExisting={openLinked} draft={draft} folders={flatFolders(folders)} defaultFolder={draftFolder ?? folder ?? undefined}
         collections={collectionList.map((item) => ({ name: item.name, icon: iconOf(item.name) }))} onCreateCollection={createCollection}
         onSave={saveDraft} onClose={() => { setDraft(null); setDraftFolder(undefined) }} />
-    </SidebarProvider>
+    </RailShell>
     {marquee && <div aria-hidden className="pointer-events-none fixed z-(--z-marquee) rounded-sm border border-primary/60 bg-primary/10" style={{ left: Math.min(marquee.x0, marquee.x1), top: Math.min(marquee.y0, marquee.y1), width: Math.abs(marquee.x1 - marquee.x0), height: Math.abs(marquee.y1 - marquee.y0) }} />}
     {/* Плашка выделения — снизу по центру: сколько выбрано и что с ними сделать; × или Esc — снять */}
     {selected.length > 0 && !cardId && (
@@ -1703,12 +1690,6 @@ function LibraryWireframe() {
               </InputGroup>
           </PopoverContent>
         </Popover></>}
-        {canPinShown && (
-          <Tooltip>
-            <TooltipTrigger asChild><Button variant={pinMode ? 'secondary' : 'ghost'} size="icon" aria-label={t('Комментарий на картинке')} aria-pressed={pinMode} onClick={() => setPinMode(!pinMode)}><MessageSquarePlus /></Button></TooltipTrigger>
-            <TooltipContent>{t('Комментарий · C')}</TooltipContent>
-          </Tooltip>
-        )}
         {agentButton}
         {(graphPage || flyPage) && <span ref={setGraphDockSlot} className="contents" />}
       </FloatingBar>
@@ -1967,6 +1948,13 @@ function DragShelf({ id, disabled, children }: { id: string; disabled: boolean; 
 // Что тащат: у листа карты id — путь в дереве (карточка бывает в нескольких ветках), сама карточка — в data.ref
 const cardOf = (active: { id: string | number; data: { current?: { ref?: string } | null } }) => active.data.current?.ref ?? String(active.id)
 
+// Меню плитки собираем, только когда оно открыто: у ленты ~40 плиток, и каждая при любом рендере строила бы целое закрытое меню
+// (список папок, подборки, действия) — в dev-режиме это ~1 с на раскрытие рейки (замер профайлером 2026-11-01)
+function LazyContextMenu({ content, children }: { content: () => ReactNode; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return <ContextMenu onOpenChange={setOpen}>{children}{open && content()}</ContextMenu>
+}
+
 // Высоту и ширину плитке задаёт обёртка-пружина (motion.div), оболочка просто заполняет её
 function DraggableTile({ id, picked, onClickCapture, children }: { id: string; picked: boolean; onClickCapture: (event: React.MouseEvent) => void; children: ReactNode }) {
   const { setNodeRef: ref, listeners } = useDraggable({ id })
@@ -2000,12 +1988,15 @@ function likeness(a: Reference, b: Reference) {
 const cardInset = tileInset
 const dayHeading = 44
 // «Сегодня», «Вчера» или дата — заголовок дня во «Входящих»
+// Форматтеры создаём один раз: toLocaleDateString заводил новый Intl.DateTimeFormat на каждую плитку при каждом пересчёте ленты (~24 мс)
+const dayFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long' })
+const dayYearFormat = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 function dayLabel(at?: number) {
   if (!at) return t('Раньше')
   const day = new Date(at); day.setHours(0, 0, 0, 0)
   const today = new Date(); today.setHours(0, 0, 0, 0)
   const diff = Math.round((today.getTime() - day.getTime()) / 86400000)
-  return diff === 0 ? t('Сегодня') : diff === 1 ? t('Вчера') : day.toLocaleDateString(locale, { day: 'numeric', month: 'long', ...(day.getFullYear() !== today.getFullYear() ? { year: 'numeric' } : {}) })
+  return diff === 0 ? t('Сегодня') : diff === 1 ? t('Вчера') : (day.getFullYear() !== today.getFullYear() ? dayYearFormat : dayFormat).format(day)
 }
 const captionHeight = tileCaption
 // Подпись под превью: домен ссылки; у файла — его тип

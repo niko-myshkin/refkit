@@ -1,3 +1,6 @@
+import { materialMosaic, type MosaicBox } from '@/lib/material-mosaic'
+import { ViewerShell } from '@/components/viewer-shell'
+import { AgentCopyIcon } from '@/components/agent-copy-icon'
 import { createContext, memo, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { PaperNote } from '@/components/paper-note'
 import { DirectionCard, parseDirection } from '@/components/canvas/direction-card'
@@ -12,9 +15,11 @@ import { type NodeStatus } from '@/components/node-status-indicator'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Toolbar } from '@/components/ai-elements/toolbar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { RotateCcw, Expand, SquareArrowUpRight, SquareX, FolderOpen, Layers, ChevronLeft, ChevronRight, Bot, Plus, Play, Square, X, Eye, FileText, Maximize2, BookmarkPlus, ChevronDown, Copy, ExternalLink, Images, ListChecks, PanelTop, Ungroup, Minimize2, Image as ImageIcon, Shapes, Trash2, Type, Pencil, Download, ClipboardCopy, Ellipsis, List as ListIcon, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { RotateCcw, Expand, SquareArrowUpRight, SquareX, FolderOpen, Layers, ChevronLeft, ChevronRight, Bot, Plus, Play, Square, X, Eye, FileText, Maximize2, BookmarkPlus, ChevronDown, Copy, Images, ListChecks, PanelTop, Ungroup, Minimize2, Image as ImageIcon, Shapes, Trash2, Type, Pencil, Download, MessageSquarePlus, ZoomIn, ZoomOut, Ellipsis, List as ListIcon, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { BaseEdge, getBezierPath, Handle, NodeResizeControl, Position, useReactFlow, useStore, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import { splitItems } from '../../../shared/canvas-graph.mjs'
+import { conceptAsset, routeField } from '../../../shared/brand-concepts.mjs'
+import { cleanSymbol } from '../../../shared/symbol.mjs'
 import { PAIR_NAMES } from '../../../shared/font-pairs.mjs'
 import '@xyflow/react/dist/base.css'
 import { Button } from '@/components/ui/button'
@@ -88,7 +93,7 @@ export function PortHandle({ type, port, add, label }: { type: 'source' | 'targe
 }
 export const ratioOf = (ratio: string) => { const [a, b] = ratio.split('/').map((part) => Number(part.trim())); return a > 0 && b > 0 ? b / a : 3 / 4 }
 
-export type Env = { fitHeight: (nodeId: string, height: number) => void; downloadPdf: (nodeId: string) => void; runAfter: (nodeId: string) => void; refine: (nodeId: string, text: string) => void; activate: (nodeId: string, index: number) => void; redoItem: (nodeId: string, index: number) => void; commenting: boolean; apply: (id: string) => void; items: Map<string, CanvasItem>; open: (id: string) => void; patch: (id: string, data: Record<string, unknown>) => void; remove: (id: string) => void; duplicate: (id: string) => void; showPrompt: (id: string) => void; expand: (id: string) => void; addNext: (id: string) => void; insertBetween: (edgeId: string) => void; outgoing: Set<string>; run: (id: string) => void; runFrom: (id: string) => void; runAll: () => void; stop: (id: string) => void; save: (id: string) => void; download: (id: string) => void; copyForAgent: (id: string) => void; multi: boolean; placeCard: (groupId: string, ref: string) => void; removeFromGroup: (groupId: string, itemId: string) => void; ungroup: (listId: string) => void; toggleList: (listId: string) => void; addToFolder: (folderId: string) => void; addInput: (id: string) => void; restore: (id: string, index: number) => void; setKind: (id: string, kind: 'agent' | 'screen') => void; models: Array<{ key: string; label: string }>; defaultModel: string; actions: ActionItem[]; manage: () => void }
+export type Env = { expandedId?: string | null; collapse?: () => void; toggleComment?: () => void; editText?: (id: string, from: string, to: string) => void; fitHeight: (nodeId: string, height: number) => void; downloadPdf: (nodeId: string) => void; runAfter: (nodeId: string) => void; refine: (nodeId: string, text: string) => void; activate: (nodeId: string, index: number) => void; redoItem: (nodeId: string, index: number) => void; commenting: boolean; apply: (id: string) => void; items: Map<string, CanvasItem>; open: (id: string) => void; patch: (id: string, data: Record<string, unknown>) => void; remove: (id: string) => void; duplicate: (id: string) => void; showPrompt: (id: string) => void; expand: (id: string) => void; addNext: (id: string) => void; insertBetween: (edgeId: string) => void; outgoing: Set<string>; run: (id: string) => void; runFrom: (id: string) => void; runAll: () => void; stop: (id: string) => void; save: (id: string) => void; download: (id: string) => void; copyForAgent: (id: string) => void; multi: boolean; placeCard: (groupId: string, ref: string) => void; removeFromGroup: (groupId: string, itemId: string) => void; ungroup: (listId: string) => void; toggleList: (listId: string) => void; addToFolder: (folderId: string) => void; addInput: (id: string) => void; restore: (id: string, index: number) => void; setKind: (id: string, kind: 'agent' | 'screen') => void; models: Array<{ key: string; label: string }>; defaultModel: string; actions: ActionItem[]; manage: () => void }
 export const CanvasEnv = createContext<Env>({ fitHeight: () => {}, downloadPdf: () => {}, runAfter: () => {}, refine: () => {}, activate: () => {}, redoItem: () => {}, commenting: false, apply: () => {}, items: new Map(), open: () => {}, patch: () => {}, remove: () => {}, duplicate: () => {}, showPrompt: () => {}, expand: () => {}, addNext: () => {}, insertBetween: () => {}, outgoing: new Set<string>(), run: () => {}, runFrom: () => {}, runAll: () => {}, stop: () => {}, save: () => {}, download: () => {}, copyForAgent: () => {}, multi: false, placeCard: () => {}, removeFromGroup: () => {}, ungroup: () => {}, toggleList: () => {}, addToFolder: () => {}, addInput: () => {}, restore: () => {}, setKind: () => {}, models: [], defaultModel: '', actions: [], manage: () => {} })
 // Поля агентных нод, которыми владеет сервер (статус, результат, цена): клиент их не сохраняет, а подтягивает из ответов
 // Серверные и вычисляемые поля нод (результат, статус, цена…) описаны в реестре shared/canvas-nodes.mjs: derivedFields(type) / stripDerived(type, data)
@@ -102,27 +107,23 @@ export function Tip({ label, children }: { label: string; children: React.ReactE
 }
 export const barButton = 'size-7 rounded-lg [&_svg]:size-3.5'
 export const barClass = 'gap-0.5 rounded-lg border bg-background p-1 shadow-sm'
-export function NodeActions({ id, selected, open }: { id: string; selected: boolean; open?: () => void }) {
-  const { deleteElements } = useReactFlow()
-  const { multi } = useContext(CanvasEnv)
-  return (
-    <Toolbar isVisible={selected && !multi} position={Position.Top} offset={32} className={barClass}>
-      {open && <Tip label={t('Открыть материал')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Открыть материал')} onClick={open}><ExternalLink /></Button></Tip>}
-      <Tip label={t('Удалить')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Удалить')} onClick={() => void deleteElements({ nodes: [{ id }] })}><Trash2 /></Button></Tip>
-    </Toolbar>
-  )
+export function NodeActions({ id, selected }: { id: string; selected: boolean; open?: () => void }) {
+  return <NodeBar id={id} selected={selected} />
 }
 
 // Панель над выбранной нодой, как у Magnific: тёмная таблетка с мелкими иконками — запуск с режимами (эта / отсюда / всё), «подключить дальше»,
 // развернуть, дубль, удалить; редкое (запрос, в библиотеку, скопировать для агента, скачать) — в меню «…». Подписей у иконок нет
 const Divider = () => <span aria-hidden className="mx-0.5 h-4 w-px bg-line" />
 export function NodeBar({ id, selected, runnable, hasOut, hasResult, screen }: { id: string; selected: boolean; runnable?: boolean; hasOut?: boolean; hasResult?: boolean; screen?: boolean }) {
-  const { run, runFrom, runAll, duplicate, showPrompt, save, download, downloadPdf, copyForAgent, expand, multi } = useContext(CanvasEnv)
+  const { run, runFrom, runAll, duplicate, showPrompt, save, download, downloadPdf, copyForAgent, expand, multi, expandedId, commenting, toggleComment } = useContext(CanvasEnv)
   const { deleteElements, getNode } = useReactFlow()
+  const expanded = expandedId === id
+  const data = getNode(id)?.data as AgentData | undefined
+  const historical = typeof data?.activeAt === 'number' && Boolean(data.history?.[data.activeAt])
   const result = Boolean(runnable && hasResult)
   const deck = Boolean(screen && (getNode(id)?.data as { designSystem?: string } | undefined)?.designSystem === 'deck')
-  return (
-    <Toolbar isVisible={selected && !multi} position={Position.Top} offset={44} className={barClass}>
+  const buttons = (
+    <>
       {runnable && (
         <DropdownMenu>
           <Tip label={t('Запустить')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Запустить')} disabled={SNAPSHOT} onClick={() => run(id)}><Play /></Button></Tip>
@@ -135,8 +136,10 @@ export function NodeBar({ id, selected, runnable, hasOut, hasResult, screen }: {
         </DropdownMenu>
       )}
       {runnable && (hasOut || result) && <Divider />}
-      {result && <Tip label={screen ? t('Развернуть экран') : t('Развернуть')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={screen ? t('Развернуть экран') : t('Развернуть')} onClick={() => expand(id)}><Maximize2 /></Button></Tip>}
-      {result && <Tip label={t('Скопировать для агента')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Скопировать для агента')} onClick={() => copyForAgent(id)}><ClipboardCopy /></Button></Tip>}
+      {!expanded && <Tip label={screen ? t('Развернуть экран') : t('Развернуть')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={screen ? t('Развернуть экран') : t('Развернуть')} onClick={() => expand(id)}><Maximize2 /></Button></Tip>}
+      <Tip label={t('Скопировать для агента')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Скопировать для агента')} onClick={() => copyForAgent(id)}><AgentCopyIcon /></Button></Tip>
+      {expanded && <Tip label={t('Скачать')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Скачать')} onClick={() => download(id)}><Download /></Button></Tip>}
+      {expanded && !historical && (screen || getNode(id)?.type === 'image') && <Tip label={t('Правки')}><Button variant={commenting ? 'secondary' : 'ghost'} size="icon-sm" className={barButton} aria-label={t('Правки')} aria-pressed={commenting} onClick={toggleComment}><MessageSquarePlus /></Button></Tip>}
       {(hasOut || result || runnable) && <Divider />}
       <Tip label={t('Дублировать')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Дублировать')} onClick={() => duplicate(id)}><Copy /></Button></Tip>
       <Tip label={t('Удалить')}><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Удалить')} onClick={() => void deleteElements({ nodes: [{ id }] })}><Trash2 /></Button></Tip>
@@ -145,14 +148,16 @@ export function NodeBar({ id, selected, runnable, hasOut, hasResult, screen }: {
           <Tip label={t('Ещё')}><DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" className={barButton} aria-label={t('Ещё')}><Ellipsis /></Button></DropdownMenuTrigger></Tip>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onSelect={() => showPrompt(id)}><FileText />{t('Показать запрос')}</DropdownMenuItem>
-            {result && <DropdownMenuItem onSelect={() => save(id)}><BookmarkPlus />{screen ? t('Картинкой в библиотеку') : t('В библиотеку')}</DropdownMenuItem>}
-            {result && <DropdownMenuItem onSelect={() => download(id)}><Download />{screen ? t('Скачать HTML') : t('Скачать .md')}</DropdownMenuItem>}
-            {result && deck && <DropdownMenuItem onSelect={() => downloadPdf(id)}><Download />{t('Скачать PDF')}</DropdownMenuItem>}
+            {result && !historical && <DropdownMenuItem onSelect={() => save(id)}><BookmarkPlus />{screen ? t('Картинкой в библиотеку') : t('В библиотеку')}</DropdownMenuItem>}
+            {result && <DropdownMenuItem onSelect={() => download(id)}><Download />{screen ? t('Скачать HTML') : getNode(id)?.type === 'image' ? t('Скачать') : t('Скачать .md')}</DropdownMenuItem>}
+            {result && !historical && deck && <DropdownMenuItem onSelect={() => downloadPdf(id)}><Download />{t('Скачать PDF')}</DropdownMenuItem>}
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-    </Toolbar>
+    </>
   )
+  if (expanded) return <div className="flex flex-wrap items-center gap-0.5" role="toolbar" aria-label={data?.title ?? t('Результат ноды')}>{buttons}</div>
+  return <Toolbar isVisible={selected && !multi} position={Position.Top} offset={44} className={barClass}>{buttons}</Toolbar>
 }
 
 // Контекстное меню ноды (как у Tersa): Дублировать, Показать (камера едет к ноде), Удалить; правый клик заодно выделяет ноду
@@ -165,9 +170,11 @@ export function NodeMenu({ id, children }: { id: string; children: React.ReactNo
   }
   // Правый клик — то же, что панель над нодой, но полным списком (как у Magnific): запуск, связи, результат, экспорт, дубль, удаление
   const node = getNode(id)
-  const runnable = node?.type === 'agent' || node?.type === 'screen'
+  const runnable = node?.type === 'agent' || node?.type === 'screen' || node?.type === 'image'
   const screen = node?.type === 'screen'
-  const result = runnable && Boolean((node?.data as { result?: string } | undefined)?.result)
+  const data = node?.data as AgentData | undefined
+  const historical = typeof data?.activeAt === 'number' && Boolean(data.history?.[data.activeAt])
+  const result = runnable && Boolean((node?.data as { result?: string; imageFile?: string } | undefined)?.result || node?.data.imageFile)
   return (
     <ContextMenu onOpenChange={(open) => { if (open && !getNode(id)?.selected) updateNode(id, { selected: true }) }}>
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
@@ -176,13 +183,13 @@ export function NodeMenu({ id, children }: { id: string; children: React.ReactNo
         {runnable && <ContextMenuItem disabled={SNAPSHOT} onSelect={() => runFrom(id)}><Play />{t('Запустить отсюда')}</ContextMenuItem>}
         {runnable && <ContextMenuItem disabled={SNAPSHOT} onSelect={() => runAll()}><Play />{t('Запустить всё')}</ContextMenuItem>}
         {runnable && <ContextMenuSeparator />}
-        {result && <ContextMenuItem onSelect={() => expand(id)}><Maximize2 />{t('Развернуть')}</ContextMenuItem>}
+        <ContextMenuItem onSelect={() => expand(id)}><Maximize2 />{t('Развернуть')}</ContextMenuItem>
         {runnable && <ContextMenuItem onSelect={() => showPrompt(id)}><FileText />{t('Показать запрос')}</ContextMenuItem>}
         {result && <ContextMenuSeparator />}
-        {result && <ContextMenuItem onSelect={() => copyForAgent(id)}><ClipboardCopy />{t('Скопировать для агента')}</ContextMenuItem>}
-        {result && <ContextMenuItem onSelect={() => save(id)}><BookmarkPlus />{screen ? t('Картинкой в библиотеку') : t('В библиотеку')}</ContextMenuItem>}
-        {result && <ContextMenuItem onSelect={() => download(id)}><Download />{screen ? t('Скачать HTML') : t('Скачать .md')}</ContextMenuItem>}
-        {result && (getNode(id)?.data as { designSystem?: string } | undefined)?.designSystem === 'deck' && <ContextMenuItem onSelect={() => downloadPdf(id)}><Download />{t('Скачать PDF')}</ContextMenuItem>}
+        <ContextMenuItem onSelect={() => copyForAgent(id)}><AgentCopyIcon />{t('Скопировать для агента')}</ContextMenuItem>
+        {result && !historical && <ContextMenuItem onSelect={() => save(id)}><BookmarkPlus />{screen ? t('Картинкой в библиотеку') : t('В библиотеку')}</ContextMenuItem>}
+        {result && <ContextMenuItem onSelect={() => download(id)}><Download />{screen ? t('Скачать HTML') : getNode(id)?.type === 'image' ? t('Скачать') : t('Скачать .md')}</ContextMenuItem>}
+        {result && !historical && (getNode(id)?.data as { designSystem?: string } | undefined)?.designSystem === 'deck' && <ContextMenuItem onSelect={() => downloadPdf(id)}><Download />{t('Скачать PDF')}</ContextMenuItem>}
         <ContextMenuSeparator />
         <ContextMenuItem onSelect={focus}><Eye />{t('Показать на холсте')}</ContextMenuItem>
         <ContextMenuItem onSelect={() => duplicate(id)}><Copy />{t('Дублировать')}</ContextMenuItem>
@@ -201,20 +208,38 @@ export function NodeFrame({ id, selected, icon: Icon, title, meta, tools, bar, p
   bar: React.ReactNode; ports: React.ReactNode; resize: { minWidth: number; minHeight: number; onEnd?: () => void }
   onDoubleClick?: () => void; className?: string; bodyClassName?: string; ring?: string; children: React.ReactNode
 }) {
-  return (
-    <NodeMenu id={id}><div data-selected={selected || undefined} className={cn('group/node relative', className ?? 'size-full')} onDoubleClick={onDoubleClick}>
-      {bar}
-      <ResizeArcs selected={selected} minWidth={resize.minWidth} minHeight={resize.minHeight} onEnd={resize.onEnd} />
-      {ports}
-      <div className="absolute bottom-full left-0 right-0 mb-2 flex items-center gap-1.5 px-1">
-        <Icon className="size-3.5 shrink-0 text-muted-foreground" />
-        {title ? <span className="min-w-0 flex-1 truncate text-[11px] font-semibold uppercase tracking-[0.06em]">{title}</span> : <span className="flex-1" />}
+  const { expandedId, collapse, expand } = useContext(CanvasEnv)
+  const { getNode } = useReactFlow()
+  const nodeData = getNode(id)?.data
+  const label = String(nodeData?.title ?? nodeData?.name ?? nodeData?.label ?? t('Нода'))
+  const expanded = expandedId === id
+  const header = (
+      <div className={cn('flex min-w-0 items-center px-1', expanded ? 'h-8 gap-2' : 'absolute bottom-full left-0 right-0 mb-2 gap-1.5')}>
+        <Icon className={cn('shrink-0 text-muted-foreground', expanded ? 'size-4' : 'size-3.5')} />
+        {title ? <span className={cn('min-w-0 flex-1 truncate', expanded ? 'text-sm font-medium [&_input]:text-sm [&_input]:font-medium [&_input]:normal-case [&_input]:tracking-normal' : 'text-[11px] font-semibold uppercase tracking-[0.06em]')}>{title}</span> : <span className="flex-1" />}
         {meta && <span className="shrink-0 text-[11px] uppercase tracking-[0.06em] text-muted-foreground">{meta}</span>}
-        {tools}
+        {!expanded && tools}
       </div>
-      <BaseNode className={cn('flex h-full w-full flex-col overflow-hidden rounded-lg', ring ?? (selected && 'ring-1 ring-port-text'), bodyClassName)}>{children}</BaseNode>
+  )
+  const content = (
+    <NodeMenu id={id}><div data-selected={selected || undefined} className={cn('group/node relative', expanded ? 'flex size-full min-h-0 flex-col gap-2 p-4 pt-16 max-compact:pt-28' : className ?? 'size-full')} onDoubleClick={onDoubleClick}>
+      {!expanded && bar}
+      {!expanded && <ResizeArcs selected={selected} minWidth={resize.minWidth} minHeight={resize.minHeight} onEnd={resize.onEnd} />}
+      {!expanded && ports}
+      {!expanded && header}
+      <BaseNode className={cn('flex min-h-0 w-full flex-col overflow-hidden rounded-lg', expanded ? 'flex-1' : 'h-full', ring ?? (selected && 'ring-1 ring-port-text'), bodyClassName, !expanded && !['agent', 'screen', 'image', 'card'].includes(String(getNode(id)?.type)) && 'pt-10')}>
+        {!expanded && <Tip label={t('Развернуть')}><Button variant="ghost" size="icon-sm" className="nodrag absolute top-3 right-3 z-20 size-8 rounded-lg bg-card/90" aria-label={t('Открыть')} onClick={(event) => { event.stopPropagation(); expand(id) }}><Maximize2 /></Button></Tip>}
+        {children}
+      </BaseNode>
     </div></NodeMenu>
   )
+  if (!expanded) return content
+  return <>
+    <div aria-hidden className={className ?? 'size-full'} />
+    <ViewerShell open onClose={() => collapse?.()} title={label} heading={header} topActions={<>{tools}{bar}</>} description={t('Результат ноды целиком.')}>
+      {content}
+    </ViewerShell>
+  </>
 }
 
 // Длинное содержимое прокручивается внутри ноды, снизу затухание — видно, что есть ещё. Колесо мыши прокручивает текст только когда
@@ -437,8 +462,8 @@ export type TemplateStep = { type: 'agent' | 'screen' | 'image' | 'choice'; titl
 // Этапы шаблона: рамка вокруг шагов этапа; цвет — индекс в FRAME_HUES (анализ — оливковый, решение — синий, результат — нейтральный)
 export const TEMPLATE_STAGES: Record<TemplateStage, { label: () => string; hue?: number }> = { analysis: { label: () => t('Анализ'), hue: 1 }, decision: { label: () => t('Решение'), hue: 2 }, result: { label: () => t('Результат') } }
 // graph — шаблон-граф: узлы, связи и рамки берутся из shared/*-template.mjs (параллельные ветки), а не из линейных steps
-export const TEMPLATES: { key: string; label: string; hint: string; steps: TemplateStep[]; graph?: boolean }[] = [
-  { key: 'hypothesis', label: t('Проверка гипотезы'), hint: t('идея → рынок → бренд → лендинг → промпт для сборки'), steps: [], graph: true },
+export const TEMPLATES: { key: string; label: string; hint: string; caption?: [string, string]; steps: TemplateStep[]; graph?: boolean }[] = [
+  { key: 'hypothesis', label: t('Проверка гипотезы'), hint: t('идея → рынок → бренд → лендинг → промпт для сборки'), caption: [t('Проверь идею, прежде чем строить.'), t('Конкуренты, сигналы спроса и вердикт с источниками. Слабый вердикт останавливает дорогие шаги; хороший ведёт к брифу, бренду, экранам и промпту для сборки.')], steps: [], graph: true },
   { key: 'landing-reference', label: t('Лендинг из снимков'), hint: t('заметки и снимки → паспорт → направления → текст → страница'), steps: [], graph: true },
   { key: 'product-landing', label: t('Лендинг продукта'), hint: t('факты и снимки → план → куски интерфейса → лендинг → проверка'), steps: [], graph: true },
   { key: 'rules-concepts', label: t('Правила → концепты → экран'), hint: t('правила → концепты → выбор → экран'), steps: [
@@ -447,12 +472,13 @@ export const TEMPLATES: { key: string; label: string; hint: string; steps: Templ
     { type: 'choice', title: t('Выбор концепта'), stage: 'decision' },
     { type: 'screen', title: t('Экран'), instr: SCREEN_INSTR, stage: 'decision' },
   ] },
-  { key: 'brand-directions', label: t('Бренд-направления'), hint: t('мудборд → правила → 4 направления → выбор → экран'), steps: [
+  { key: 'brand-directions', label: t('Бренд-направления'), hint: t('мудборд → правила → 4 направления → выбор → экран'), caption: [t('Четыре направления из одного мудборда.'), t('Правила стиля из референсов становятся брендовыми направлениями и экраном лендинга, каждый шаг на виду.')], steps: [
     { type: 'agent', title: t('Правила стиля'), instr: t('По мудборду выведи 5–7 коротких правил стиля: что держит эти рефы вместе, что стоит взять, чего избегать. Каждое правило — механика («как сделано»), а не «нравится». Заметку владельца к каждому рефу читай как главный сигнал. Всё из анти-референсов — то, чего избегать: превращай в правила вида «не …». Списком, без вступлений.'), stage: 'analysis' },
     { type: 'agent', title: t('Направления'), instr: t('Придумай 4 по-настоящему разных направления бренда в рамках этих правил и позиционирования. Меняй только то, что ещё открыто: оттенок акцента, характер заголовочного шрифта, скругление углов, композицию hero. Ответ — нумерованный список, один пункт на направление, ровно в такой форме (владелец выбирает по карточке, собранной из полей, поэтому названия полей не менять):\n1. **Короткое имя** — идея одной фразой.\nAccent: #RRGGBB\nPair: ровно одна из этих пар, шрифт заголовка + шрифт текста, у разных направлений пары разные: Newsreader + Hanken Grotesk; Funnel Display + Funnel Sans; Host Grotesk + IBM Plex Mono; Young Serif + Onest; Schibsted Grotesk + Newsreader; Brygada 1918 + Albert Sans; Literata + Familjen Grotesk; Gloock + Public Sans; Atkinson Hyperlegible Next + DM Mono; Libre Caslon Display + Radio Canada Big; Radio Canada Big + Newsreader; Hanken Grotesk + Literata\nHeadline: заголовок hero в голосе направления, до 8 слов\nLayout: одно из centered, split, left (композиция hero: текст по центру над кадром, текст рядом с кадром или крупный текст слева над ним; у разных направлений разная)\nCorners: одно из sharp, soft, pill (скругление кнопок и карточек в этом направлении; у разных направлений разное)\nVerdict: читается ли за 5 секунд, живёт ли знак на 16 px, чем отличается от ближайших продуктов. Другого текста нет.'), stage: 'decision', pick: true },
     { type: 'screen', title: t('Hero направления'), instr: t('Нарисуй hero лендинга 1440×900 в тёмной теме для выбранного направления: графит и один акцент выбранного оттенка на главной кнопке, место под логотип, заголовок, одна строка, одна кнопка и широкая пустая область под кадр продукта. Наши компоненты, без выдуманных брендов и значков-искр.'), stage: 'decision' },
   ] },
-  { key: 'technique-recipe', label: t('Приём → рецепт'), hint: t('разбор приёма → рецепт в токенах → экран'), steps: [
+  { key: 'brandbook', label: t('Брендбук'), hint: t('бриф и референсы → начертание → цвета и шрифты → брендбук'), caption: [t('От референсов до брендбука.'), t('Выбери начертание, затем палитру и пару шрифтов. Брендбук соберёт голос и применения, а знаком станет первая буква вордмарка.')], steps: [], graph: true },
+  { key: 'technique-recipe', label: t('Приём → рецепт'), hint: t('разбор приёма → рецепт в токенах → экран'), caption: [t('Преврати приём в рецепт.'), t('Посмотри, что делают референсы, и получи рецепт в токенах проекта и экран, собранный по нему.')], steps: [
     { type: 'agent', title: t('Разбор приёма'), instr: t('Разбери, на чём держится приём в этих рефах: что именно сделано, сколько шагов, где подсказка и где действие. Начни с вывода в 1–3 предложения.'), stage: 'analysis' },
     { type: 'agent', title: t('Рецепт в токенах'), instr: t('Преврати приём в рецепт для нашего проекта: какие наши компоненты и токены взять, в каком порядке собрать, чего избегать. Нумерованными шагами, без вступлений.'), stage: 'analysis' },
     { type: 'screen', title: t('Экран по рецепту'), instr: t('Собери экран по рецепту из входа на React, наших компонентах и токенах проекта. Без придуманных брендов и значков-искр.'), stage: 'result' },
@@ -464,7 +490,7 @@ export const TEMPLATES: { key: string; label: string; hint: string; steps: Templ
     { type: 'screen', title: t('Пример экрана'), instr: t('Собери один типовой экран продукта (список с поиском и одной главной кнопкой), чтобы глазами проверить вкус. Тема из «Токенов» подставится сама: цвета и шрифты вручную не задавай, бери классы темы (bg-primary, text-muted-foreground, border-border); акцент (text-primary или bg-primary) — на одном маленьком элементе: значке, метке, выделении. Без придуманных брендов, значков-искр и градиентов.'), stage: 'result' },
     { type: 'agent', title: t('Запомнить'), instr: t('Сожми правила стиля и токены в 1–2 строки памяти, чтобы агент применил их в любом другом проекте: «В моих интерфейсах: …». Назови фон, акцент HEX и пару шрифтов из токенов. Каждая строка короче 200 знаков, с новой строки через «- », без вступления и примечаний.'), from: [1, 2], remember: true, stage: 'result' },
   ] },
-  { key: 'style-image', label: t('Правила стиля → картинка'), hint: t('правила стиля → картинка в этом стиле'), steps: [
+  { key: 'style-image', label: t('Правила стиля → картинка'), hint: t('правила стиля → картинка в этом стиле'), caption: [t('Сначала правила стиля, потом картинка.'), t('Выдели правила из референсов и передай их шагу с картинкой.')], steps: [
     { type: 'agent', title: PRESETS[0].title, instr: PRESETS[0].instr, preset: 0, stage: 'analysis' },
     { type: 'image', title: t('Картинка в стиле'), instr: t('Нарисуй иллюстрацию в духе этих правил: спокойная композиция, один акцентный цвет, без текста на картинке.'), stage: 'result' },
   ] },
@@ -473,7 +499,7 @@ export const TEMPLATES: { key: string; label: string; hint: string; steps: Templ
     { type: 'agent', title: t('Чего не хватает'), instr: t('Чего в этой подборке не хватает: какие приёмы, примеры и контрасты стоит добавить. Списком до 5 пунктов.'), stage: 'analysis' },
     { type: 'agent', title: t('Что применить'), instr: t('Что из этого применить на этой неделе: три шага, каждый — одно действие в проекте.'), stage: 'result' },
   ] },
-  { key: 'compare-choose', label: t('Сравни и выбери'), hint: t('сравнение → выбор → как применить'), steps: [
+  { key: 'compare-choose', label: t('Сравни и выбери'), hint: t('сравнение → выбор → как применить'), caption: [t('Сравни подходы и выбери.'), t('Сравни варианты, выбери один и получи, как его применить.')], steps: [
     { type: 'agent', title: t('Сравнение'), instr: t('Сравни эти материалы по критериям: механика, ясность, плотность, работа акцента. Нумерованным списком, по одному материалу на пункт: название и два предложения о сильных и слабых сторонах.'), stage: 'analysis' },
     { type: 'choice', title: t('Выбор варианта'), stage: 'decision' },
     { type: 'agent', title: t('Как применить'), instr: t('Объясни, как применить выбранный вариант в нашем проекте: 3–5 конкретных шагов.'), stage: 'decision' },
@@ -481,7 +507,7 @@ export const TEMPLATES: { key: string; label: string; hint: string; steps: Templ
 ]
 
 export type AgentUsage = { input?: number; output?: number; cached?: number; seconds?: number }
-export type AgentData = { held?: boolean; actions?: string[]; autoPick?: boolean; activeAt?: number; productName?: string; comments?: CardComment[]; imageFile?: string; sized?: boolean; fit?: boolean; context?: Array<{ kind: 'card' | 'text' | 'result' | 'group'; id?: string; image?: string; images?: string[]; label: string }>; inputRefs?: string[]; history?: Array<{ result?: string; imageFile?: string; ranAt?: number }>; title?: string; instr?: string; status?: string; result?: string; error?: string; ranAt?: number; stale?: boolean; estimateK?: number; estimateMin?: number; modelLabel?: string; inputNames?: string[]; usage?: AgentUsage[]; pick?: boolean; choice?: number; items?: string[]; needsChoice?: string }
+export type AgentData = { held?: boolean; actions?: string[]; autoPick?: boolean; activeAt?: number; productName?: string; comments?: CardComment[]; imageFile?: string; brandMonogram?: boolean; sized?: boolean; fit?: boolean; context?: Array<{ kind: 'card' | 'text' | 'result' | 'group'; id?: string; image?: string; images?: string[]; label: string }>; inputRefs?: string[]; history?: Array<{ result?: string; imageFile?: string; ranAt?: number }>; title?: string; instr?: string; status?: string; result?: string; error?: string; ranAt?: number; stale?: boolean; estimateK?: number; estimateMin?: number; modelLabel?: string; inputNames?: string[]; usage?: AgentUsage[]; pick?: boolean; choice?: number; items?: string[]; needsChoice?: string }
 // Состояние ноды для строки и индикатора: общее у компактной ноды и у панели результата
 export function agentState(data: AgentData) {
   const status = data.status ?? 'idle'
@@ -533,7 +559,10 @@ function ContextStrip({ items }: { items: ContextItem[] }) {
 export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData>>) {
   // Поля тащатся вместе с нодой, пока в них не печатаешь: клик ставит фокус (и только тогда nodrag), иначе за любое место ноды её можно двигать
   const [typing, setTyping] = useState<'title' | 'instr' | null>(null)
-  const { fitHeight, patch, run, stop, addNext, outgoing, models, defaultModel, activate, refine, runAfter, addInput, expand, commenting, apply } = useContext(CanvasEnv)
+  const { fitHeight, patch, run, stop, addNext, outgoing, models, defaultModel, activate, refine, runAfter, addInput, commenting, apply, editText } = useContext(CanvasEnv)
+  const expanded = useContext(CanvasEnv).expandedId === id
+  const [zoomed, setZoomed] = useState(false)
+  const [editingScreen, setEditingScreen] = useState(false)
   const [compose, setCompose] = useState<PickEvent | null>(null)
   useEffect(() => { if (!commenting) setCompose(null) }, [commenting])
   const screen = type === 'screen'
@@ -549,16 +578,17 @@ export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData
   const at = typeof data.activeAt === 'number' && data.activeAt < total - 1 ? data.activeAt : total - 1
   const old = at < total - 1
   const shown: { result?: string; imageFile?: string } = old ? past[at] : { result: data.result, imageFile: data.imageFile }
-  const hasResult = Boolean(shown.result)
+  const waiting = Boolean(data.needsChoice && !old)
+  const hasResult = !waiting && Boolean(shown.result || shown.imageFile)
   // Режим pick: результат читается как список вариантов, владелец отмечает один, дальше идёт только он; у прошлой версии отметка недоступна
   const pickItems = data.pick && shown.result ? (old ? splitItems(shown.result) : (data.items ?? splitItems(shown.result))) : []
-  const mode = view ?? (hasResult || running || status === 'error' ? 'result' : 'instr')
+  const mode = view ?? (hasResult || waiting || running || status === 'error' ? 'result' : 'instr')
   // Нода из шаблона (fit) облегает свой результат: высота подбирается под содержимое, без прокрутки внутри и без ручного растягивания;
   // потянул размер руками — нода выходит из автоподбора (fit: false). Следим за размером содержимого: у экрана-страницы высота приходит позже
   const resultRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = resultRef.current
-    if (!data.fit || !el || mode !== 'result' || running || !hasResult || image || old) return
+    if (expanded || !data.fit || !el || mode !== 'result' || running || !hasResult || image || old) return
     const measure = () => {
       const scroller = el.scrollHeight > el.clientHeight + 1 ? el : el.querySelector<HTMLElement>('.overflow-y-auto') ?? el
       const node = el.closest<HTMLElement>('.react-flow__node')
@@ -575,11 +605,11 @@ export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData
     watch.observe(el); if (el.firstElementChild) watch.observe(el.firstElementChild)
     measure()
     return () => watch.disconnect()
-  }, [data.fit, mode, running, hasResult, shown.result, image, old, id, fitHeight])
+  }, [expanded, data.fit, mode, running, hasResult, shown.result, image, old, id, fitHeight])
   const ring = status === 'error' ? 'ring-2 ring-destructive' : running ? 'ring-2 ring-port-text animate-pulse' : selected ? 'ring-1 ring-port-text' : ''
   const body = (
     <>
-      <div className="flex items-center gap-2 px-3 pt-3">
+      <div className={cn("flex items-center gap-2 px-3 pt-3", !expanded && "pr-14")}>
         {/* Как у Magnific: таблетка «Промт | Результат» (сначала промт), круглая «+» добавить в контекст, дальше миниатюры того, что реально в контексте */}
         <div className="flex h-8 shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5" role="tablist" aria-label={t('Что показывать')}>
           <Button variant={mode === 'instr' ? 'secondary' : 'ghost'} size="icon-xs" className="nodrag rounded-lg" role="tab" aria-selected={mode === 'instr'} aria-label={t('Инструкция')} onClick={() => setView('instr')}><Pencil /></Button>
@@ -594,7 +624,8 @@ export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData
           </div>
         )}
         {(screen || image) && !running && !old && Boolean(data.comments?.length) && <Button size="xs" className="nodrag shrink-0 rounded-lg" onClick={() => apply(id)}>{t('Применить ({n})', { n: data.comments!.length })}</Button>}
-        {hasResult && !running && !image && <Button variant="ghost" size="icon-sm" className="nodrag size-8 shrink-0 rounded-lg bg-muted/60 [&_svg]:size-4" aria-label={t('Открыть')} onClick={() => expand(id)}><Maximize2 /></Button>}
+        {expanded && mode === 'result' && screen && hasResult && !old && <Tip label={t('Править текст')}><Button variant={editingScreen ? 'secondary' : 'ghost'} size="icon-sm" aria-label={t('Править текст')} aria-pressed={editingScreen} onClick={() => setEditingScreen(!editingScreen)}><Type /></Button></Tip>}
+        {expanded && mode === 'result' && image && hasResult && <Tip label={zoomed ? t('Вписать') : t('Увеличить')}><Button variant="ghost" size="icon-sm" aria-label={zoomed ? t('Вписать') : t('Увеличить')} onClick={() => setZoomed(!zoomed)}>{zoomed ? <ZoomOut /> : <ZoomIn />}</Button></Tip>}
         {/* В контексте: всё подключённое одной строкой с прокруткой вбок. Картинка — миниатюра (название по наведению), текст и результат ноды — иконка с названием. «+» стоит в правом углу и не прячется при прокрутке */}
       </div>
       <div className="relative min-h-0 flex-1 px-3 pt-3 pb-1">
@@ -603,18 +634,18 @@ export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData
             {running ? <Shimmer>{t('Работает над ответом…')}</Shimmer>
               : status === 'error' ? <p className="text-destructive">{data.error ?? t('Запуск не удался')}</p>
               : hasResult ? (screen
-                ? <><ScaledFrame key={at} html={shown.result!} maxH="fill" commenting={commenting && !old} onPick={(event) => setCompose(event)} overlay={!old && data.comments?.some((item) => item.x !== undefined) ? <PinLayer comments={data.comments} active={false} onHover={() => {}} onSave={() => {}} onCancel={() => {}} /> : undefined} />
+                ? <><ScaledFrame key={at} html={shown.result!} maxH="fill" interactive={expanded && !commenting && !editingScreen} editing={expanded && editingScreen && !old} onEdited={(edit) => editText?.(id, edit.from, edit.to)} commenting={commenting && !old && !editingScreen} onPick={(event) => setCompose(event)} overlay={!old && data.comments?.some((item) => item.x !== undefined) ? <PinLayer comments={data.comments} active={false} onHover={() => {}} onSave={() => {}} onCancel={() => {}} /> : undefined} />
                   {compose && (
                     <CommentComposer left={compose.box.left + (compose.info.rect[0] + compose.info.rect[2] / 2) * compose.scale + 12} top={compose.info.rect[3] * compose.scale < 80 ? compose.box.top + (compose.info.rect[1] + compose.info.rect[3]) * compose.scale + 8 : compose.box.top + compose.info.rect[1] * compose.scale + 8}
                       label={`${compose.info.tag}${compose.info.text ? ` · ${compose.info.text.slice(0, 40)}` : ''}`} onCancel={() => setCompose(null)}
                       onSave={(text) => { patch(id, { comments: [...(data.comments ?? []), { id: `c-${Date.now()}`, text, at: Date.now(), x: Math.min(1, (compose.info.rect[0] + compose.info.rect[2] / 2) / compose.size[0]), y: Math.min(1, compose.info.rect[1] / compose.size[1]), h: compose.size[1], el: compose.info }] }); setCompose(null) }} />
                   )}</>
                 : image && shown.imageFile
-                  ? <div className="relative mx-auto h-full w-fit max-w-full"><img src={shown.imageFile} alt={data.title ?? t('Картинка')} className="block h-full w-auto max-w-full rounded-md bg-background/60 object-contain" />{!old && <PinLayer comments={data.comments ?? []} active={commenting} onHover={() => {}} onCancel={() => {}} onSave={(text, x, y) => patch(id, { comments: [...(data.comments ?? []), { id: `c-${Date.now()}`, text, at: Date.now(), x, y }] })} />}</div>
+                  ? <div className={cn('relative mx-auto w-fit', expanded && zoomed ? '' : 'h-full max-w-full')}><img src={shown.imageFile} alt={data.title ?? t('Картинка')} className={cn(expanded && zoomed ? 'block max-w-none rounded-md' : 'block h-full w-auto max-w-full rounded-md object-contain', data.brandMonogram ? 'bg-white' : 'bg-background/60')} />{!old && <PinLayer comments={data.comments ?? []} active={commenting} onHover={() => {}} onCancel={() => {}} onSave={(text, x, y) => patch(id, { comments: [...(data.comments ?? []), { id: `c-${Date.now()}`, text, at: Date.now(), x, y }] })} />}</div>
                   : data.pick && pickItems.length >= 2
                     ? <VariantList nodeId={id} items={pickItems} choice={data.choice ?? (data.autoPick ? 0 : undefined)} old={old} busy={running} product={data.productName} canRedo onChoose={(index) => patch(id, { choice: index })} />
                     : <FoldedResult text={shown.result!} />)
-              : <p className="text-muted-foreground">{t('Результата ещё нет. Напиши инструкцию и запусти.')}</p>}
+              : <p className="text-muted-foreground">{waiting ? t('Ожидает выбора в ноде «{name}»', { name: data.needsChoice! }) : t('Результата ещё нет. Напиши инструкцию и запусти.')}</p>}
           </div>
         ) : (
           <Textarea aria-label={t('Инструкция')} value={data.instr ?? ''} placeholder={image ? t('Опиши картинку, которую нужно нарисовать. Подключённые картинки — референсы приёма и стиля. ⌘↵ — запустить.') : screen ? t('Опиши экран, который нужно нарисовать по подключённым входам. ⌘↵ — запустить.') : t('Агент — твой помощник по материалам: напиши, что сделать с подключёнными входами (например, «выведи 5 правил стиля из этих рефов»). ⌘↵ — запустить.')} onChange={(event) => patch(id, { instr: event.target.value })}
@@ -669,7 +700,7 @@ export function AgentNode({ id, data, selected, type }: NodeProps<Node<AgentData
       meta={(data.needsChoice || pill) && <span className={cn(data.stale && 'font-medium text-foreground', status === 'error' && 'text-destructive')}>{data.needsChoice ? t('ждёт «{name}»', { name: data.needsChoice }) : pill}</span>}
       className={cn('min-h-[200px] min-w-[240px]', data.sized ? 'size-full' : 'h-[320px] w-[320px]')} bodyClassName="gap-0 p-0"
       resize={{ minWidth: 240, minHeight: 200, onEnd: () => patch(id, { sized: true, fit: false }) }}
-      bar={<NodeBar id={id} selected={selected} runnable hasOut hasResult={hasResult && !old} screen={screen} />}
+      bar={<NodeBar id={id} selected={selected} runnable hasOut hasResult={hasResult} screen={screen} />}
       ports={<><PortHandle type="target" port="material" /><PortHandle type="source" port={screen ? 'screen' : image ? 'image' : 'text'} add={outgoing.has(id) ? undefined : () => addNext(id)} /></>}>
       {body}
     </NodeFrame>
@@ -686,20 +717,45 @@ export function GroupNode({ id, data, selected }: NodeProps<Node<{ groupKind?: s
   const members = (data.members ?? []).filter((item) => only === 'all' || item.cat === only)
   const list = data.view === 'list'
   // На дальнем плане действия по наведению не показываем: они не масштабируются вместе с нодой, мимо них легко попасть в карточку
-  const low = useStore((state) => state.transform[2]) < 0.6
+  const zoom = useStore((state) => state.transform[2])
+  const expanded = useContext(CanvasEnv).expandedId === id
+  const [gridElement, setGridElement] = useState<HTMLUListElement | null>(null)
+  const [mosaic, setMosaic] = useState<MosaicBox[]>([])
+  const memberKey = members.map((item) => `${item.id}:${item.image ?? ''}`).join('|')
+  useEffect(() => {
+    const el = gridElement
+    if (!el || list || !members.length) return
+    const measure = () => {
+      const css = getComputedStyle(el)
+      const width = el.clientWidth - parseFloat(css.paddingLeft) - parseFloat(css.paddingRight)
+      const height = el.clientHeight - parseFloat(css.paddingTop) - parseFloat(css.paddingBottom)
+      const ratios = [...el.children].map((item) => {
+        const img = item.querySelector('img')
+        return img?.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1
+      })
+      const next = materialMosaic(ratios, width, height, parseFloat(css.gap) || 0).map((box) => ({ ...box, left: box.left + parseFloat(css.paddingLeft), top: box.top + parseFloat(css.paddingTop) }))
+      setMosaic((previous) => JSON.stringify(previous) === JSON.stringify(next) ? previous : next)
+    }
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    el.addEventListener('load', measure, true)
+    measure()
+    return () => { observer.disconnect(); el.removeEventListener('load', measure, true) }
+  }, [gridElement, list, data.open, memberKey])
+  const low = !expanded && zoom < 0.6
   const isList = data.groupKind === 'list'
   // Кнопки плитки (Solar): открыть — «развернуть» в рамке, на холст — квадрат со стрелкой ↗, убрать — крестик в рамке; все по 14 px, убрать — крестик (из папки, подборки или списка)
-  const tool = 'nodrag size-[18px] rounded-md [&_svg]:size-[14px]'
+  const tool = expanded ? 'nodrag rounded-lg [&_svg]:size-4' : 'nodrag size-[18px] rounded-md [&_svg]:size-[14px]'
   const pill = (item: { id: string; title: string }, className: string) => low ? null : (
-    <span className={cn('flex items-center gap-px rounded-lg bg-background p-0.5', className)}>
-      {!isList && <Tip label={t('Открыть')}><Button variant="ghost" size="icon-xs" className={tool} aria-label={t('Открыть: {title}', { title: item.title })} onClick={() => open(item.id)}><Expand /></Button></Tip>}
-      {!isList && <Tip label={t('На холст')}><Button variant="ghost" size="icon-xs" className={tool} aria-label={t('На холст: {title}', { title: item.title })} onClick={() => placeCard(id, item.id)}><SquareArrowUpRight /></Button></Tip>}
-      <Tip label={t('Убрать')}><Button variant="ghost" size="icon-xs" className={tool} aria-label={t('Убрать: {title}', { title: item.title })} onClick={() => removeFromGroup(id, item.id)}><SquareX /></Button></Tip>
+    <span className={cn('flex items-center rounded-lg bg-background', expanded ? 'gap-1 p-1' : 'gap-px p-0.5', className)}>
+      {!isList && <Tip label={t('Открыть')}><Button variant="ghost" size={expanded ? 'icon' : 'icon-xs'} className={tool} aria-label={t('Открыть: {title}', { title: item.title })} onClick={() => open(item.id)}><Expand /></Button></Tip>}
+      {!isList && <Tip label={t('На холст')}><Button variant="ghost" size={expanded ? 'icon' : 'icon-xs'} className={tool} aria-label={t('На холст: {title}', { title: item.title })} onClick={() => placeCard(id, item.id)}><SquareArrowUpRight /></Button></Tip>}
+      <Tip label={t('Убрать')}><Button variant="ghost" size={expanded ? 'icon' : 'icon-xs'} className={tool} aria-label={t('Убрать: {title}', { title: item.title })} onClick={() => removeFromGroup(id, item.id)}><SquareX /></Button></Tip>
     </span>
   )
   const round = 'nodrag size-7 rounded-lg bg-background hover:bg-background/70 [&_svg]:size-3.5'
   // Развёрнутый список — рамка под своими участниками: название, свернуть, разобрать и общий выход
-  if (isList && data.open) return (
+  if (isList && data.open && !expanded) return (
     <NodeMenu id={id}><div data-selected={selected || undefined} className={cn('group/node relative size-full rounded-container border bg-muted/20', selected && 'border-primary ring-1 ring-primary')}>
       <NodeBar id={id} selected={selected} hasOut />
       <div className="absolute top-2 left-3 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -710,32 +766,7 @@ export function GroupNode({ id, data, selected }: NodeProps<Node<{ groupKind?: s
       <PortHandle type="source" port="material" add={outgoing.has(id) ? undefined : () => addNext(id)} />
     </div></NodeMenu>
   )
-  return (
-    <NodeFrame id={id} selected={selected} icon={data.groupKind === 'folder' ? FolderOpen : Layers} title={data.name ?? (data.groupKind === 'list' ? t('Список') : t('Подборка'))}
-      className={cn('min-h-[200px] min-w-[240px]', data.sized ? 'size-full' : 'h-[400px] w-[400px]')} bodyClassName="relative p-0"
-      resize={{ minWidth: 240, minHeight: 200, onEnd: () => patch(id, { sized: true, fit: false }) }}
-      bar={<NodeBar id={id} selected={selected} hasOut />}
-      ports={<PortHandle type="source" port="material" add={outgoing.has(id) ? undefined : () => addNext(id)} />}>
-        {members.length > 0 && (
-          <ul className={cn('nowheel size-full overflow-auto p-2 pb-14 [scrollbar-width:thin]', list ? 'flex flex-col gap-1.5' : '')} style={list ? undefined : { columnWidth: 108, columnGap: 8 }} aria-label={t('Состав')}>
-            {members.map((item) => list ? (
-              <li key={item.id} className="flex shrink-0 items-center gap-2 rounded-md bg-muted/50 p-1.5">
-                <span className="size-9 shrink-0 overflow-hidden rounded-lg bg-muted">{item.image && <img src={item.image} alt="" loading="lazy" draggable={false} className="size-full object-cover" />}</span>
-                <span className="min-w-0 flex-1 truncate text-xs">{item.title}</span>
-                {pill(item, '')}
-              </li>
-            ) : (
-              <li key={item.id} className="group/thumb relative mb-2 break-inside-avoid rounded-md bg-muted/50 p-1">
-                <span className="block overflow-hidden rounded-sm bg-muted">
-                  {item.image ? <img src={item.image} alt={item.title} loading="lazy" draggable={false} className="block h-auto w-full" /> : <span className="flex aspect-square w-full items-center p-2 text-[10px] leading-tight text-muted-foreground"><span className="line-clamp-4">{item.text ?? item.title}</span></span>}
-                </span>
-                {pill(item, 'absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-within:opacity-100')}
-              </li>
-            ))}
-          </ul>
-        )}
-        {/* Нижняя панель плавает поверх сетки: сетка уходит под затухание */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-card via-card/85 to-transparent px-2 pt-8 pb-2 [&>*]:pointer-events-auto">
+  const controls = (<>
           {data.groupKind === 'folder' && <Button variant="ghost" size="icon-sm" className={round} aria-label={t('Добавить материал в папку')} onClick={() => addToFolder(String(data.key ?? ''))}><Plus /></Button>}
           {!isList && <>
           <Tooltip><TooltipTrigger asChild><Button variant={data.asAssets ? 'secondary' : 'ghost'} size="icon-sm" className={round} aria-label={t('Картинки для страницы')} aria-pressed={Boolean(data.asAssets)} onClick={() => patch(id, { asAssets: !data.asAssets || undefined })}><Images /></Button></TooltipTrigger><TooltipContent>{data.asAssets ? t('Картинки для страницы: вшиваются в экран') : t('Отдавать как картинки для страницы')}</TooltipContent></Tooltip>
@@ -750,14 +781,40 @@ export function GroupNode({ id, data, selected }: NodeProps<Node<{ groupKind?: s
             </SelectContent>
           </Select>
           </>}
-          <span className="flex-1" />
+          {!expanded && <span className="flex-1" />}
           {isList && <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon-sm" className={round} aria-label={t('Развернуть список')} onClick={() => toggleList(id)}><Maximize2 /></Button></TooltipTrigger><TooltipContent>{t('Развернуть: ноды внутри станут видны и живы')}</TooltipContent></Tooltip>}
           {data.groupKind === 'list' && <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon-sm" className={round} aria-label={t('Разобрать список')} onClick={() => ungroup(id)}><Ungroup /></Button></TooltipTrigger><TooltipContent>{t('Разобрать список')}</TooltipContent></Tooltip>}
           <div className="nodrag flex gap-0.5 rounded-lg bg-background p-0.5" role="group" aria-label={t('Вид состава')}>
             <Button variant={list ? 'secondary' : 'ghost'} size="icon-xs" className="size-6 rounded-lg [&_svg]:size-3.5" aria-pressed={list} aria-label={t('Список')} onClick={() => patch(id, { view: 'list' })}><ListIcon /></Button>
             <Button variant={list ? 'ghost' : 'secondary'} size="icon-xs" className="size-6 rounded-lg [&_svg]:size-3.5" aria-pressed={!list} aria-label={t('Сетка')} onClick={() => patch(id, { view: 'grid' })}><LayoutGrid /></Button>
           </div>
-        </div>
+
+  </>)
+  return (
+    <NodeFrame id={id} selected={selected} icon={data.groupKind === 'folder' ? FolderOpen : Layers} title={data.name ?? (data.groupKind === 'list' ? t('Список') : t('Подборка'))}
+      className={cn('min-h-[200px] min-w-[240px]', data.sized ? 'size-full' : 'h-[400px] w-[400px]')} bodyClassName="relative p-0"
+      resize={{ minWidth: 240, minHeight: 200, onEnd: () => patch(id, { sized: true, fit: false }) }}
+      bar={<NodeBar id={id} selected={selected} hasOut />}
+      ports={<PortHandle type="source" port="material" add={outgoing.has(id) ? undefined : () => addNext(id)} />}>
+        {members.length > 0 && (
+          <ul ref={setGridElement} className={cn('nowheel size-full min-h-0 overflow-auto p-2 [scrollbar-width:thin]', !expanded && 'pb-14', list ? 'flex flex-col gap-1.5' : 'relative block gap-2')} aria-label={t('Состав')}>
+            {members.map((item, index) => list ? (
+              <li key={item.id} className="flex shrink-0 items-center gap-2 rounded-md bg-muted/50 p-1.5">
+                <span className="size-9 shrink-0 overflow-hidden rounded-lg bg-muted">{item.image && <img src={item.image} alt="" loading="lazy" draggable={false} className="size-full object-cover" />}</span>
+                <span className="min-w-0 flex-1 truncate text-xs">{item.title}</span>
+                {pill(item, '')}
+              </li>
+            ) : (
+              <li key={item.id} style={mosaic[index]} className="group/thumb absolute min-h-0 min-w-0 overflow-hidden rounded-md bg-muted/50">
+                <span className="flex size-full items-center justify-center overflow-hidden rounded-sm bg-muted">
+                  {item.image ? <img src={item.image} alt={item.title} loading="lazy" draggable={false} className="block size-full object-contain" /> : <span className="flex size-full items-center p-2 text-[10px] leading-tight text-muted-foreground"><span className="line-clamp-4">{item.text ?? item.title}</span></span>}
+                </span>
+                {pill(item, 'absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-within:opacity-100')}
+              </li>
+            ))}
+          </ul>
+        )}
+        {!expanded && <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-gradient-to-t from-card via-card/85 to-transparent px-2 pt-8 pb-2 [&>*]:pointer-events-auto">{controls}</div>}
     </NodeFrame>
   )
 }
@@ -766,14 +823,14 @@ export const plural = (n: number) => (form(n) === 'one' ? t('материал') 
 // Нода «Выбор» — отдельное действие человека: показывает варианты из ноды слева, владелец отмечает один, дальше идёт только он. Модель не зовёт, ничего не стоит
 // Список вариантов с выбором одного: общий для ноды «Выбор» и для агентной ноды в режиме pick. Направления бренда рисуются мини-hero, остальное текстом
 export function VariantList({ nodeId, items, choice, old, busy, product, onChoose, canRedo }: { nodeId: string; items: string[]; choice?: number; old: boolean; busy: boolean; product?: string; onChoose: (index: number) => void; canRedo: boolean }) {
-  const { redoItem } = useContext(CanvasEnv)
+  const { redoItem, expandedId } = useContext(CanvasEnv)
   return (
-    <RadioGroup value={!old && choice !== undefined ? String(choice) : ''} onValueChange={(value) => { if (!old) onChoose(Number(value)) }} className="nodrag nowheel min-h-0 flex-1 content-start gap-1.5 overflow-auto">
+    <RadioGroup value={!old && choice !== undefined ? String(choice) : ''} onValueChange={(value) => { if (!old) onChoose(Number(value)) }} className={cn('nodrag nowheel min-h-0 flex-1 content-start gap-1.5 overflow-auto', expandedId === nodeId && items.some((item) => /(?:^|\n)(?:Wordmark|Symbol|Background):/.test(item)) && 'compact:grid-cols-3')}>
       {items.map((item, index) => (
         <label key={index} className={cn('group/option relative flex items-start gap-2 rounded-lg border border-line p-2 text-xs', old ? 'cursor-default' : 'cursor-pointer', !old && choice === index && 'border-primary bg-muted/40', busy && 'opacity-60')}>
           <RadioGroupItem value={String(index)} disabled={old} className="mt-0.5" />
           {canRedo && !old && <Tip label={t('Другой вариант')}><Button type="button" variant="ghost" size="icon-xs" className="nodrag absolute top-1.5 right-1.5 size-6 opacity-0 transition-opacity group-hover/option:opacity-100 focus-visible:opacity-100" aria-label={t('Другой вариант')} disabled={busy} onClick={(event) => { event.preventDefault(); redoItem(nodeId, index) }}><RotateCcw /></Button></Tip>}
-          {(() => { const direction = parseDirection(item); return direction ? <DirectionCard direction={direction} product={product ?? 'Refkit'} selected={!old && choice === index} /> : <span className="min-w-0 flex-1"><MessageResponse>{item.replace(/^(?:[-*]\s+|\d+[.)]\s+)/, '')}</MessageResponse></span> })()}
+          {(() => { const direction = parseDirection(item); const image = conceptAsset(item, 'Wordmark') || conceptAsset(item, 'Sign'); const symbol = cleanSymbol(routeField(item, 'Symbol')); const title = item.match(/\*\*([^*]+)\*\*/)?.[1] ?? `${index + 1}`; const idea = item.split('\n')[0].replace(/^(?:[-*]\s+|\d+[.)]\s+)/, '').replace(/\*\*[^*]+\*\*/, '').replace(/^[\s—–:.-]+/, ''); return symbol ? <span className="flex min-w-0 flex-1 flex-col gap-3"><span className="text-sm font-medium">{title}</span><span className="flex min-h-48 w-full flex-col items-center justify-center gap-5 rounded-lg bg-white p-4 text-black"><span className="block size-32 [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: symbol }} /><span className="flex items-end gap-5"><span className="block size-8 [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: symbol }} /><span className="block size-4 [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: symbol }} /></span></span><span className="text-sm leading-snug text-muted-foreground">{idea}</span></span> : image ? <span className="flex min-w-0 flex-1 flex-col gap-3"><span className="text-sm font-medium">{title}</span><img src={image} alt={item.includes('Sign:') ? `Sign ${index + 1}` : `Wordmark ${index + 1}`} className="block aspect-[3/2] w-full rounded-lg bg-white object-contain" /><span className="text-sm leading-snug text-muted-foreground">{idea}</span></span> : direction ? <DirectionCard direction={direction} product={product ?? 'Refkit'} selected={!old && choice === index} /> : <span className="min-w-0 flex-1"><MessageResponse>{item.replace(/^(?:[-*]\s+|\d+[.)]\s+)/, '')}</MessageResponse></span> })()}
         </label>
       ))}
     </RadioGroup>

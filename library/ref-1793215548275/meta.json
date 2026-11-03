@@ -36,7 +36,7 @@
   "updatedAt": 1793272203775,
   "thread": [
     {
-      "command": "Разбери",
+      "command": "Analyze",
       "answer": "- A traceability frame showing how an AI system combined multiple sources (image, text, connected notes) to form a single result\n- Card-based layout displays each contribution with type (visual context, written context, instruction, suggestion), source, and status (Included, Applied, Awaiting acceptance, Unproven)\n- Uses a single accent color (teal) on dark background with subtle icons—visual restraint that helps focus attention on understanding the chain, not the interface\n- Each card includes a trace-back capability: pointing back to the source (image, article, note) to verify where that contribution came from\n- Primary action 'Review result' is positioned as invitation to validate, not approve automatically—result stays as suggestion until owner accepts it\n- Sidebar navigation (Canvas, Materials, Runs, Memory, Settings) keeps context accessible without cluttering the trace view\n\nHow to apply:\n- Extract the card-based pattern for your own processes: each contribution gets status, explanation, and a way back to its source\n- Adopt the single-accent-color approach in dark mode to reduce noise when users need to understand complex multi-step formations\n- Create status vocabulary (Included, Applied, Awaiting acceptance, Unproven) that maps to different roles: materials vs. agent suggestions vs. unresolved claims\n- Position primary actions near summary explanations—invite decision after showing the chain, not before\n- Use icons and brief labels to help users quickly identify contribution type without reading full descriptions",
       "at": 1793272196191,
       "usage": [

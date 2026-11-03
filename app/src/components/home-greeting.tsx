@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { t } from '@/lib/i18n'
+import { lang, t } from '@/lib/i18n'
 
 // Приветствие главной (владелец 2026-10-29, как у Fabric): по часам, с именем из профиля. Без иконки погоды (убрана 2026-10-30)
 // Фразочки вместо «Добрый день» (владелец 2026-10-30, как у Claude): случайная из набора под время суток, одна на заход
@@ -22,11 +22,14 @@ export function HomeGreeting() {
     const time = hour >= 5 && hour < 12 ? phrases.morning : hour >= 12 && hour < 18 ? phrases.day : hour >= 18 && hour < 23 ? phrases.evening : phrases.night
     const week = day === 1 ? phrases.monday : day === 5 ? phrases.friday : day === 0 || day === 6 ? phrases.weekend : []
     const set = [...time, ...phrases.any, ...week]
-    return t(set[Math.floor(Math.random() * set.length)]).replace('{name}', t('Николай'))
+    const phrase = t(set[Math.floor(Math.random() * set.length)])
+    // В демо имени нет (владелец 2026-11-01): все фразы держат его после запятой, поэтому «, {name}» просто выпадает
+    return lang === 'en' ? phrase.replace(/,\s*\{name\}/g, '') : phrase.replace('{name}', t('Николай'))
   })
   return (
-    <h1 className="flex min-w-0 items-center justify-center text-4xl font-semibold tracking-tight">
-      <span className="truncate">{text}</span>
+    // Телефон: фраза переносится на две строки и чуть мельче; с 768 px — одна строка, длинная обрезается многоточием
+    <h1 className="flex min-w-0 items-center justify-center text-center text-3xl font-semibold tracking-tight md:text-4xl">
+      <span className="min-w-0 text-balance md:truncate">{text}</span>
     </h1>
   )
 }

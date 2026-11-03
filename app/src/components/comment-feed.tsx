@@ -1,7 +1,7 @@
 import { useState, type KeyboardEvent } from 'react'
 import { t, locale } from '@/lib/i18n'
 import { fieldTitle } from '@/components/field-title'
-import { ArrowUp, Ellipsis, Pencil, Trash2 } from 'lucide-react'
+import { ArrowUp, Brain, Ellipsis, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from '@/components/ui/input-group'
@@ -25,23 +25,42 @@ const onEnter = (event: KeyboardEvent, done: () => void) => {
   done()
 }
 
-export function CommentFeed({ comments, onAdd, onEdit, onRemove, hovered, onHover, placeholder = t('Зачем сохранил, что взять') }: {
+export function CommentFeed({ comments, onAdd, onEdit, onRemove, onRemember, hovered, onHover, placeholder = t('Зачем сохранил, что взять'), title = t('Заметки') }: {
   comments: CardComment[]; onAdd: (text: string) => void; onEdit: (id: string, text: string) => void; onRemove: (id: string) => void
-  hovered?: string | null; onHover?: (id: string | null) => void; placeholder?: string // связь с точкой на картинке: навёл здесь — подсветилась там
+  onRemember?: (text: string) => Promise<unknown> // «Запомнить» в меню заметки: строка уходит в память о владельце (grill-comments-system.md); без пропа пункта нет
+  hovered?: string | null; onHover?: (id: string | null) => void; placeholder?: string; title?: string // связь с точкой на картинке: навёл здесь — подсветилась там
 }) {
   const [draft, setDraft] = useState('')
   const [editing, setEditing] = useState<{ id: string; text: string } | null>(null)
   const save = () => { const text = draft.trim(); if (!text) return; onAdd(text); setDraft('') }
   const commit = () => { if (editing?.text.trim()) onEdit(editing.id, editing.text.trim()); setEditing(null) }
+  // «Запомнить»: заметка открывается в поле (строку можно поправить), «Да» кладёт её в память — владелец решает сам, агент в фоне ничего не делает
+  const [remembering, setRemembering] = useState<{ id: string; text: string } | null>(null)
+  const [remembered, setRemembered] = useState<string | null>(null)
+  const remember = async () => {
+    const text = remembering?.text.trim(); if (!remembering || !text || !onRemember) return
+    try { await onRemember(text); setRemembered(remembering.id); setRemembering(null) } catch { /* сервер недоступен — поле остаётся, можно повторить */ }
+  }
   return (
     <section className="flex flex-col gap-2">
-      <h3 className={fieldTitle}>{t('Комментарии')}</h3>
+      <h3 className={fieldTitle}>{title}</h3>
       {comments.length > 0 && (
         <ul className="flex flex-col gap-2">
           {comments.map((item) => (
             <li key={item.id} onMouseEnter={() => onHover?.(item.id)} onMouseLeave={() => onHover?.(null)}
               className={cn('group/comment relative flex flex-col gap-0.5 rounded-control bg-muted/40 px-3 py-2 transition-colors', hovered === item.id && 'bg-muted')}>
-              {editing?.id === item.id ? (
+              {remembering?.id === item.id ? (
+                <>
+                  <Textarea aria-label={t('Запомнить')} autoFocus value={remembering.text} rows={1} onFocus={(event) => { const end = event.currentTarget.value.length; event.currentTarget.setSelectionRange(end, end) }} onChange={(event) => setRemembering({ id: item.id, text: event.target.value })}
+                    onKeyDown={(event) => { if (event.key === 'Escape') { event.stopPropagation(); setRemembering(null) } else onEnter(event, () => void remember()) }}
+                    className="min-h-9 resize-none text-body md:text-body" />
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <span className="mr-auto caption">{t('Запомнить: ')}</span>
+                    <Button variant="ghost" size="xs" onClick={() => setRemembering(null)}>{t('Отмена')}</Button>
+                    <Button size="xs" disabled={!remembering.text.trim()} onClick={() => void remember()}>{t('Да')}</Button>
+                  </div>
+                </>
+              ) : editing?.id === item.id ? (
                 <>
                   <Textarea aria-label={t('Правка комментария')} autoFocus value={editing.text} rows={1} onFocus={(event) => { const end = event.currentTarget.value.length; event.currentTarget.setSelectionRange(end, end) }} onChange={(event) => setEditing({ id: item.id, text: event.target.value })}
                     onKeyDown={(event) => { if (event.key === 'Escape') { event.stopPropagation(); setEditing(null) } else onEnter(event, commit) }}
@@ -57,13 +76,14 @@ export function CommentFeed({ comments, onAdd, onEdit, onRemove, hovered, onHove
                     {item.x !== undefined && <span className="mr-1.5 inline-grid size-5 place-items-center rounded-full bg-primary align-[1px] text-micro font-medium text-primary-foreground tabular-nums">{pinNumber(comments, item.id)}</span>}
                     {item.text}
                   </p>
-                  <span className="caption">{when(item)}</span>
+                  <span className="caption">{when(item)}{remembered === item.id ? t(' · в памяти') : ''}</span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon-xs" aria-label={t('Действия с комментарием')} className="absolute top-1 right-1 opacity-0 group-hover/comment:opacity-100 focus-visible:opacity-100 aria-expanded:opacity-100"><Ellipsis /></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onSelect={() => setEditing({ id: item.id, text: item.text })}><Pencil />{t('Изменить')}</DropdownMenuItem>
+                      {onRemember && <DropdownMenuItem onSelect={() => { setRemembered(null); setRemembering({ id: item.id, text: item.text }) }}><Brain />{t('Запомнить')}</DropdownMenuItem>}
                       <DropdownMenuItem variant="destructive" onSelect={() => onRemove(item.id)}><Trash2 />{t('Удалить')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -8,10 +8,10 @@ import { aliases } from './aliases.ts'
 import { findPair, pairFontCss } from './shared/font-pairs.mjs'
 
 const root = import.meta.dirname
-export type DesignSystem = 'shadcn' | 'fluid' | 'landing' | 'brandapp' | 'deck' | 'report'
-export const designSystemOf = (value: unknown): DesignSystem => value === 'fluid' ? 'fluid' : value === 'landing' ? 'landing' : value === 'brandapp' ? 'brandapp' : value === 'deck' ? 'deck' : value === 'report' ? 'report' : 'shadcn'
+export type DesignSystem = 'shadcn' | 'fluid' | 'landing' | 'brandapp' | 'deck' | 'report' | 'brandbook'
+export const designSystemOf = (value: unknown): DesignSystem => value === 'fluid' ? 'fluid' : value === 'landing' ? 'landing' : value === 'brandapp' ? 'brandapp' : value === 'deck' ? 'deck' : value === 'report' ? 'report' : value === 'brandbook' ? 'brandbook' : 'shadcn'
 // Папка компонентов набора: shadcn — ui, Fluid — fluid, набор секций лендинга — landing
-const namespaceOf = (system: DesignSystem) => system === 'fluid' ? 'fluid' : system === 'landing' ? 'landing' : system === 'deck' ? 'deck' : system === 'report' ? 'report' : 'ui'
+const namespaceOf = (system: DesignSystem) => system === 'fluid' ? 'fluid' : system === 'landing' ? 'landing' : system === 'deck' ? 'deck' : system === 'report' ? 'report' : system === 'brandbook' ? 'brandbook' : 'ui'
 // brandapp — макет приложения в теме направления: компоненты shadcn внутри обёртки Page из набора лендинга, поэтому цвета, шрифты и скругление берутся из направления
 const componentDir = (system: DesignSystem) => join(root, `src/components/${namespaceOf(system)}`)
 const componentNames = (system: DesignSystem) => readdirSync(componentDir(system)).filter((file) => file.endsWith('.tsx')).map((file) => file.slice(0, -4))
@@ -59,10 +59,17 @@ export function screenContract(system: DesignSystem = 'shadcn', task = '') {
       return []
     })
     const printer = ts.createPrinter({ removeComments: true })
-    const props = (system === 'landing' || system === 'deck' || system === 'report' || (system === 'fluid' && wanted(name, task))) ? source.statements.filter((s) => ts.isInterfaceDeclaration(s) || ts.isTypeAliasDeclaration(s)).map((s) => printer.printNode(ts.EmitHint.Unspecified, s, source)).join('\n') : ''
+    const props = (system === 'landing' || system === 'deck' || system === 'report' || system === 'brandbook' || (system === 'fluid' && wanted(name, task))) ? source.statements.filter((s) => ts.isInterfaceDeclaration(s) || ts.isTypeAliasDeclaration(s)).map((s) => printer.printNode(ts.EmitHint.Unspecified, s, source)).join('\n') : ''
     const hidden = system === 'fluid' && !wanted(name, task)
     return `@/components/${namespace}/${name}: ${[...new Set(names)].join(', ')}${props ? `\nAPI: ${props}` : hidden ? '\n(API не раскрыт: для этой задачи не нужен — не используй; чтобы подключить, назови компонент в инструкции ноды)' : ''}`
   }).join('\n')
+  if (system === 'brandbook') return `Верни JSON {code, platform, theme}. code — один TSX-модуль React с default export компонента Screen, без markdown и HTML-документа. platform всегда page, theme всегда dark.
+Страница «Брендбук» собирается ТОЛЬКО из готовых секций набора: ты не верстаешь, а заполняешь свойства из брифа, выбранного начертания, выбранной палитры и референсов. Идею, голос и правила формулируешь здесь из этих входов. Вёрстка, охранное поле, варианты, «чего нельзя», применения и контраст цветов рисуются внутри набора кодом.
+Импорты ровно такие, все именованные (default-экспортов нет): import { Page } from '@/components/landing/page'; import { BookCover, Logo, Construction, LogoMisuse, Colors, Typography, Voice, Applications, Moodboard, InUse } from '@/components/brandbook/sections'; при ассетах ещё import assets from '@/assets'.
+Скелет: default export Screen возвращает <Page accent pair corners palette={{background, surface, text, support}}> с секциями по порядку: BookCover, Logo, Construction, LogoMisuse, Colors, Typography, Voice, Applications, Moodboard, InUse. Все пять цветов и Pair бери дословно из выбранного варианта Palette & type; corners="soft". Pair у Typography — тот же.
+Знак — первая буква выбранного вордмарка: набор секций сам обрезает выбранную картинку. Среди ассетов страницы есть выбранная картинка из ноды Lettering — передай её как wordmark={assets.<имя>} в BookCover, Logo, Construction, LogoMisuse и Applications. mark и symbol не передавай. Никакой отдельной монограммы и выдуманной сетки построения. Если картинки вордмарка нет, wordmark не передавай. Мудборд: остальные ассеты — референсы, подписи формулируй по их источникам.
+Данные — только из входов: бриф, выбранное начертание, палитра и референсы. Colors содержит ровно пять выбранных ролей и цветов, без добавлений и округлений. Название — ровно Name из брифа. Идея, черты, текст и голос должны быть согласованы с брифом; не выдумывай фактов и чисел. Охранное поле и минимальный размер формулируй как рекомендации, а Construction note — как первую букву исходного начертания, без заявления о сетке. Дата — сегодняшняя из запроса, если указана, иначе текущая дата. В строках свойств никакого markdown: ни звёздочек, ни решёток, ни ссылок.
+Каталог доступных экспортов и свойств секций (Section, display, label, contrast не импортируй):\n${catalog}`
   if (system === 'report') return `Верни JSON {code, platform, theme}. code — один TSX-модуль React с default export компонента Screen, без markdown и HTML-документа. platform всегда page, theme всегда dark.
 Страница «Итог гипотезы» собирается ТОЛЬКО из готовых секций набора: ты не верстаешь, а переносишь найденное по рынку в свойства секций. Вёрстка внутри.
 Импорты ровно такие, все именованные (default-экспортов нет): import { Page } from '@/components/landing/page'; import { ReportHeader, Verdict, Competitors, Signals, Frames, NextSteps } from '@/components/report/sections'; при кадрах ещё import assets from '@/assets'.
@@ -110,7 +117,7 @@ export function parseScreen(raw: string, system: DesignSystem = 'shadcn'): Scree
   source.designSystem = system
   source.code = source.code.replace(/text-\[(?:8|9|10|11)px\]/g, 'text-xs') // страховка к правилу «не мельче 12 px»
   const ast = ts.createSourceFile('Screen.tsx', source.code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
-  const allowed = new Set(['react', 'lucide-react', '@/lib/utils', '@/assets', ...(system === 'brandapp' || system === 'deck' || system === 'report' ? ['@/components/landing/page'] : []), ...(system === 'brandapp' ? ['@/components/landing/app-shell'] : []), ...componentNames(system).map((name) => `@/components/${namespaceOf(system)}/${name}`)])
+  const allowed = new Set(['react', 'lucide-react', '@/lib/utils', '@/assets', ...(system === 'brandapp' || system === 'deck' || system === 'report' || system === 'brandbook' ? ['@/components/landing/page'] : []), ...(system === 'brandapp' ? ['@/components/landing/app-shell'] : []), ...componentNames(system).map((name) => `@/components/${namespaceOf(system)}/${name}`)])
   const visit = (node: ts.Node) => {
     if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
       if (node.moduleSpecifier && (!ts.isStringLiteral(node.moduleSpecifier) || !allowed.has(node.moduleSpecifier.text))) throw new Error('Экран: импорт доступен только из выбранного каталога компонентов, React, lucide-react и @/lib/utils')
@@ -168,7 +175,7 @@ export async function compileScreen(source: ScreenSource, assets: ScreenAsset[] 
   // Ассеты страницы вшиваются картинками data: — в песочнице сети нет, а CSP пропускает только data:
   writeFileSync(join(cwd, 'assets.ts'), `export default ${JSON.stringify(Object.fromEntries(assets.map((asset) => [asset.name, asset.dataUrl])))} as Record<string, string>\n`)
   const fluid = source.designSystem === 'fluid'
-  const landing = source.designSystem === 'landing' || source.designSystem === 'brandapp' || source.designSystem === 'deck' || source.designSystem === 'report'
+  const landing = source.designSystem === 'landing' || source.designSystem === 'brandapp' || source.designSystem === 'deck' || source.designSystem === 'report' || source.designSystem === 'brandbook'
   // Набор секций лендинга: Tailwind должен видеть его классы, а шрифты нужны только выбранной паре и только латиницей (иначе страница вырастает до мегабайтов)
   const pairName = landing ? findPair(source.code) : findPair(source.tokens ?? '')
   if (landing || pairName) writeFileSync(join(cwd, 'fonts.css'), pairFontCss(pairName, (pkg: string, file: string) => join(root, 'node_modules', pkg, 'files', file)))

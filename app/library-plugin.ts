@@ -1,3 +1,5 @@
+import { conceptAsset, conceptWordmark, simpleBrandSymbol, symbolOnBrandGrid, routeField, routeSymbol } from './shared/brand-concepts.mjs'
+import { cleanSymbol } from './shared/symbol.mjs'
 import { execFile, execFileSync, spawn } from 'node:child_process'
 import { appendFileSync, copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
@@ -1931,9 +1933,10 @@ const assetName = (at: number) => `img${at + 1}`
 function assetsForScreen(metas: Meta[]) {
   return metas.map((meta, at) => {
     const source = join(libraryDir, String(meta.image).replace(/^\/library\//, ''))
-    const out = join(isolated('asset'), 'a.jpg')
-    execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', source, '-vf', "scale='min(1200,iw)':-2", '-frames:v', '1', '-q:v', '4', out])
-    return { name: assetName(at), dataUrl: `data:image/jpeg;base64,${readFileSync(out).toString('base64')}` }
+    const transparent = Boolean((meta as Meta & { preserveAlpha?: boolean }).preserveAlpha)
+    const out = join(isolated('asset'), transparent ? 'a.png' : 'a.jpg')
+    execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', source, '-vf', transparent ? "scale='min(1200,iw)':-2,format=rgba" : "scale='min(1200,iw)':-2", '-frames:v', '1', ...(transparent ? [] : ['-q:v', '4']), out])
+    return { name: assetName(at), dataUrl: `data:image/${transparent ? 'png' : 'jpeg'};base64,${readFileSync(out).toString('base64')}` }
   })
 }
 // Тип материала для фильтра ноды: картинки / видео / статьи / заметки (остальное — только во «Всё»)
@@ -1980,11 +1983,20 @@ function canvasPackage(data: CanvasData, node: CNode) {
       // Папка помечена «картинки для страницы»: не референс, а набор ассетов — экран получает их готовыми src.
       // Агенту та же папка — обычная подборка с картинками: снимки продукта видят и паспорт, и текст страницы (2026-10-30)
       const members = groupMembers(input).filter((meta) => String(meta.image ?? '').startsWith('/library/')).slice(0, ASSET_LIMIT)
-      const names = members.map((_, at) => assetName(at))
+      const names = members.map((_, at) => assetName(assets.length + at)) // номера сквозные: у двух наборов ассетов на одной странице имена не совпадают
       members.forEach((meta) => assets.push(meta))
       if (members.length) {
         blocks.push(`Ассеты страницы из «${input.data?.name ?? 'набора'}» — картинки приложены и доступны в коде как assets.<имя> (import assets from '@/assets'):\n${members.map((meta, at) => `- assets.${names[at]}: ${String(meta.title ?? 'без названия')}${meta.ratio ? `, пропорции ${meta.ratio}` : ''}`).join('\n')}`)
         for (const meta of members) context.push({ kind: 'card', id: meta.id, image: String(meta.image ?? '') || undefined, label: `${meta.title ?? 'Ассет'} · ассет` })
+      }
+    } else if (input.type === 'image' && input.data?.asAsset && node.type === 'screen') {
+      // Картинка из ноды «Картинка», помеченная «ассет страницы» (вордмарк в шаблоне «Брендбук»): экран получает её готовым src, как кадр из папки
+      const file = onDisk(input.data?.imageFile)
+      if (file && existsSync(file)) {
+        const name = assetName(assets.length)
+        assets.push({ id: `${String(input.id)}-asset`, title: String(input.data?.title ?? 'Картинка'), image: String(input.data.imageFile), preserveAlpha: Boolean(input.data?.brandMonogram) } as unknown as Meta)
+        blocks.push(`Ассеты страницы — картинка из ноды «${input.data?.title ?? 'Картинка'}» приложена и доступна в коде как assets.${name} (import assets from '@/assets'):\n- assets.${name}: ${String(input.data?.title ?? 'картинка')}`)
+        context.push({ kind: 'result', label: `${input.data?.title ?? 'картинка'} · ассет` })
       }
     } else if (input.type === 'group') {
       const members = groupMembers(input)
@@ -2004,7 +2016,21 @@ function canvasPackage(data: CanvasData, node: CNode) {
       const items = splitItems(String(input.data.result))
       // autoPick (режим «одна кнопка»): пока владелец не выбрал сам, идёт первый вариант — агент ставит рекомендуемый первым
       const choice = typeof input.data.choice === 'number' ? input.data.choice : input.data.autoPick ? 0 : undefined
-      if (typeof choice === 'number' && items[choice]) blocks.push(`Выбранный вариант из ноды «${input.data?.title ?? 'без названия'}» (остальные отброшены):\n${items[choice]}`)
+      if (typeof choice === 'number' && items[choice]) {
+        blocks.push(`Выбранный вариант из ноды «${input.data?.title ?? 'без названия'}» (остальные отброшены):\n${items[choice]}`)
+        const key = input.data?.brandVisual === 'wordmark' ? 'Wordmark' : input.data?.brandVisual === 'sign' ? 'Sign' : ''
+        const image = key && conceptAsset(items[choice], key)
+        const file = image && onDisk(image)
+        if (file && existsSync(file)) {
+          generated.push(file)
+          context.push({ kind: 'result', image, label: `${input.data?.title ?? key} · выбранный` })
+          if (node.type === 'screen' && key === 'Wordmark') {
+            const name = assetName(assets.length)
+            assets.push({ id: `${String(input.id)}-asset`, title: 'Wordmark', image } as unknown as Meta)
+            blocks.push(`Ассет страницы — выбранный вордмарк доступен в коде как assets.${name} (import assets from '@/assets'). Используй его для wordmark во всех секциях брендбука.`)
+          }
+        }
+      }
       else needsChoice = String(input.data?.title ?? 'без названия')
     } else if (input.type === 'image') {
       const file = onDisk(input.data?.imageFile)
@@ -2200,14 +2226,22 @@ function imagePrompt(pack: ReturnType<typeof canvasPackage>) {
     '---',
   ].join('\n')
 }
-async function generateImage(canvasId: string, nodeId: string, pack: ReturnType<typeof canvasPackage>, usage: Usage[], signal: AbortSignal, edit?: { edits: EditComment[]; current: string }) {
-  const out = await trackProvider('codex', runCodex({ kind: 'canvas', model: modelFor('gpt61-sol').id, prompt: edit ? imageEditPrompt(pack, edit.edits) : imagePrompt(pack), images: edit ? [edit.current] : [...pack.images, ...screenShots(pack)], cwd: isolated('canvas-image'), signal, track: usage, effort: 'low' }))
+async function generateImage(canvasId: string, nodeId: string, pack: ReturnType<typeof canvasPackage>, usage: Usage[], signal: AbortSignal, edit?: { edits: EditComment[]; current: string }, custom?: { prompt: string; images: string[] }) {
+  const out = await trackProvider('codex', runCodex({ kind: 'canvas', model: modelFor('gpt61-sol').id, prompt: custom?.prompt ?? (edit ? imageEditPrompt(pack, edit.edits) : imagePrompt(pack)), images: custom?.images ?? (edit ? [edit.current] : [...pack.images, ...screenShots(pack)]), cwd: isolated('canvas-image'), signal, track: usage, effort: 'low' }))
   const made = out.match(/\/[^\s"'`]+\.(?:png|jpe?g|webp)/gi)?.pop() ?? ''
   if (!made || !made.includes('/generated_images/') || !existsSync(made)) throw new Error(t('Codex не вернул файл картинки: ') + out.trim().slice(0, 200))
   const name = `gen-${nodeId.replace(/[^\w-]/g, '')}-${Date.now()}${extname(made).toLowerCase()}`
   mkdirSync(join(libraryDir, canvasId), { recursive: true })
   copyFileSync(made, join(libraryDir, canvasId, name))
   return `/library/${canvasId}/${name}`
+}
+function wordmarkDistance(left: string, right: string) {
+  const pixels = (file: string) => execFileSync('ffmpeg', ['-v', 'error', '-i', onDisk(file), '-vf', 'scale=64:32,format=gray', '-f', 'rawvideo', '-'])
+  const a = pixels(left), b = pixels(right)
+  if (a.length !== b.length) return 0
+  let difference = 0
+  for (let i = 0; i < a.length; i++) difference += Math.abs(a[i] - b[i])
+  return difference / (a.length * 255)
 }
 // ── Правки по точкам (комментарии на «Экране» и «Картинке») ──────────────────
 // Точка — доли 0…1 от ширины и высоты результата; h — высота страницы в px на момент клика (у экранов-страниц)
@@ -2284,6 +2318,7 @@ async function runCanvasNode(canvasId: string, nodeId: string, edit = false, red
     before = node.data ?? {}
     const pack = canvasPackage(data, node)
     if (needsChoiceOf(pack)) throw new Error(t('Выбери вариант в ноде «{needsChoice}», дальше пойдёт только он', { needsChoice: pack.needsChoice }))
+    if ((node.data?.brandConcepts || node.data?.brandVisual) && !pack.images.length) throw new Error('Add reference images before generating brand concepts')
     if (!pack.blocks.length) throw new Error(t('Подключи к ноде карточки, подписи или другие ноды слева'))
     patchCanvasNode(canvasId, nodeId, { status: 'running', error: undefined, runStartedAt: Date.now() })
     const usage: Usage[] = []
@@ -2296,7 +2331,12 @@ async function runCanvasNode(canvasId: string, nodeId: string, edit = false, red
       if (node.type === 'image' && !before.imageFile) throw new Error(t('Нет картинки для правки'))
     }
     if (node.type === 'image') {
-      const imageFile = await generateImage(canvasId, nodeId, pack, usage, controller.signal, edit ? { edits, current: join(libraryDir, canvasId, String(before.imageFile).split('/').pop()!) } : undefined)
+      const selectedWordmark = !edit && node.data?.brandWordmark ? conceptWordmark(pack.blocks.join('\n')) : ''
+      if (selectedWordmark && !existsSync(onDisk(selectedWordmark))) throw new Error('Selected wordmark file is missing')
+      const monogramSource = !edit && node.data?.brandMonogram ? conceptWordmark(pack.blocks.join('\n')) : ''
+      if (node.data?.brandMonogram && (!monogramSource || !existsSync(onDisk(monogramSource)))) throw new Error('Choose a lettering option before making its monogram')
+      const monogram = monogramSource ? { prompt: `Use image_gen to isolate ONLY the first letter of the attached finished wordmark. Preserve its exact drawn silhouette, weight, internal cut and proportions. Remove every other letter and the white background completely. Output a black monogram on a fully transparent square PNG with a small even margin. Do not redraw, stylize, add a frame or invent a new sign. Reply ONLY with the full path to the PNG.`, images: [onDisk(monogramSource)] } : undefined
+      const imageFile = selectedWordmark || await generateImage(canvasId, nodeId, pack, usage, controller.signal, edit ? { edits, current: join(libraryDir, canvasId, String(before.imageFile).split('/').pop()!) } : undefined, monogram)
       if (controller.signal.aborted) throw new Error(t('Запуск остановлен'))
       const past = (before.history ?? []) as Array<Record<string, unknown>>
       const history = before.imageFile ? [...past, { result: before.result, imageFile: before.imageFile, ranAt: before.ranAt, ranHash: before.ranHash, usage: before.usage, ...(edit ? { edits } : {}) }].slice(-8) : past
@@ -2313,7 +2353,66 @@ async function runCanvasNode(canvasId: string, nodeId: string, edit = false, red
     // Подсказка к действию: владелец нажал уточнение, прошлый ответ идёт модели как основа
     const refineNote = refine && node.type === 'agent' ? `\n\nУточнение владельца: ${refine}\nПредыдущий ответ ноды:\n${String(activeData(node).result ?? '')}\nОтветь заново с учётом уточнения, в той же форме.` : ''
     const prompt = edit ? editPrompt(node, pack, edits, String(before.screenSource.code)) : canvasPrompt(node, pack, canvasId) + redoNote + refineNote
-    const out = await runModel({ kind: 'canvas', prompt, images: edit ? [screenWithPins(node, edits)] : [...pack.images, ...screenShots(pack)], cwd: isolated('canvas'), signal: controller.signal, track: usage, modelKey: nodeModelKey(node), web: node.type === 'agent' && node.data?.web === true, ...(node.type === 'screen' ? { schema: screenSchema } : {}) }, 'ask')
+    let out = await runModel({ kind: 'canvas', prompt, images: edit ? [screenWithPins(node, edits)] : [...pack.images, ...screenShots(pack)], cwd: isolated('canvas'), signal: controller.signal, track: usage, modelKey: nodeModelKey(node), web: node.type === 'agent' && node.data?.web === true, ...(node.type === 'screen' ? { schema: screenSchema } : {}) }, 'ask')
+    if (node.data?.brandVisual === 'sign' && splitItems(out).some((route) => !simpleBrandSymbol(route))) {
+      out = await runModel({ kind: 'canvas', prompt: `${prompt}\n\nYour previous SVGs did not pass the geometry check. Revise the complete answer below. Every Symbol must have exactly 2 or 3 filled shapes, each only rect, circle or polygon; ALL numbers in x, y, cx, cy, r, rx, ry, width, height and points must be multiples of 4. Use one-line SVG, double-quoted attributes, viewBox="0 0 64 64", fill="currentColor". No paths, strokes, transforms, code fences or extra text. Keep the three distinct metaphors.\n\n${out}`, images: [...pack.images, ...screenShots(pack)], cwd: isolated('canvas'), signal: controller.signal, track: usage, modelKey: nodeModelKey(node) }, 'ask')
+    }
+    if (node.data?.brandVisual && node.type === 'agent') {
+      const visual = node.data.brandVisual === 'sign' ? 'sign' : 'wordmark'
+      const routes = splitItems(out)
+      if (routes.length !== (redoItem === undefined ? 3 : 1)) throw new Error(`${visual} returned ${routes.length} concepts; expected ${redoItem === undefined ? 3 : 1}`)
+      if (visual === 'sign') {
+        if (routes.some((route) => !simpleBrandSymbol(route))) {
+          throw new Error('Sign must contain 2–3 shapes on the 4 px grid; rerun this node')
+        }
+        out = routes.map((route) => `${route.split('\n').filter((line) => !line.includes('<svg')).join('\n').trim()}\nSymbol: ${cleanSymbol(routeSymbol(route))}`).join('\n\n')
+      } else {
+        const concepts = []
+        let baseline = redoItem !== undefined && redoItem > 0 ? conceptWordmark(kept[0]) : conceptAsset(`Wordmark: ${String(node.data.brandSeed ?? '')}`, 'Wordmark')
+        if (baseline && !existsSync(onDisk(baseline))) throw new Error('Original wordmark file is missing')
+        for (let index = 0; index < routes.length; index++) {
+          if (controller.signal.aborted) throw new Error(t('Запуск остановлен'))
+          const target = redoItem ?? index
+          const route = routes[index].replace(/^Wordmark:.*$/gmi, '')
+          let imageFile = baseline
+          if (target === 0 && !imageFile) {
+            imageFile = await generateImage(canvasId, `${nodeId}-original`, { ...pack, instr: 'Draw the exact product name from the Brief as one finished custom wordmark. Study the attached lettering references for expressive shape language, unusual curves, deliberate cuts and tight optical spacing. Pure black lettering on white, one line, generous margin. No symbol, frame, mockup or extra text. Spell the name exactly.' }, usage, controller.signal)
+          } else if (target > 0) {
+            if (!baseline) throw new Error('Generate the original wordmark first')
+            const direction = target === 1
+              ? 'SOFT SCULPTURAL: redraw every letter with broad rounded curves, open counters and a flowing connected rhythm. The whole word must have a clearly new silhouette.'
+              : 'SHARP COMPACT: redraw every letter with angular cuts, narrow proportions, sharp terminals and a tight geometric rhythm. The whole word must have a clearly new silhouette.'
+            const prompt = `Use image_gen to DRAW a new custom wordmark for the exact product name in this context:\n${pack.blocks.join('\n').slice(0, 3000)}\nThe attached original is a quality and character reference, not a tracing template. ${direction} Keep only the original's boldness and crafted detail. Pure black on white, one line, no symbol, border, mockup or extra text. Spell the name exactly. Return only the absolute path to the generated PNG.`
+            imageFile = await generateImage(canvasId, `${nodeId}-direction-${target}`, pack, usage, controller.signal, undefined, { prompt, images: [onDisk(baseline), ...pack.images] })
+            const previous = [baseline, ...concepts.map((item) => conceptWordmark(item))].filter(Boolean)
+            if (previous.some((file) => wordmarkDistance(file, imageFile) < 0.07)) {
+              imageFile = await generateImage(canvasId, `${nodeId}-direction-${target}-retry`, pack, usage, controller.signal, undefined, { prompt: `${prompt} The previous attempt looked almost identical to another option. Change the entire letter construction and outer silhouette visibly; a viewer must tell the options apart at thumbnail size.`, images: [onDisk(baseline), ...pack.images] })
+              if (previous.some((file) => wordmarkDistance(file, imageFile) < 0.07)) throw new Error('Lettering options are too similar; rerun this node for distinct directions')
+            }
+          }
+          if (target === 0) baseline = imageFile
+          concepts.push(`${route.trim()}\nWordmark: ${imageFile}`)
+        }
+        out = concepts.join('\n\n')
+      }
+    }
+    if (node.data?.brandConcepts && node.type === 'agent') {
+      const routes = splitItems(out)
+      if (routes.length !== (redoItem === undefined ? 3 : 1)) throw new Error(`Brand Routes returned ${routes.length} concepts; expected ${redoItem === undefined ? 3 : 1}`)
+      if (routes.some((route) => !symbolOnBrandGrid(route))) throw new Error('A concept symbol is off the 4 px grid: rerun Brand Routes')
+      const concepts = []
+      for (let index = 0; index < routes.length; index++) {
+        if (controller.signal.aborted) throw new Error(t('Запуск остановлен'))
+        const route = routes[index].replace(/^Wordmark:.*$/gmi, '')
+        const imageFile = await generateImage(canvasId, `${nodeId}-concept-${index}`, {
+          ...pack,
+          instr: 'Draw only the exact product name from the Brief as custom lettering. Follow this route: ' + routeField(route, 'Lettering') + '. Pure black lettering on pure white, one line, generous margins. No frame, symbol, mockup, shadows or extra text. Spell the product name exactly. Make the lettering distinctive and consistent with the route metaphor.',
+          blocks: [...pack.blocks, 'This concept only:\n' + route],
+        }, usage, controller.signal)
+        concepts.push(`${route.trim()}\nWordmark: ${imageFile}`)
+      }
+      out = concepts.join('\n\n')
+    }
     // Блок памяти просит отмечать номера применённых пунктов в схеме ответа; у ноды схемы нет — модель печатает «memory: [1, 3]» строкой, срезаем
     let screenSource = node.type === 'screen' ? parseScreen(out, designSystemOf(node.data?.designSystem)) : undefined
     // Тема из ноды «Токены» во входе: кладётся поверх темы проекта, компоненты экрана берут цвета и шрифт сами
@@ -2354,7 +2453,7 @@ async function runCanvasNode(canvasId: string, nodeId: string, edit = false, red
     const history = before.result ? [...past, { result: before.result, screenSource: before.screenSource, ranAt: before.ranAt, ranHash: before.ranHash, usage: before.usage, ...(edit ? { edits } : {}) }].slice(-8) : past
     const ranAt = Date.now()
     logRun(canvasId, node, ranAt, { result: finalResult })
-    patchCanvasNode(canvasId, nodeId, { status: 'ready', held: undefined, activeAt: undefined, actions: actions.length ? actions : undefined, result: finalResult, screenSource, error: undefined, ranAt, ranHash: pack.hash, usage, history, ...(edit ? { appliedEdits: edits.map((item) => item.id) } : {}) })
+    patchCanvasNode(canvasId, nodeId, { status: 'ready', held: undefined, activeAt: undefined, actions: actions.length ? actions : undefined, result: finalResult, ...((node.data?.brandConcepts || node.data?.brandVisual) && (redoItem === undefined || before.choice === redoItem) ? { choice: undefined } : {}), screenSource, error: undefined, ranAt, ranHash: pack.hash, usage, history, ...(edit ? { appliedEdits: edits.map((item) => item.id) } : {}) })
     try { syncFrameRef(canvasId, nodeId) } catch (error) { console.log('[refkit] кадр страницы не обновился:', error instanceof Error ? error.message : error) }
   } catch (error) {
     const stopped = controller.signal.aborted
@@ -2975,13 +3074,14 @@ export function libraryPlugin(): Plugin {
       migrateShelf()
       migrateFolders()
       try { migrateDigests() } catch (error) { console.error('[refkit] выжимки не перенесены в ленту:', (error as Error).message) }
-      resume()
-      drainQueue()
+      // Превью интерфейса не читает домашние источники и не возобновляет работу моделей.
+      const preview = process.env.REFKIT_PREVIEW === '1'
+      if (!preview) { resume(); drainQueue() }
       setTimeout(() => { try { paintColors() } catch (error) { console.error('[refkit] цвета не посчитаны:', (error as Error).message) } }, 2000)
       scheduleIndex()
       server.httpServer?.once('listening', () => { const address = server.httpServer?.address(); if (address && typeof address === 'object') appOrigin = `http://localhost:${address.port}` })
-      const timer = setInterval(() => { drainQueue(); try { paintColors() } catch { /* следующий раз */ } }, 60_000)
-      const cuesTimer = setInterval(() => void backfillCues(), 30_000)
+      const timer = setInterval(() => { if (!preview) drainQueue(); try { paintColors() } catch { /* следующий раз */ } }, 60_000)
+      const cuesTimer = setInterval(() => { if (!preview) void backfillCues() }, 30_000)
       server.httpServer?.on('close', () => { clearInterval(timer); clearInterval(cuesTimer) })
 
       // Refkit без пароля: он должен слушать только этот компьютер. С --host / 0.0.0.0 API (запуск агента, чтение и удаление материалов) открылось бы всей сети
@@ -3476,7 +3576,7 @@ export function libraryPlugin(): Plugin {
           // Холст: POST — создать пустой, GET/PUT /canvas/<id> — доска целиком (узлы и стрелки);
           // POST /canvas/<id>/run | stop | save { node } — запуск агентной ноды, остановка, результат в библиотеку
           if (rawId === 'canvas') {
-            if (req.method === 'POST' && !action) { const body = await readBody(req); return res.end(JSON.stringify(addCanvas({ via: 'hand', ...pickAddFields(body), ...(typeof body.title === 'string' && body.title.trim() ? { title: body.title.trim().slice(0, 80) } : {}) }))) } // title — имя от шаблона: холст сразу называется по делу
+            if (req.method === 'POST' && !action) { const body = await readBody(req); return res.end(JSON.stringify(addCanvas({ via: 'hand', ...pickAddFields(body), ...(typeof body.title === 'string' && body.title.trim() ? { title: body.title.trim().slice(0, 80) } : {}), ...(typeof body.template === 'string' && /^[a-z0-9-]{1,40}$/.test(body.template) ? { template: body.template } : {}) }))) } // title — имя от шаблона: холст сразу называется по делу
             const target = safeId(action)
             if (!target || !existsSync(metaPath(target)) || readMeta(target).kind !== 'canvas') { res.statusCode = 404; return res.end(JSON.stringify({ error: t('Холста нет') })) }
             if (sub) {

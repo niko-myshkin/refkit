@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from '@/lib/i18n'
 import { createRoot } from 'react-dom/client'
 import { Folder, FolderInput, Inbox, Layers, Link2, Tag } from 'lucide-react'
 import { CollectionChip } from '@/components/collection-chip'
@@ -20,7 +21,7 @@ type Folder = { id: string; name: string; inbox?: boolean; parent?: string }
 
 async function readTab(): Promise<Clip> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
-  if (!tab?.id || !/^https?:/.test(tab.url ?? '')) throw new Error('Эту страницу сохранить нельзя')
+  if (!tab?.id || !/^https?:/.test(tab.url ?? '')) throw new Error(t('Эту страницу сохранить нельзя'))
   await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['extract.js'] })
   const [{ result }] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => (window as unknown as { __refkitClip: Clip }).__refkitClip })
   return result as Clip
@@ -62,7 +63,7 @@ function Popup() {
     const body = { ...clip, description: about.trim(), collections: picked, folder }
     const result = await send(body)
     if (result === 'offline') { await enqueue(body); void chrome.runtime.sendMessage('flush'); setError(''); setQueued(true); setTimeout(() => window.close(), 1200); return }
-    if (result === 'rejected') { setError('Не сохранилось'); setSaving(false); return }
+    if (result === 'rejected') { setError(t('Не сохранилось')); setSaving(false); return }
     window.close()
   }
 
@@ -80,16 +81,16 @@ function Popup() {
         )}
         {clip?.cover && <img src={clip.cover} alt="" className="max-h-40 w-full rounded-control border object-cover" />}
         <div className="relative">
-          <Textarea autoFocus aria-label="Описание — агент не будет придумывать своё" placeholder="Расскажи о нём…" value={about} onChange={(event) => setAbout(event.target.value)} className={hints.length ? 'min-h-24 pb-10' : 'min-h-24'} />
+          <Textarea autoFocus aria-label={t('Описание — агент не будет придумывать своё')} placeholder={t('Расскажи о нём…')} value={about} onChange={(event) => setAbout(event.target.value)} className={hints.length ? 'min-h-24 pb-10' : 'min-h-24'} />
           {hints.length > 0 && (
-            <div className="absolute inset-x-2.5 bottom-2.5 flex flex-wrap gap-1.5" role="group" aria-label="Подсказанные теги">
+            <div className="absolute inset-x-2.5 bottom-2.5 flex flex-wrap gap-1.5" role="group" aria-label={t('Подсказанные теги')}>
               {hints.map((name) => (
                 <button key={name} type="button" className="rounded-full border border-dashed border-line px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-solid hover:bg-muted hover:text-foreground" onClick={() => setPicked((list) => [...list, name])}>{name}</button>
               ))}
             </div>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Space и теги">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('Space и теги')}>
           {inFolder && <CollectionChip icon={inFolder.inbox ? Inbox : Folder} name={inFolder.name} onRemove={() => setFolder(undefined)} />}
           {picked.map((name) => <CollectionChip key={name} icon={Tag} name={name} onRemove={() => setPicked((list) => list.filter((item) => item !== name))} />)}
           <DropdownMenu>
@@ -103,10 +104,10 @@ function Popup() {
           <CollectionPicker collections={items} picked={picked} onPick={(name) => setPicked((list) => [...list, name])} onCreate={async (name) => { const api = await server(); const next = await fetch(`${api.base}/api/library/collections`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) }).then((response) => response.json()); setCollections(next) }} />
         </div>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        {queued ? <p role="status" className="text-sm text-muted-foreground">Refkit не запущен — страница в очереди, уйдёт сама</p> : offline && <p className="text-sm text-muted-foreground">Refkit не запущен — страница уйдёт в очередь</p>}
+        {queued ? <p role="status" className="text-sm text-muted-foreground">{t('Refkit не запущен — страница в очереди, уйдёт сама')}</p> : offline && <p className="text-sm text-muted-foreground">{t('Refkit не запущен — страница уйдёт в очередь')}</p>}
         <div className="flex items-center justify-between">
-          <Button variant="secondary" onClick={() => setCollecting(true)}><Layers />Собрать все вкладки</Button>
-          <Button onClick={() => void save()} disabled={!clip} loading={saving}>Сохранить <KbdGroup><Kbd>⌘</Kbd><Kbd>↵</Kbd></KbdGroup></Button>
+          <Button variant="secondary" onClick={() => setCollecting(true)}><Layers />{t('Собрать все вкладки')}</Button>
+          <Button onClick={() => void save()} disabled={!clip} loading={saving}>{t('Сохранить')} <KbdGroup><Kbd>⌘</Kbd><Kbd>↵</Kbd></KbdGroup></Button>
         </div>
       </div>
     </TooltipProvider>

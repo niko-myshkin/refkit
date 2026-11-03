@@ -25,7 +25,6 @@
   "kind": "article",
   "author": "",
   "describing": false,
-  "describeError": "Лимит Codex на сейчас исчерпан — попробуйте позже",
   "colors": [
     "#121212",
     "#474747",
@@ -37,7 +36,7 @@
   "digesting": false,
   "thread": [
     {
-      "command": "Разбери",
+      "command": "Analyze",
       "answer": "- The text uses an implausibly long shadow to spark curiosity about what might be hidden.\n- It raises the possibility of additional features without saying what they are.\n- A playful, demanding aside insists on a full product description before purchase.\n- The promised surprise remains unspecified.\n- The invitation offers weekly emails and requires confirmation of age and consent to the privacy policy.\n- For the intended orange concept, this provides a way to put play inside clear, exact copy; it provides no evidence about the orange itself.\n\nSections:\n- “hold on...” — pause before the invitation.\n- “enter your email” — subscription prompt.\n- “by signing up” — age confirmation and privacy consent.\n- “THIS SHADOW IS unrealistically LONG” — the visual hook stated in copy.\n- “ARE YOU HIDING SOMETHING?” — a playful challenge.\n- “PERHAPS EVEN MORE FEATURES” — possibility of undisclosed features.\n- “I NEED A FULL PRODUCT DESCRIPTION” — demand for purchase information.\n- “we still have a surprise for you” — unspecified reveal.\n- “subscribe to receive information” — weekly email offer.\n- “hold on...” — the same sequence repeats.\n\nHow to apply:\n- Draft a caption for the orange concept that pairs one exact, supportable statement with one playful question; the result is a restrained voice with room for surprise.\n- Write a parenthetical buyer objection asking for concrete details before purchase; the result is playful copy that still values precision.\n- Separate confirmed product facts from unanswered questions in the draft; the result is curiosity without invented features.\n- Keep any subscription invitation beside its weekly frequency and consent language; the result is a clear offer.",
       "at": 1793332445038,
       "usage": [

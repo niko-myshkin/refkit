@@ -1,12 +1,14 @@
+import { RefkitMark } from '@/components/refkit-mark'
 import { useState, type ReactNode } from 'react'
-import { t } from '@/lib/i18n'
+import { t, lang } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
-import { Network, ChevronRight, Folder, FolderTree, Layers, Orbit, Tag, Moon, Settings, Sun, Trash2, type LucideIcon } from 'lucide-react'
+import { Network, ChevronRight, Folder, FolderTree, Layers, Orbit, Tag, Moon, Settings, Star, Sun, Trash2, type LucideIcon } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { type Action } from '@/lib/library'
 import { DropTarget } from '@/components/drop-target'
 import { SidebarResizeHandle } from './SidebarResizeHandle'
+import { useRailWidth } from './RailShell'
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader,
   SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar,
@@ -19,8 +21,9 @@ export const actionLabels: Array<{ action: Action; label: string }> = [
   { action: 'ask', label: t('Просьбы агенту') },
 ]
 
-// Старая версия — второй дев-сервер (.claude/launch.json, «app-v1»)
-const v1Url = 'http://localhost:5191'
+// Название библиотеки в футере: по нему видно, в каком окружении ты сейчас (личная или демо)
+const libraryName = lang === 'en' ? 'Demo library' : 'Личная'
+const GITHUB = 'https://github.com/niko-myshkin/refkit'
 
 type Props = {
   canvases: Array<{ id: string; title: string }>; currentCanvasId: string | null; onOpenCanvas: (id: string) => void // список холстов под «Холстом» в раскрытой рейке
@@ -41,13 +44,13 @@ type Props = {
   graphActive: boolean; onGraph: () => void
   flyActive: boolean; onFly: () => void
   onSettings: () => void
-  railWidth: number; onRailWidth: (width: number) => void // ширина раскрытой рейки
   canvasActive: boolean; onCanvas: () => void // «Холст» — лента, отфильтрованная по типу «холст»
 }
 // Боковая панель на стандартном Sidebar shadcn: типы контента — что это (рефы, ролики, статьи).
 // Подборки — о чём это — живут рядом с сеткой, под поиском. Больше ничего — приложение личное.
-export function AppSidebar({ canvases, currentCanvasId, onOpenCanvas, folders, currentFolderId, onOpenFolder, railWidth, onRailWidth, onSettings, trashActive, onTrash, allFoldersActive, onAllFolders, timelineActive, onTimeline, tagsActive, onTags, graphActive, onGraph, canvasActive, onCanvas }: Props) {
+export function AppSidebar({ canvases, currentCanvasId, onOpenCanvas, folders, currentFolderId, onOpenFolder, onSettings, trashActive, onTrash, allFoldersActive, onAllFolders, timelineActive, onTimeline, tagsActive, onTags, graphActive, onGraph, canvasActive, onCanvas }: Props) {
   const { isMobile, setOpenMobile } = useSidebar()
+  const { width: railWidth, setWidth: setRailWidth } = useRailWidth()
   // Тема: класс dark на <html>; выбор запоминается в браузере (index.html ставит его до загрузки, без вспышки)
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
   const toggleTheme = () => {
@@ -84,7 +87,7 @@ export function AppSidebar({ canvases, currentCanvasId, onOpenCanvas, folders, c
         {/* Панель — постоянная узкая рейка из иконок с подсказками (владелец 2026-10-27): не сворачивается и не тянется.
             «R» — главная (владелец 2026-10-29): хронология открывается им, отдельного пункта нет; версии и «Система» — в меню профиля */}
         <button type="button" aria-label={t('Главная')} aria-current={timelineActive ? 'page' : undefined} onClick={go(onTimeline)} className={cn('flex h-8 items-center rounded-lg pr-2 text-sm font-medium outline-none hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-sidebar-ring group-data-[collapsible=icon]:pr-0', timelineActive && 'bg-sidebar-accent')}>
-          <span className="grid size-8 shrink-0 place-items-center"><span className="flex size-[18px] translate-x-px items-center justify-center rounded-md bg-primary text-micro leading-none font-semibold text-primary-foreground">R</span></span>
+          <span className="grid size-8 shrink-0 place-items-center"><span className="flex size-[18px] translate-x-px items-center justify-center rounded-md bg-primary text-primary-foreground"><RefkitMark className="h-[11px] w-auto" /></span></span>
           <span className="truncate group-data-[collapsible=icon]:hidden">{t('Главная')}</span>
         </button>
       </SidebarHeader>
@@ -130,17 +133,18 @@ export function AppSidebar({ canvases, currentCanvasId, onOpenCanvas, folders, c
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton tooltip={t('Николай')} className="min-w-0">
-                  <Avatar aria-hidden className="size-4 rounded-sm"><AvatarFallback className="rounded-sm text-micro">{t('Н')}</AvatarFallback></Avatar>
-                  <span className="truncate">{t('Николай')}</span>
+                <SidebarMenuButton tooltip={libraryName} className="min-w-0">
+                  <Avatar aria-hidden className="size-4 rounded-sm"><AvatarFallback className="rounded-sm text-micro">{libraryName[0]}</AvatarFallback></Avatar>
+                  <span className="truncate">{libraryName}</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="min-w-52">
                 <DropdownMenuItem onSelect={() => onSettings()}><Settings />{t('Настройки')}</DropdownMenuItem>
                 <DropdownMenuItem onSelect={toggleTheme}>{dark ? <Sun /> : <Moon />}{dark ? t('Светлая тема') : t('Тёмная тема')}</DropdownMenuItem>
+                {/* Служебное — только в личной (русской) сборке; в открытой вместо него ссылка на репозиторий */}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => window.open(v1Url, '_blank')}><span className="size-4" />Refkit 1.0</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => { window.location.hash = '#/system' }}><Layers />{t('Система')}</DropdownMenuItem>
+                {lang === 'ru' && <DropdownMenuItem onSelect={() => { window.location.hash = '#/system' }}><Layers />{t('Система')}</DropdownMenuItem>}
+                {lang === 'en' && <DropdownMenuItem onSelect={() => window.open(GITHUB, '_blank', 'noopener')}><Star />Star on GitHub</DropdownMenuItem>}
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
@@ -148,7 +152,7 @@ export function AppSidebar({ canvases, currentCanvasId, onOpenCanvas, folders, c
       </SidebarFooter>
 
       {/* Край — только для ширины (правило проекта): клик по нему ничего не делает */}
-      {!isMobile && <SidebarResizeHandle width={railWidth} onWidth={onRailWidth} />}
+      {!isMobile && <SidebarResizeHandle width={railWidth} onWidth={setRailWidth} />}
     </Sidebar>
   )
 }

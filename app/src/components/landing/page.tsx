@@ -5,6 +5,8 @@ import { FONT_PAIRS, cssFamily } from '../../../shared/font-pairs.mjs'
 // Вёрстка (сетка, отступы, ритм) зашита здесь, поэтому страница каждый раз ровная, а токенов на неё уходит меньше. Все цвета, шрифты и скругления — из темы <Page>.
 const luminance = (hex: string) => { const [r, g, b] = [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b }
 const inkOn = (hex: string) => { const l = luminance(hex); return 1.05 / (l + 0.05) >= (l + 0.05) / 0.057 ? '#ffffff' : '#141414' }
+/** Контраст двух цветов #RRGGBB по WCAG (от 1 до 21): для плашек цвета в брендбуке, считается кодом, а не моделью */
+export const contrast = (a: string, b: string) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05) }
 
 export interface PageProps {
   /** Акцентный цвет направления, #RRGGBB: используется один раз на экран, на главной кнопке */
@@ -13,6 +15,8 @@ export interface PageProps {
   pair: string
   /** Скругление кнопок и карточек: sharp, soft или pill */
   corners: 'sharp' | 'soft' | 'pill'
+  /** Полная палитра брендбука; остальные страницы сохраняют свою стандартную тёмную тему. */
+  palette?: { background: string; surface: string; text: string; support: string }
   children: ReactNode
 }
 
@@ -22,7 +26,7 @@ const RADIUS = { sharp: ['2px', '4px'], soft: ['8px', '14px'], pill: ['999px', '
 // поэтому и макеты приложения (компоненты ui внутри Page) выглядят в цветах и шрифтах выбранного направления.
 // Телефон (≤640 px): крупные размеры и поля сжимаются; !important нужен, потому что токены Page заданы инлайном
 const PHONE = '@media(max-width:640px){.lp-page{--lp-fs-hero:40px!important;--lp-fs-hero-lg:44px!important;--lp-fs-h2:30px!important;--lp-fs-h2-lg:36px!important;--lp-fs-statement:22px!important;--lp-gutter:20px!important;--lp-section-y:56px!important;--lp-gap:32px!important}}'
-export function Page({ accent, pair, corners, children }: PageProps) {
+export function Page({ accent, pair, corners, palette, children }: PageProps) {
   const faces = FONT_PAIRS[pair] ?? FONT_PAIRS['Newsreader + Hanken Grotesk']
   const [button, card] = RADIUS[corners] ?? RADIUS.soft
   const ink = inkOn(accent)
@@ -31,8 +35,13 @@ export function Page({ accent, pair, corners, children }: PageProps) {
     '--lp-accent': accent, '--lp-ink': ink, '--lp-display': cssFamily(faces.display), '--lp-text-face': cssFamily(faces.text), '--lp-label-face': cssFamily(faces.label),
     '--lp-display-weight': String(faces.weight), '--lp-r-button': button, '--lp-r-card': card,
     // поверхности и текст (тёмная тема)
-    '--lp-surface': '#141414', '--lp-raised': '#1a1a1a', '--lp-text': '#f2f2f2', '--lp-muted': 'rgb(255 255 255 / 0.65)', '--lp-subtle': 'rgb(255 255 255 / 0.55)',
-    '--lp-border': 'rgb(255 255 255 / 0.12)', '--lp-border-soft': 'rgb(255 255 255 / 0.08)', '--lp-fill': 'rgb(255 255 255 / 0.03)',
+    '--lp-surface': palette?.background ?? '#141414', '--lp-raised': palette?.surface ?? '#1a1a1a', '--lp-text': palette?.text ?? '#f2f2f2',
+    '--lp-muted': palette ? 'color-mix(in srgb, var(--lp-text) 65%, var(--lp-surface))' : 'rgb(255 255 255 / 0.65)',
+    '--lp-subtle': palette ? 'color-mix(in srgb, var(--lp-text) 55%, var(--lp-surface))' : 'rgb(255 255 255 / 0.55)',
+    '--lp-border': palette ? 'color-mix(in srgb, var(--lp-text) 18%, var(--lp-surface))' : 'rgb(255 255 255 / 0.12)',
+    '--lp-border-soft': palette ? 'color-mix(in srgb, var(--lp-text) 10%, var(--lp-surface))' : 'rgb(255 255 255 / 0.08)',
+    '--lp-fill': palette ? 'color-mix(in srgb, var(--lp-support) 12%, var(--lp-surface))' : 'rgb(255 255 255 / 0.03)',
+    '--lp-support': palette?.support ?? '#f2f2f2',
     // шкала шрифтов и ритм
     '--lp-fs-hero': '68px', '--lp-fs-hero-lg': '84px', '--lp-fs-h2': '46px', '--lp-fs-h2-lg': '64px', '--lp-fs-h3': '24px', '--lp-fs-statement': '34px', '--lp-fs-lead': '18px', '--lp-fs-body': '16px', '--lp-fs-small': '13px', '--lp-fs-label': '12px',
     '--lp-max': '1200px', '--lp-gutter': '40px', '--lp-section-y': '96px', '--lp-gap': '64px',

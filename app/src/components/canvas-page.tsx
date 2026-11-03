@@ -1,26 +1,28 @@
+import { shownCanvasData } from '@/lib/canvas-view'
+import { AgentCopyIcon } from '@/components/agent-copy-icon'
 import { createPortal } from 'react-dom'
 import { compact, useMinWidth } from '@/lib/breakpoints'
 import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CodeBlock, CodeBlockCopyButton } from '@/components/ai-elements/code-block'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenuItem, DropdownMenuShortcut } from '@/components/ui/dropdown-menu'
 import { Canvas } from '@/components/ai-elements/canvas'
 import { Connection } from '@/components/ai-elements/connection'
 import { Panel } from '@/components/ai-elements/panel'
 import dagre from '@dagrejs/dagre'
-import { X, Library, LocateFixed, Map as MapIcon, Redo2, FolderOpen, Layers, ListPlus, Scissors, AlignHorizontalDistributeCenter, ArrowLeft, ChevronRight, Undo2, Bot, Plus, Play, Square, ChevronDown, Copy, Image as ImageIcon, Images, ListChecks, PanelTop, MousePointer2, Shapes, Trash2, Type, Pencil, MessageSquarePlus } from 'lucide-react'
+import { X, Library, LocateFixed, Map as MapIcon, Redo2, FolderOpen, Layers, ListPlus, Scissors, AlignHorizontalDistributeCenter, ArrowLeft, ChevronRight, Undo2, Bot, Plus, Play, Square, Copy, Image as ImageIcon, Images, ListChecks, PanelTop, MousePointer2, Shapes, Trash2, Type, MessageSquarePlus, Download } from 'lucide-react'
 import { Toolbar } from '@/components/ai-elements/toolbar'
 import { applyEdgeChanges, applyNodeChanges, MiniMap, Position, useKeyPress, useStore, useViewport, ReactFlowProvider, SelectionMode, useNodesInitialized, useReactFlow, type Edge, type EdgeChange, type Node, type NodeChange } from '@xyflow/react'
 import '@xyflow/react/dist/base.css'
 import { Button } from '@/components/ui/button'
 import { NodePreview } from '@/components/canvas/node-preview'
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import { ReviewDialog, type ReviewNode } from '@/components/canvas/review-dialog'
+import { ViewerShell } from '@/components/viewer-shell'
+import { ZoomIsland } from '@/components/zoom-island'
 import { MemoryPanel } from '@/components/canvas/memory-panel'
 import { CommentsPanel, type CommentGroup } from '@/components/canvas/comments-panel'
 import { CARDS_MIME, MaterialPicker } from '@/components/canvas/material-picker'
 import { Island } from '@/components/ui/island'
 import { type CardComment } from '@/components/comment-feed'
-import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Kbd } from '@/components/ui/kbd'
@@ -32,9 +34,9 @@ import { applyOps } from '../../shared/canvas-graph.mjs'
 import { hypothesisChain } from '../../shared/hypothesis-template.mjs'
 import { productLandingChain } from '../../shared/product-landing-template.mjs'
 import { landingReferenceChain } from '../../shared/landing-reference-template.mjs'
+import { brandbookChain } from '../../shared/brandbook-template.mjs'
 import { accepts, connectionError, derivedFields, stripDerived } from '../../shared/canvas-nodes.mjs'
 import { t } from '@/lib/i18n'
-import { MessageResponse } from '@/components/ai-elements/message'
 import { Tip, barButton, barClass, type CanvasItem, cardWidth, portOf, PORT_VAR, ratioOf, type Env, CanvasEnv, PRESETS, SCREEN_INSTR, TEMPLATES, TEMPLATE_STAGES, edgeTypes, nodeTypes, edgeOptions } from './canvas/nodes'
 // Страница холста (grill-canvas.md): доска на React Flow. Карточки — живые ссылки на материалы (название и обложка берутся
 // из библиотеки, на доске хранятся только id, место и размер), рамки и текст — свои. Стрелку тянут от точки на краю
@@ -72,19 +74,13 @@ function ZoomMenu({ map, onMap }: { map: boolean; onMap: () => void }) {
   const { zoomIn, zoomOut, zoomTo, fitView } = useReactFlow()
   const selected = useStore((state) => [...state.nodeLookup.values()].filter((node) => node.selected).map((node) => ({ id: node.id })))
   return (
-    <Panel position="bottom-right" className="!m-4 !border-0 !bg-transparent !p-0 !shadow-none !overflow-visible !right-[var(--agent-overlay-w,0px)]"><Island>
-      <Tooltip><TooltipTrigger asChild><Button variant={map ? 'secondary' : 'ghost'} size="icon" aria-label={t('Миникарта')} aria-pressed={map} onClick={onMap}><MapIcon /></Button></TooltipTrigger><TooltipContent>{t('Миникарта')}</TooltipContent></Tooltip>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" size="lg" className="h-8 gap-1 px-2 text-xs tabular-nums" aria-label={t('Масштаб')}>{Math.round(zoom * 100)}%<ChevronDown /></Button></DropdownMenuTrigger>
-        <DropdownMenuContent align="end" side="top" className="min-w-48">
-          <DropdownMenuItem onSelect={() => void zoomIn({ duration: 200 })}>{t('Приблизить')}<DropdownMenuShortcut>⌘ +</DropdownMenuShortcut></DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void zoomOut({ duration: 200 })}>{t('Отдалить')}<DropdownMenuShortcut>⌘ −</DropdownMenuShortcut></DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void zoomTo(1, { duration: 200 })}>{t('Масштаб 100 %')}<DropdownMenuShortcut>⌘ 0</DropdownMenuShortcut></DropdownMenuItem>
+    <Panel position="bottom-right" className="!m-4 !border-0 !bg-transparent !p-0 !shadow-none !overflow-visible !right-[var(--agent-overlay-w,0px)]">
+      <ZoomIsland percent={Math.round(zoom * 100)} onZoomIn={() => void zoomIn({ duration: 200 })} onZoomOut={() => void zoomOut({ duration: 200 })} onReset={() => void zoomTo(1, { duration: 200 })}
+        leading={<Tooltip><TooltipTrigger asChild><Button variant={map ? 'secondary' : 'ghost'} size="icon" aria-label={t('Миникарта')} aria-pressed={map} onClick={onMap}><MapIcon /></Button></TooltipTrigger><TooltipContent>{t('Миникарта')}</TooltipContent></Tooltip>}>
           <DropdownMenuItem onSelect={() => void fitView({ maxZoom: 1, padding: 0.2, duration: 300 })}>{t('Вместить всё')}<DropdownMenuShortcut>D</DropdownMenuShortcut></DropdownMenuItem>
           <DropdownMenuItem disabled={!selected.length} onSelect={() => void fitView({ nodes: selected, maxZoom: 1.5, padding: 0.3, duration: 300 })}>{t('К выбранному')}<DropdownMenuShortcut>F</DropdownMenuShortcut></DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </Island></Panel>
+      </ZoomIsland>
+    </Panel>
   )
 }
 // «К доске» — появляется внизу по центру, когда все ноды ушли за кадр (как Recenter у Magnific)
@@ -161,9 +157,8 @@ function Board(props: Props) {
   // Модели для выбора на ноде: те же, что в настройках; «по умолчанию» — модель «Просьбы агенту»
   const [modelList, setModelList] = useState<ModelSettings | null>(null)
   useEffect(() => { void library.settings().then(setModelList).catch(() => {}) }, [])
-  const [reviewId, setReviewId] = useState<string | null>(null)
-  const [textView, setTextView] = useState<{ id: string; title: string; text: string } | null>(null)
-  const [textDraft, setTextDraft] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [frameView, setFrameView] = useState<{ id: string; title: string; members: Array<{ id: string; title: string; image?: string; node?: boolean }> } | null>(null)
   const [promptView, setPromptView] = useState<{ title: string; prompt: string; images: string[]; model: string } | null>(null)
   // Стартовые умения добавляем один раз за сессию: два параллельных вызова (двойной монтаж) иначе создали бы дубли
   useEffect(() => {
@@ -205,12 +200,6 @@ function Board(props: Props) {
     if (to === 'closed') patch(nodeId, { comments: rest, closedComments: [...(data.closedComments ?? []), { ...item, closedAt: Date.now(), closedBy: 'manual' as const }] })
     else { const { closedAt: _closedAt, closedBy: _closedBy, ...back } = item; patch(nodeId, { closedComments: rest, comments: [...(data.comments ?? []), back] }) }
   }
-  const reviewNode = useMemo<ReviewNode | null>(() => {
-    const node = reviewId ? nodes.find((item) => item.id === reviewId) : undefined
-    if (!node || (node.type !== 'screen' && node.type !== 'image')) return null
-    const data = node.data as { title?: string; result?: string; imageFile?: string; comments?: CardComment[]; status?: string }
-    return { id: node.id, type: node.type, title: data.title, result: data.result, imageFile: data.imageFile, comments: data.comments, running: data.status === 'running' || data.status === 'pending' }
-  }, [nodes, reviewId])
   const nodesRef = useRef<Node[]>([])
   nodesRef.current = nodes
   const [edges, setEdges] = useState<Edge[]>([])
@@ -300,6 +289,7 @@ function Board(props: Props) {
   // обычный текст — подписью. Слушаем раньше библиотеки (она открыла бы окно «Добавить») и забираем событие себе
   const pasteRef = useRef<(event: ClipboardEvent) => void>(() => {})
   pasteRef.current = (event) => {
+    if (document.querySelector('[role="dialog"]')) { event.stopImmediatePropagation(); return }
     if ((event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable="true"]')) return
     event.stopImmediatePropagation()
     event.preventDefault()
@@ -319,7 +309,7 @@ function Board(props: Props) {
   }, [])
   useEffect(() => {
     const on = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey) || event.altKey || (event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable="true"]')) return
+      if (document.querySelector('[role="dialog"]') || !(event.metaKey || event.ctrlKey) || event.altKey || (event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable="true"]')) return
       const key = event.key.toLowerCase()
       if (key === '0') { event.preventDefault(); void zoomToRef.current(1, { duration: 200 }) }
       else if (key === '=' || key === '+') { event.preventDefault(); void zoomInRef.current({ duration: 200 }) }
@@ -632,13 +622,38 @@ function Board(props: Props) {
   const stopAll = () => { void library.stopCanvasNode(id, 'all').then(() => library.canvas(id)).then((data) => mergeServer(data.nodes)).catch(() => {}) }
   const stopNode = (nodeId: string) => { void library.stopCanvasNode(id, nodeId).then(() => library.canvas(id)).then((data) => mergeServer(data.nodes)).catch(() => {}) }
   const restoreVersion = (nodeId: string, index: number) => { void library.restoreCanvasVersion(id, nodeId, index).then(() => library.canvas(id)).then((data) => mergeServer(data.nodes)).catch(() => notify(t('Не удалось вернуть версию'))) }
+  const nodeContent = (nodeId: string) => {
+    const node = nodesRef.current.find((item) => item.id === nodeId)
+    const data = shownCanvasData((node?.data ?? {}) as { activeAt?: number; history?: Array<{ result?: string; imageFile?: string }>; title?: string; name?: string; label?: string; text?: string; result?: string; imageFile?: string; ref?: string; instr?: string; items?: string[]; filter?: string; members?: Array<{ id: string; title: string; image?: string; text?: string; cat?: string }>; contains?: string[] })
+    const card = data.ref ? byId.get(data.ref) : undefined
+    const members = node?.type === 'frame' || (node?.type === 'group' && data.contains)
+      ? ((node?.type === 'frame' ? (node.data.members as string[] | undefined) : data.contains) ?? []).flatMap((memberId) => {
+          const child = nodesRef.current.find((item) => item.id === memberId)
+          return child ? [{ id: child.id, title: String(child.data.title ?? child.data.name ?? child.data.label ?? child.type), node: true }] : []
+        })
+      : node?.type === 'group' ? (data.members ?? []).filter((item) => !data.filter || data.filter === 'all' || item.cat === data.filter).map((item) => ({ id: item.id, title: item.title, image: item.image, node: false })) : undefined
+    const title = data.title || data.name || data.label || card?.title || t('Результат ноды')
+    const text = data.result || data.text || card?.text || (node?.type === 'choice' ? (data.items ?? []).join('\n\n---\n\n') : '') || (members ? members.map((item) => `- ${item.title} (${item.node ? `refkit:canvas/${id}#${item.id}` : `refkit:card/${item.id}`})`).join('\n') : '') || data.instr || ''
+    return { node, data, title, text, members, card }
+  }
+  const expandNode = (nodeId: string) => {
+    const { node, title, members, card } = nodeContent(nodeId)
+    if (card) { onOpenCard(card.id); return }
+    if (node?.type === 'frame') { setFrameView({ id: nodeId, title, members: members ?? [] }); return }
+    if (node) setExpandedId(nodeId)
+  }
   const downloadScreen = (nodeId: string) => {
-    const data = nodesRef.current.find((node) => node.id === nodeId)?.data as { result?: string; title?: string } | undefined
-    if (!data?.result) return
-    const screen = nodesRef.current.find((node) => node.id === nodeId)?.type === 'screen'
+    const { node, data, title, text } = nodeContent(nodeId)
     const link = document.createElement('a')
-    link.href = URL.createObjectURL(new Blob([data.result], { type: screen ? 'text/html' : 'text/markdown' }))
-    link.download = `${(data.title || (nodesRef.current.find((node) => node.id === nodeId)?.type === 'screen' ? t('экран') : t('результат'))).replace(/[\\/:*?"<>|]+/g, ' ').trim()}.${screen ? 'html' : 'md'}`
+    if (node?.type === 'image' && data.imageFile) {
+      link.href = data.imageFile
+      link.download = data.imageFile.split('/').pop() ?? title
+      link.click()
+      return
+    }
+    const screen = node?.type === 'screen'
+    link.href = URL.createObjectURL(new Blob([text], { type: screen ? 'text/html' : 'text/markdown' }))
+    link.download = `${title.replace(/[\\/:*?"<>|]+/g, ' ').trim()}.${screen ? 'html' : 'md'}`
     link.click(); URL.revokeObjectURL(link.href)
   }
   // PDF презентации: сервер печатает страницу в Chrome, браузер сохраняет файл
@@ -654,18 +669,17 @@ function Board(props: Props) {
     } catch { notify(t('Не удалось собрать PDF')) }
   }
   const copyForAgent = (nodeId: string) => {
-    const node = nodesRef.current.find((item) => item.id === nodeId)
-    const data = node?.data as { result?: string; title?: string; inputRefs?: string[] } | undefined
-    if (!data?.result) return
-    const sources = (data.inputRefs ?? []).map((ref) => byId.get(ref)).filter(Boolean).map((item) => `- ${item!.title} (refkit:card/${item!.id})`)
+    const { node, data, title, text, card } = nodeContent(nodeId)
+    if (!node) return
+    const sources = ((node.data.inputRefs as string[] | undefined) ?? []).map((ref) => byId.get(ref)).filter(Boolean).map((item) => `- ${item!.title} (refkit:card/${item!.id})`)
     const tail = [sources.length ? t('Источники:') + `\n${sources.join('\n')}` : '', t('Холст: refkit:canvas/{id} · эта нода: refkit:canvas/{id}#{nodeId}', { id, nodeId })]
     const put = (parts: string[]) => void navigator.clipboard.writeText(parts.filter((line, index, list) => line !== '' || list[index - 1] !== '').join('\n')).then(() => notify(t('Скопировано — вставь агенту'))).catch(() => notify(t('Не удалось скопировать')))
     // Экран — это HTML на тысячи токенов: файлом в папке холста, агенту путь и ссылка (по MCP код читается целиком); текст отдаём как есть
-    if (node?.type === 'screen') {
+    if (node?.type === 'screen' && data.result && !(typeof data.activeAt === 'number' && data.history?.[data.activeAt])) {
       void library.exportCanvasNode(id, nodeId).then(({ path, size, sourcePath }) => put([`# ${data.title || t('Экран')}`, '', ...(sourcePath ? [t('Исходник React/shadcn: {path}', { path: sourcePath }), t('Прочитай TSX целиком; используй компоненты и токены Refkit.')] : []), t('Автономный HTML экрана ({size} символов): {path}', { size, path }), t('Через MCP исходник доступен по refkit_read с ссылкой ниже.'), '', ...tail])).catch(() => notify(t('Не удалось сохранить экран файлом')))
       return
     }
-    put([`# ${data.title || t('Результат ноды')}`, '', data.result.trim(), '', ...tail])
+    put([`# ${title}`, '', text.trim(), ...(data.imageFile ? ['', t('Картинка') + ': ' + new URL(data.imageFile, window.location.origin).href] : []), ...(card ? ['', `refkit:card/${card.id}`] : []), '', ...tail])
   }
   // «На холст» из ноды-папки: материал отдельной карточкой справа от неё, каждый следующий — ниже
   const placeCard = (groupId: string, ref: string) => {
@@ -726,7 +740,7 @@ function Board(props: Props) {
       } catch { notify(t('Не удалось показать запрос')) }
     })()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  const env = useMemo<Env>(() => ({ fitHeight, downloadPdf: (nodeId) => void downloadPdf(nodeId), runAfter: (nodeId) => void runAfter(nodeId), refine: (nodeId, text) => void refine(nodeId, text), activate: (nodeId, index) => activate(nodeId, index), redoItem: (choiceId, index) => void redoItem(choiceId, index), commenting: tool === 'comment', apply: (nodeId) => void applyEdits(nodeId), items: byId, open: onOpenCard, patch, remove, duplicate, showPrompt, addNext, insertBetween, outgoing, models: modelList?.models ?? [], defaultModel: modelList?.models.find((model) => model.key === modelList.assigned.ask)?.label ?? '', expand: (nodeId) => { const node = nodesRef.current.find((item) => item.id === nodeId); const data = node?.data as { result?: string; title?: string } | undefined; if (node?.type === 'screen' || (node?.type === 'image' && (node.data as { imageFile?: string }).imageFile)) setReviewId(nodeId); else setTextView({ id: nodeId, title: data?.title ?? t('Результат'), text: String(data?.result ?? '') }) }, copyForAgent, multi, addInput: (nodeId) => { const node = nodesRef.current.find((item) => item.id === nodeId); if (node) setSpot({ to: nodeId, at: { x: node.position.x - 180, y: node.position.y + (node.measured?.height ?? 320) / 2 } }) }, placeCard, removeFromGroup: (groupId, itemId) => removeFromGroupRef.current(groupId, itemId), ungroup: (listId) => ungroupRef.current(listId), toggleList: (listId) => toggleListRef.current(listId), addToFolder: (folderId) => onAddToFolder?.(folderId), run: (nodeId) => void runNode(nodeId), runFrom: (nodeId) => void runPlan('downstream', nodeId), runAll: () => void runPlan('all'), stop: stopNode, save: saveNode, download: downloadScreen, restore: restoreVersion, setKind: (nodeId, kind) => { mark(); setNodes((list) => list.map((node) => node.id === nodeId ? { ...node, type: kind, data: kind === 'screen' ? { designSystem: 'fluid', ...node.data, ...((node.data as { instr?: string }).instr ? {} : { instr: SCREEN_INSTR }) } : node.data } : node)) }, actions, manage: () => { flush(); onManageActions?.() } }), [byId, onOpenCard, patch, remove, duplicate, showPrompt, addNext, insertBetween, outgoing, actions, onManageActions, modelList, multi, tool]) // eslint-disable-line react-hooks/exhaustive-deps
+  const env = useMemo<Env>(() => ({ expandedId, collapse: () => { setExpandedId(null); setTool('select') }, editText: (nodeId, from, to) => { void saveNow().then(() => library.editCanvasText(id, nodeId, from, to)).then(() => library.canvas(id)).then((data) => mergeServer(data.nodes)).catch((error) => notify((error as Error).message)) }, toggleComment: () => setTool(tool === 'comment' ? 'select' : 'comment'), fitHeight, downloadPdf: (nodeId) => void downloadPdf(nodeId), runAfter: (nodeId) => void runAfter(nodeId), refine: (nodeId, text) => void refine(nodeId, text), activate: (nodeId, index) => activate(nodeId, index), redoItem: (choiceId, index) => void redoItem(choiceId, index), commenting: tool === 'comment', apply: (nodeId) => void applyEdits(nodeId), items: byId, open: onOpenCard, patch, remove, duplicate, showPrompt, addNext, insertBetween, outgoing, models: modelList?.models ?? [], defaultModel: modelList?.models.find((model) => model.key === modelList.assigned.ask)?.label ?? '', expand: expandNode, copyForAgent, multi, addInput: (nodeId) => { const node = nodesRef.current.find((item) => item.id === nodeId); if (node) setSpot({ to: nodeId, at: { x: node.position.x - 180, y: node.position.y + (node.measured?.height ?? 320) / 2 } }) }, placeCard, removeFromGroup: (groupId, itemId) => removeFromGroupRef.current(groupId, itemId), ungroup: (listId) => ungroupRef.current(listId), toggleList: (listId) => toggleListRef.current(listId), addToFolder: (folderId) => onAddToFolder?.(folderId), run: (nodeId) => void runNode(nodeId), runFrom: (nodeId) => void runPlan('downstream', nodeId), runAll: () => void runPlan('all'), stop: stopNode, save: saveNode, download: downloadScreen, restore: restoreVersion, setKind: (nodeId, kind) => { mark(); setNodes((list) => list.map((node) => node.id === nodeId ? { ...node, type: kind, data: kind === 'screen' ? { designSystem: 'fluid', ...node.data, ...((node.data as { instr?: string }).instr ? {} : { instr: SCREEN_INSTR }) } : node.data } : node)) }, actions, manage: () => { flush(); onManageActions?.() } }), [byId, onOpenCard, patch, remove, duplicate, showPrompt, addNext, insertBetween, outgoing, actions, onManageActions, modelList, multi, tool, expandedId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const add = (node: Omit<Node, 'id'>) => { mark(); setNodes((list) => [...list.map((item) => ({ ...item, selected: false })), { ...node, id: `n-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, selected: true } as Node]) }
   // Бросить материал на ноду-папку: он переезжает в эту папку (как «Переместить в…» в библиотеке). Работает и для карточки на холсте, и для материала с полки
@@ -845,9 +859,13 @@ function Board(props: Props) {
   const addGraph = async (key: string, point?: { x: number; y: number }) => {
     const at = point ?? center(), stamp = Date.now().toString(36)
     const folder = async (name: string) => { const made = await library.createFolder(name); return { key: made.id, name } }
+    // Референсы брендбука: полка «Под рукой», если на ней что-то лежит (материалы остаются на месте), иначе новая пустая папка
+    const brandRefs = async () => { const shelf = (await library.boards().catch(() => [])).find((board) => board.shelf); return shelf?.order?.length ? { kind: 'board' as const, key: shelf.name, name: t('Пины') } : await folder(t('Референсы')) }
     let chain: ReturnType<typeof hypothesisChain>
     try {
-      chain = key === 'landing-reference'
+      chain = key === 'brandbook'
+        ? brandbookChain({ brief: t('Name: название бренда\nWhat it is: что это, два предложения\nFor whom: для кого\n\nПоложи референсы в папку «{refs}» слева. Выбери начертание, затем палитру и пару шрифтов. Брендбук использует первую букву выбранного вордмарка как знак.', { refs: t('Референсы') }), refs: await brandRefs() })
+        : key === 'landing-reference'
         ? landingReferenceChain({ notes: t('Пара слов о продукте своими словами: что это, для кого и в каком порядке рассказывать. Документы положи рядом подписями и соедини с паспортом; в папку снимков — красивые кадры продукта, страница соберётся из них.'), shots: await folder(t('Снимки продукта')), refs: await folder(t('Референс лендинга')) })
         : key === 'product-landing'
         ? productLandingChain({ notes: t('Пара слов о продукте своими словами: что это и для кого. Документы (позиционирование, PRD) положи рядом подписями и соедини с паспортом — агент сам разделит, что видно на снимках, а что только обещано.'), shots: await folder(t('Снимки продукта')), refs: await folder(t('Референс лендинга')), fragments: await folder(t('Куски интерфейса')) })
@@ -962,7 +980,7 @@ function Board(props: Props) {
   useEffect(() => {
     const keys: Record<string, Tool> = { v: 'select', t: 'text', c: 'comment', k: 'cut' }
     const on = (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey || (event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable="true"]')) return
+      if (document.querySelector('[role="dialog"]') || event.metaKey || event.ctrlKey || event.altKey || (event.target as HTMLElement | null)?.closest('input, textarea, [contenteditable="true"]')) return
       const key = event.key.toLowerCase()
       const next = keys[key]
       if (next) { setTool(next); if (next === 'comment') props.onOpenComments?.() }
@@ -1053,7 +1071,7 @@ function Board(props: Props) {
           <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={t('Выровнять цепочку')} onClick={layout}><AlignHorizontalDistributeCenter /></Button></TooltipTrigger><TooltipContent>{t('Выровнять цепочку')}</TooltipContent></Tooltip>
           <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={anyRunning ? t('Остановить всё') : t('Запустить всё')} disabled={SNAPSHOT} onClick={() => (anyRunning ? stopAll() : void runPlan('all'))}>{anyRunning ? <Square /> : <Play />}</Button></TooltipTrigger><TooltipContent>{anyRunning ? t('Остановить всё') : t('Запустить всё: свежие ноды пропускаются')}</TooltipContent></Tooltip>
           <span aria-hidden className="mx-1 h-4 w-px bg-line" />
-          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={t('Скопировать для агента')} onClick={copyLink}><Copy /></Button></TooltipTrigger><TooltipContent>{t('Скопировать для агента')}</TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={t('Скопировать для агента')} onClick={copyLink}><AgentCopyIcon /></Button></TooltipTrigger><TooltipContent>{t('Скопировать для агента')}</TooltipContent></Tooltip>
         </Island>
       </header>
       <div className="flex min-h-0 flex-1">
@@ -1084,6 +1102,13 @@ function Board(props: Props) {
         <CanvasEnv.Provider value={env}>
           <Canvas nodes={shownNodes} edges={shownEdges} nodeTypes={nodeTypes} edgeTypes={edgeTypes} connectionLineComponent={Connection} defaultEdgeOptions={edgeOptions}
             nodeDragThreshold={4}
+            onNodeDoubleClick={(event, node) => {
+              // Двойной клик по ноде с результатом открывает просмотр — то же, что «Развернуть». Поля ввода, кнопки и ссылки внутри ноды двойной клик не перехватывают
+              const data = node.data as { result?: string; imageFile?: string } | undefined
+              if (!data?.result && !data?.imageFile) return
+              if ((event.target as HTMLElement).closest('input, textarea, select, button, a, [contenteditable="true"]')) return
+              env.expand(node.id)
+            }}
             onNodesChange={(changes: NodeChange[]) => {
               if (changes.some((change) => change.type === 'remove')) { mark(); undoable() } setNodes((list) => applyNodeChanges(withGroupMoves(changes, list), list)) }}
             onEdgesChange={(changes: EdgeChange[]) => { if (changes.some((change) => change.type === 'remove')) { mark(); undoable() } setEdges((list) => applyEdgeChanges(changes, list)) }}
@@ -1098,6 +1123,7 @@ function Board(props: Props) {
             onNodeDrag={(event, node) => { if (node.type !== 'card') return; setDropFolder(pointerFolder(event as unknown as MouseEvent)?.id ?? null) }}
             onNodeDragStop={(event, __, dragged) => dropCards(dragged, pointerFolder(event as unknown as MouseEvent))}
             onPaneContextMenu={(event) => { event.preventDefault(); const point = 'clientX' in event ? event : null; if (point) setSpot({ at: screenToFlowPosition({ x: point.clientX, y: point.clientY }) }) }}
+            deleteKeyCode={expandedId ? null : 'Backspace'}
             {...(SNAPSHOT ? { nodesDraggable: false, nodesConnectable: false, edgesReconnectable: false, deleteKeyCode: null } : {})}
             onPaneClick={place} fitView fitViewOptions={{ maxZoom: 1, padding: 0.2 }} minZoom={0.1} maxZoom={2}
             panActivationKeyCode="Space" panOnScroll zoomOnScroll={false} zoomActivationKeyCode={['Meta', 'Control']} selectionOnDrag={!coarse} panOnDrag={coarse ? true : [1]} selectionMode={SelectionMode.Partial} multiSelectionKeyCode={['Meta', 'Shift']}
@@ -1204,24 +1230,16 @@ function Board(props: Props) {
         <MaterialPicker open={pickerOpen} items={items.filter((item) => item.id !== id && item.kind !== 'canvas')} groups={groups} onCanvas={new Set(nodes.filter((node) => node.type === 'card').map((node) => String((node.data as { ref?: string }).ref ?? '')))} onClose={() => setPickerOpen(false)}
           onAddCards={(ids) => { const base = center(); ids.forEach((refId, at) => addCard(refId, { x: base.x + ((at % 3) - 1) * (cardWidth + 24), y: base.y + Math.floor(at / 3) * 200 })) }}
           onAddGroup={(group) => addGroup(group, nudge(center()))} />
-        <ReviewDialog node={reviewNode} onClose={() => setReviewId(null)} onComments={(nodeId, comments) => patch(nodeId, { comments })} onApply={(nodeId) => { setReviewId(null); void applyEdits(nodeId) }}
-          onEditText={(nodeId, from, to) => { void saveNow().then(() => library.editCanvasText(id, nodeId, from, to)).then(() => library.canvas(id)).then((data) => mergeServer(data.nodes)).catch((error) => notify((error as Error).message)) }} />
-        <Dialog open={textView !== null} onOpenChange={(open) => { if (!open) { setTextView(null); setTextDraft(null) } }}>
-          <DialogContent className="max-h-[85vh] overflow-auto sm:max-w-3xl">
-            <DialogHeader><DialogTitle>{textView?.title}</DialogTitle><DialogDescription>{t('Результат ноды целиком.')}</DialogDescription></DialogHeader>
-            {textView && (textDraft === null
-              ? <><MessageResponse>{textView.text}</MessageResponse>
-                  <div><Button variant="ghost" size="icon-sm" aria-label={t('Править текст')} onClick={() => setTextDraft(textView.text)}><Pencil /></Button></div></>
-              : <><Textarea aria-label={t('Текст результата')} autoFocus value={textDraft} onChange={(event) => setTextDraft(event.target.value)} className="min-h-64 font-mono text-sm" />
-                  <div className="flex gap-2">
-                    <Button size="sm" disabled={!textDraft.trim()} onClick={async () => {
-                      try { await saveNow(); await library.editCanvasResult(id, textView.id, textDraft); const fresh = await library.canvas(id); mergeServer(fresh.nodes); setTextView({ ...textView, text: textDraft.trim() }); setTextDraft(null) }
-                      catch { notify(t('Не удалось сохранить текст')) }
-                    }}>{t('Сохранить')}</Button>
-                    <Button variant="ghost" size="sm" onClick={() => setTextDraft(null)}>{t('Отмена')}</Button>
-                  </div></>)}
-          </DialogContent>
-        </Dialog>
+        <ViewerShell open={frameView !== null} onClose={() => setFrameView(null)} title={frameView?.title ?? ''} description={t('Состав')}
+          actions={frameView && <>
+            <Tip label={t('Скопировать для агента')}><Button variant="ghost" size="icon" aria-label={t('Скопировать для агента')} onClick={() => copyForAgent(frameView.id)}><AgentCopyIcon /></Button></Tip>
+            <Tip label={t('Скачать .md')}><Button variant="ghost" size="icon" aria-label={t('Скачать .md')} onClick={() => downloadScreen(frameView.id)}><Download /></Button></Tip>
+          </>}>
+          {frameView && <div className="h-full overflow-auto p-6 pb-28"><div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+            <h2 className="text-lg font-semibold">{frameView.title}</h2>
+            <ul className="flex flex-col gap-2">{frameView.members.map((item) => <li key={item.id}><Button variant="ghost" className="h-auto w-full justify-start gap-3 whitespace-normal p-3 text-left" onClick={() => { setFrameView(null); if (item.node) expandNode(item.id); else onOpenCard(item.id) }}>{item.image && <img src={item.image} alt="" className="size-16 shrink-0 rounded-md object-cover" />}<span>{item.title}</span><ChevronRight className="ml-auto shrink-0" /></Button></li>)}</ul>
+          </div></div>}
+        </ViewerShell>
         <Dialog open={promptView !== null} onOpenChange={(open) => { if (!open) setPromptView(null) }}>
           <DialogContent className="max-h-[85vh] overflow-hidden sm:max-w-2xl">
             <DialogHeader>
@@ -1241,7 +1259,7 @@ function Board(props: Props) {
         <Island className="absolute top-18 z-10 flex-col" style={{ left: 'calc(var(--canvas-inset, 16px) + var(--agent-left-w, 0px))' }} role="toolbar" aria-orientation="vertical" aria-label={t('Инструменты холста')}>
             <Tooltip><TooltipTrigger asChild><Button variant={tool === 'select' ? 'default' : 'ghost'} size="icon" aria-label={t('Выбор')} onClick={() => setTool('select')}><MousePointer2 /></Button></TooltipTrigger><TooltipContent side="right">{t('Выбор')} <Kbd>V</Kbd></TooltipContent></Tooltip>
             <Tooltip><TooltipTrigger asChild><Button variant={pickerOpen ? 'secondary' : 'ghost'} size="icon" aria-label={t('Библиотека')} aria-pressed={pickerOpen} onClick={() => setPickerOpen(!pickerOpen)}><Library /></Button></TooltipTrigger><TooltipContent side="right">{t('Библиотека: материалы, папки и подборки')} <Kbd>M</Kbd></TooltipContent></Tooltip>
-            <Tooltip><TooltipTrigger asChild><Button variant={tool === 'comment' || props.commentsActive ? 'secondary' : 'ghost'} size="icon" className="relative" aria-label={t('Комментарии')} aria-pressed={tool === 'comment' || Boolean(props.commentsActive)} onClick={() => { const on = tool === 'comment' && Boolean(props.commentsActive); setTool(on ? 'select' : 'comment'); if (on) props.onHideComments?.(); else props.onOpenComments?.() }}><MessageSquarePlus />{openComments > 0 && <span className="absolute -top-0.5 -right-0.5 grid min-w-4 place-items-center rounded-lg bg-primary px-1 text-[10px] leading-4 font-medium text-primary-foreground tabular-nums">{openComments}</span>}</Button></TooltipTrigger><TooltipContent side="right">{t('Комментарии')} <Kbd>C</Kbd></TooltipContent></Tooltip>
+            <Tooltip><TooltipTrigger asChild><Button variant={tool === 'comment' || props.commentsActive ? 'secondary' : 'ghost'} size="icon" className="relative" aria-label={t('Правки')} aria-pressed={tool === 'comment' || Boolean(props.commentsActive)} onClick={() => { const on = tool === 'comment' && Boolean(props.commentsActive); setTool(on ? 'select' : 'comment'); if (on) props.onHideComments?.(); else props.onOpenComments?.() }}><MessageSquarePlus />{openComments > 0 && <span className="absolute -top-0.5 -right-0.5 grid min-w-4 place-items-center rounded-lg bg-primary px-1 text-[10px] leading-4 font-medium text-primary-foreground tabular-nums">{openComments}</span>}</Button></TooltipTrigger><TooltipContent side="right">{t('Правки')} <Kbd>C</Kbd></TooltipContent></Tooltip>
             <Tooltip><TooltipTrigger asChild><Button variant={tool === 'cut' ? 'secondary' : 'ghost'} size="icon" aria-label={t('Нож')} aria-pressed={tool === 'cut'} onClick={() => setTool(tool === 'cut' ? 'select' : 'cut')}><Scissors /></Button></TooltipTrigger><TooltipContent side="right">{t('Нож')} <Kbd>K</Kbd></TooltipContent></Tooltip>
             <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={t('Добавить ноду')} onClick={() => setSpot({})}><Plus /></Button></TooltipTrigger><TooltipContent side="right">{t('Добавить ноду')} <Kbd>N</Kbd></TooltipContent></Tooltip>
         {agentButton}

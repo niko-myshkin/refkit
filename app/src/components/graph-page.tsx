@@ -26,6 +26,9 @@ import { cn } from '@/lib/utils'
 // — режимы из окна у названия режима. Приближение превращает точки в карточки-превью (картинки грузятся только тогда). Модель работает ТОЛЬКО по кнопке (цена — в диалоге до запуска). Холст — React Flow (компонента графа в shadcn нет).
 export type Item = { id: string; title: string; image: string; ratio?: string; description?: string; kind?: string; format?: string; createdAt?: number; author?: string; collections?: string[] }
 // Пропорция превью карточки — как в «Мозаике» (у каждой своя), но не длиннее 1,6 и не площе 0,5 ширины: иначе у шара торчат и вытянутые, и плоские
+// Высота плитки в фокусе от ширины: по пропорциям самой картинки, чтобы рамка обнимала её, а не резала (владелец 2026-11-03);
+// max — потолок для высоких картинок, чтобы не ломать раскладку кольцом
+const fitHeight = (item: Item | undefined, max: number) => { const [w, h] = (item?.ratio ?? '').split('/').map(Number); return w > 0 && h > 0 ? Math.min(max, Math.max(0.5, h / w)) : Math.min(1, max) }
 const heightOf = (item?: Item) => { const [w, h] = (item?.ratio ?? '').split('/').map(Number); return w > 0 && h > 0 ? Math.min(1.6, Math.max(0.5, h / w)) : 1 }
 type At = { x: number; y: number } // точка в поле графа: откуда растёт вид-фокус
 type Focus = { card: string; from?: At } | { concept: string; from?: At } | null
@@ -458,7 +461,10 @@ export function Sphere({ wheel = true, radius = 0.36, dock = 80, cardTip = false
       frame = requestAnimationFrame(step)
     }
     frame = requestAnimationFrame(step)
-    return () => cancelAnimationFrame(frame)
+    // За экраном (лендинг, страница ниже шара) кадры не планируем; dt зажат до 48 мс, так что после паузы шар не прыгает
+    const watch = box.current ? new IntersectionObserver(([entry]) => { cancelAnimationFrame(frame); if (entry.isIntersecting) { last = performance.now(); frame = requestAnimationFrame(step) } }) : null
+    if (box.current) watch?.observe(box.current)
+    return () => { cancelAnimationFrame(frame); watch?.disconnect() }
   }, [still])
 
   // Точка шара под указателем (в осях вида) — за неё шар «берут»
@@ -685,7 +691,7 @@ export function FocusView({ byId, title, cover, cards, keys, onCard, onKey, onOp
             {cover ? (
               <div className="group/center flex flex-col items-center gap-2" style={{ width: centerW }}>
                 {/* Центральная карточка сама открывает материал: отдельной кнопки-стрелки нет */}
-                <button type="button" aria-label={t('Открыть «{title}»', { title: cover.title })} disabled={!onOpen} tabIndex={stage < 3 ? -1 : 0} onClick={onOpen} className={cn('relative block w-full overflow-hidden rounded-container shadow-md outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-ring', onOpen && 'cursor-pointer hover:scale-[1.02]', cover.image ? 'border bg-card' : 'bg-transparent')} style={{ aspectRatio: tileRatio }}>
+                <button type="button" aria-label={t('Открыть «{title}»', { title: cover.title })} disabled={!onOpen} tabIndex={stage < 3 ? -1 : 0} onClick={onOpen} className={cn('relative block w-full overflow-hidden rounded-container shadow-md outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-ring', onOpen && 'cursor-pointer hover:scale-[1.02]', cover.image ? 'border bg-card' : 'bg-transparent')} style={{ aspectRatio: cover.image ? `1 / ${fitHeight(cover, 1)}` : tileRatio }}>
                   {cover.image ? <img src={cover.image} alt="" className="size-full object-cover" draggable={false} /> : <PaperNote title={cover.title} text={cover.description} size="tile" />}
                 </button>
                 {cover.image && <span className="line-clamp-2 w-full px-1 text-center text-sm font-medium">{cover.title}</span>}{/* у заметки название уже в самом листе */}
@@ -703,7 +709,7 @@ export function FocusView({ byId, title, cover, cards, keys, onCard, onKey, onOp
                 onClick={() => onCard(spot.id, { x: spot.x, y: spot.y })}>
                 {item?.image ? (
                   <>
-                    <span className="relative block h-18 w-24 overflow-hidden rounded-surface border bg-card"><img src={item.image} alt="" className="size-full object-cover" draggable={false} /></span>
+                    <span className="relative block w-24 overflow-hidden rounded-surface border bg-card" style={{ aspectRatio: `1 / ${fitHeight(item, 0.75)}` }}><img src={item.image} alt="" className="size-full object-cover" draggable={false} /></span>
                     <span className="line-clamp-2 text-center text-xs text-foreground/80">{item.title}</span>
                   </>
                 ) : (

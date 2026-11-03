@@ -2,7 +2,9 @@
 @layer components {
 body { overflow: hidden; }
 
-.library-canvas { height: 100svh; overflow: hidden; }
+.library-canvas { height: 100svh; overflow: hidden; container-type: inline-size; }
+/* Главная: контент не шире 768 px и по центру, под блоком приветствия и табов (владелец 2026-11-01; 1280 выглядело почти на всю ширину); остальные страницы и холст — как были. Шапка и лента берут отступ из одного токена, поэтому встают в колонку вместе. cqw — от области рядом с рейкой, не от окна */
+.library-canvas[data-home] { --canvas-gutter: round(down, max(16px, calc((100cqw - 768px) / 2)), 2px); }
 .library-main { min-height: 0; flex: 1; overflow-y: auto; scrollbar-width: none; padding: 0 var(--canvas-gutter) 56px; }
 .library-main::-webkit-scrollbar { display: none; }
 /* Граф: страница не прокручивается — фильтры сверху и шар на месте, колесо крутит шар */

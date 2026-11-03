@@ -1,0 +1,11 @@
+{
+  "name": {
+    "message": "Refkit"
+  },
+  "description": {
+    "message": "Save the open page to Refkit"
+  },
+  "action": {
+    "message": "Save to Refkit"
+  }
+}

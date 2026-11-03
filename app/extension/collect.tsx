@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { t } from '@/lib/i18n'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -56,7 +57,7 @@ export function Collect({ onBack }: { onBack: () => void }) {
     setError('')
     // Читать чужие вкладки можно только с разрешением на сайты; просим один раз, по клику, а не при установке
     const granted = await chrome.permissions.request({ origins: ['http://*/*', 'https://*/*'] }).catch(() => false)
-    if (!granted) { setError('Без доступа к сайтам вкладки не прочесть'); return }
+    if (!granted) { setError(t('Без доступа к сайтам вкладки не прочесть')); return }
     let base = ''
     let key = ''
     let sessionId = ''
@@ -69,7 +70,7 @@ export function Collect({ onBack }: { onBack: () => void }) {
       if (!made.ok) throw new Error('rejected')
       const batch = await made.json()
       sessionId = batch.id; source = batch.source; inbox = batch.inbox
-    } catch { setError('Refkit не запущен: собирать некуда'); return }
+    } catch { setError(t('Refkit не запущен: собирать некуда')); return }
     setPhase('run')
     const ok: number[] = []
     let bad = 0
@@ -104,12 +105,12 @@ export function Collect({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex w-[400px] flex-col gap-3 bg-background p-4 text-foreground">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onBack} aria-label="Назад" disabled={phase === 'run'}><ArrowLeft /></Button>
-        <span className="text-sm text-muted-foreground">Вкладок: {rows.length}</span>
+        <Button variant="ghost" size="icon" onClick={onBack} aria-label={t('Назад')} disabled={phase === 'run'}><ArrowLeft /></Button>
+        <span className="text-sm text-muted-foreground">{t('Вкладок: {n}', { n: rows.length })}</span>
       </div>
       {phase === 'pick' && (
         <>
-          <ul className="flex max-h-72 flex-col gap-1 overflow-y-auto" aria-label="Вкладки">
+          <ul className="flex max-h-72 flex-col gap-1 overflow-y-auto" aria-label={t('Вкладки')}>
             {rows.map((row) => (
               <li key={row.id}>
                 <label className="flex cursor-pointer items-center gap-3 rounded-control px-2 py-1.5 text-sm hover:bg-muted/50">
@@ -119,18 +120,18 @@ export function Collect({ onBack }: { onBack: () => void }) {
               </li>
             ))}
           </ul>
-          {hidden && <p role="alert" className="text-sm text-destructive">Не все вкладки видны: обнови расширение в chrome://extensions</p>}
+          {hidden && <p role="alert" className="text-sm text-destructive">{t('Не все вкладки видны: обнови расширение в chrome://extensions')}</p>}
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-          <div className="flex justify-end"><Button onClick={() => void run()} disabled={!picked.length}>Собрать {picked.length}</Button></div>
+          <div className="flex justify-end"><Button onClick={() => void run()} disabled={!picked.length}>{t('Собрать {n}', { n: picked.length })}</Button></div>
         </>
       )}
-      {phase === 'run' && <p role="status" className="text-sm text-muted-foreground">Собрано {progress} из {picked.length}</p>}
+      {phase === 'run' && <p role="status" className="text-sm text-muted-foreground">{t('Собрано {done} из {n}', { done: progress, n: picked.length })}</p>}
       {phase === 'done' && (
         <>
-          <p role="status" className="text-sm">Собрано {saved.length}{already > 0 && <span className="text-muted-foreground">{openUrl ? `, из них уже были в библиотеке ${already}` : ', все уже были в библиотеке: новой папки нет'}</span>}{rows.length - saved.length > 0 && <span className="text-muted-foreground">, остались открытыми {rows.length - saved.length}{failed ? ` (не удалось: ${failed})` : ''}</span>}</p>
+          <p role="status" className="text-sm">{t('Собрано {n}', { n: saved.length })}{already > 0 && <span className="text-muted-foreground">{openUrl ? t(', из них уже были в библиотеке {n}', { n: already }) : t(', все уже были в библиотеке: новой папки нет')}</span>}{rows.length - saved.length > 0 && <span className="text-muted-foreground">{t(', остались открытыми {n}', { n: rows.length - saved.length })}{failed ? t(' (не удалось: {n})', { n: failed }) : ''}</span>}</p>
           <div className="flex items-center justify-between">
-            {openUrl ? <Button variant="ghost" onClick={() => void chrome.tabs.create({ url: openUrl })}>Открыть в Refkit</Button> : <span />}
-            {closed ? <span className="text-sm text-muted-foreground">Закрыто</span> : <Button onClick={() => void close()} disabled={!saved.length}>Закрыть собранные</Button>}
+            {openUrl ? <Button variant="ghost" onClick={() => void chrome.tabs.create({ url: openUrl })}>{t('Открыть в Refkit')}</Button> : <span />}
+            {closed ? <span className="text-sm text-muted-foreground">{t('Закрыто')}</span> : <Button onClick={() => void close()} disabled={!saved.length}>{t('Закрыть собранные')}</Button>}
           </div>
         </>
       )}

@@ -1,8 +1,11 @@
-import { createPortal } from 'react-dom'
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { t, locale } from '@/lib/i18n'
+import { canDownload, downloadReference } from '@/lib/download'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
+import { ZoomMenu } from '@/components/zoom-menu'
+import { ImageViewer } from '@/components/image-viewer'
 import { fieldTitle } from '@/components/field-title'
-import { ArrowLeft, Zap, BookmarkPlus, Copy, ChevronDown, Check, EllipsisVertical, ExternalLink, Globe, Info, Link2, Loader2, Paperclip, GripVertical, PanelRightClose, PanelRightOpen, Pin, PinOff, Tag, Trash2, X, type LucideIcon , SlidersHorizontal } from 'lucide-react'
+import { ArrowLeft, Download, Image as ImageIcon, Zap, BookmarkPlus, Copy, ChevronDown, Check, EllipsisVertical, ExternalLink, Globe, Info, Link2, Loader2, Paperclip, GripVertical, PanelRightClose, PanelRightOpen, Pin, PinOff, Tag, Trash2, X, type LucideIcon , SlidersHorizontal } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -52,7 +55,6 @@ type Patch = { title?: string; meaning?: string; description?: string; tags?: st
 type Props = {
   onInfo: (patch: Partial<CardReference>) => void // данные ролика подгрузились — только в состояние ленты, без записи и без даты «Изменено»
   onShown: (id: string | null) => void // карточка открыта или закрыта — нижняя панель спросит агента про неё
-  pinMode: boolean; onPinMode: (on: boolean) => void // режим комментария на картинке: кнопка в нижней панели (владелец 2026-10-10), состояние — у страницы
   onDescribe: () => void // «Описать» — агент пишет описание (с учётом комментария)
   reference: CardReference
   collections: Array<{ name: string; icon: LucideIcon; hint?: string }>
@@ -81,14 +83,13 @@ type Props = {
   onDelete: () => void
   // Карточка страницей (идея 61, grill-card-page.md): на месте ленты, шапка как у space — ← назад, крошки, название последним шагом
   page?: boolean
-  infoSlot?: HTMLElement | null // страница-карточка: сведения живут вкладкой Info в окне агента, сюда их кладёт портал
-  infoOn?: boolean; onOpenInfo?: () => void
+  onStage?: (on: boolean) => void // сведения у страницы-карточки лежат на самой странице, вкладка «Сведения» в окне агента не нужна
   crumbs?: ReactNode
 }
 
 // Карточка материала (v2, каркас Fabric): открыта поверх сетки на слое 70 (ImageModal) — всплывающие окна внутри
 // неё поднимаем на 80, иначе они под карточкой. Вопросы агенту — в правой панели библиотеки (onAskAgent)
-function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCreateCollection, media, onClose, onUpdate, onRemoveSource, onTagOffer, onDelete, onShown, onInfo, onDescribe, onDigest, library: items, page, crumbs, infoSlot, infoOn, onOpenInfo }: Props) {
+function RefCard({ onStage, reference, collections, onCreateCollection, media, onClose, onUpdate, onRemoveSource, onTagOffer, onDelete, onShown, onInfo, onDescribe, onDigest, library: items, page, crumbs }: Props) {
   const note = reference.kind === 'note'
   // У заметки и статьи показываем полный текст — его и читают (владелец 2026-09-30: «статью прочитать полностью»)
   const article = reference.kind === 'article' || reference.kind === 'link'
@@ -124,18 +125,6 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
     ...(reference.marks ?? []).filter((mark) => mark.text?.trim() && !reference.comments?.some((item) => item.id === mark.id)).map((mark) => ({ id: mark.id, text: mark.text, at: mark.at, x: mark.x, y: mark.y })),
   ]
   const [hoverPin, setHoverPin] = useState<string | null>(null)
-  // C — режим комментария (как в Figma), только у картинки и не в поле; Esc выходит из режима, а не закрывает карточку
-  const canPin = !reference.kind && reference.format === 'image' && Boolean(reference.image)
-  useEffect(() => {
-    if (!canPin) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, [contenteditable="true"]')) return
-      if (event.key === 'Escape' && pinMode) { event.preventDefault(); event.stopPropagation(); setPinMode(false); return }
-      if ((event.key === 'c' || event.key === 'с') && !event.metaKey && !event.ctrlKey && !event.altKey) { event.preventDefault(); setPinMode(!pinMode) }
-    }
-    window.addEventListener('keydown', onKey, true)
-    return () => window.removeEventListener('keydown', onKey, true)
-  }, [canPin, pinMode])
   const comment = (body: Parameters<typeof library.comment>[1]) => library.comment(reference.id, body).then((saved) => onInfo({ comments: saved.comments, meaning: saved.meaning }))
   const toggleFocus = (id: string) => onUpdate({ focus: focus.includes(id) ? focus.filter((item) => item !== id) : [...focus, id] })
   const [picked, setPicked] = useState<string[]>(collectionsOf(reference))
@@ -150,7 +139,10 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
   }, [title, picked])
   // Масштаб картинки (как просмотр у Fabric, идея из пинов): null — вписана в окно; иначе доля настоящего размера.
   // ⌘ или Ctrl + колесо (щипок на тачпаде), как в Figma, и ⌘+ / ⌘− меняют масштаб, клик по процентам — снова вписать
-  const zoomable = !reference.kind && reference.format === 'image' && Boolean(reference.image) && (reference.media?.length ?? 0) < 2 // у альбома — лента, масштаба нет
+  const imageCard = !reference.kind && reference.format === 'image' && Boolean(reference.image) && (reference.media?.length ?? 0) < 2 // у альбома — лента, масштаба нет
+  const stage = Boolean(page && imageCard) // картинка-страница: вверху вписанная картинка, клик открывает просмотр на весь экран, под ней сведения
+  const zoomable = imageCard && !stage // зум на месте — только у карточки-окна; на странице он в просмотре (ImageViewer)
+  const [viewing, setViewing] = useState(false)
   // Панель сведений: сворачивается кнопкой в шапке (по краю не кликаем), выбор запоминается; пока выбора нет — на окне уже 1100 px свёрнута сама
   const root = useRef<HTMLDivElement>(null)
   const [wide, setWide] = useState(true)
@@ -175,8 +167,18 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null)
   const frame = useRef<HTMLDivElement>(null)
   useEffect(() => { if (!zoomable) return; const img = new Image(); img.onload = () => setNatural({ w: img.naturalWidth, h: img.naturalHeight }); img.src = reference.image }, [zoomable, reference.image])
-  const stage = Boolean(page && zoomable) // картинка-страница: материал на всё поле под островами; поля сверху 64, снизу 80, по бокам 8
-  const fit = natural && frame.current ? Math.min(1, (frame.current.clientWidth - (stage ? 16 : 0)) / natural.w, (frame.current.clientHeight - (stage ? 144 : 0)) / natural.h) : 1
+  // Агентская панель лежит поверх правой части поля (--agent-overlay-w ставит LibraryAgent): картинку центрируем и вписываем в свободную часть слева
+  const [agentW, setAgentW] = useState(0)
+  useEffect(() => { onStage?.(Boolean(page)); return () => onStage?.(false) }, [page, onStage])
+  useEffect(() => {
+    if (!page) return
+    const read = () => setAgentW(parseFloat(document.documentElement.style.getPropertyValue('--agent-overlay-w')) || 0)
+    read()
+    const watch = new MutationObserver(read)
+    watch.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] })
+    return () => watch.disconnect()
+  }, [page])
+  const fit = natural && frame.current ? Math.min(1, (frame.current.clientWidth - (stage ? 32 : 0)) / natural.w, (frame.current.clientHeight - (stage ? 32 : 0)) / natural.h) : 1
   const scale = zoom ?? fit
   const zoomBy = (step: number) => setZoom(Math.min(8, Math.max(0.1, Math.round(scale * step * 100) / 100)))
   // Как на холсте: колесо — масштаб к курсору, перетаскивание — сдвиг. Точка под курсором остаётся на месте:
@@ -207,7 +209,7 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
     anchor.current = null
     if (!view || !hold || !natural || zoom === null) return
     const offX = Math.max(0, (view.clientWidth - (natural.w * zoom + 48)) / 2)
-    const pad = stage ? 128 : 48, offY = Math.max(0, (view.clientHeight - (natural.h * zoom + pad)) / 2)
+    const pad = 48, offY = Math.max(0, (view.clientHeight - (natural.h * zoom + pad)) / 2)
     view.scrollLeft = hold.u * zoom + 24 + offX - hold.x
     view.scrollTop = hold.v * zoom + pad / 2 + offY - hold.y
   }, [zoom, natural, stage])
@@ -298,10 +300,8 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
   // v2 (каркас Fabric): карточка — шапка, вкладки «Материал · Суть · Сведения», внизу кнопка агента.
   // Агент один — правая панель библиотеки; из карточки открывается с этим материалом в контексте (grill-minimal.md)
   const sourceUrl = /^https?:\/\//.test(reference.source) ? reference.source : ''
-  const infoPanel = (
+  const infoBody = (
     <>
-          <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
-            <div className={cn('flex flex-col gap-5 pt-4 pb-4 pl-4', page ? 'pr-4' : 'pr-4')}>
               <InfoField label={t('Описание')} value={reference.description ?? ''} onSave={(description) => onUpdate({ description })}
                 action={<span className="flex items-center gap-1"><Button variant="outline" size="xs" className={agentPill} aria-label={reference.description ? t('Переписать описание — агент учтёт комментарий') : t('Описать — агент учтёт комментарий')} disabled={Boolean(reference.describing || reference.digesting)} onClick={onDescribe}>
                   {/* Та же кнопка агента, что «Назвать за меня» (как у Fabric) */}
@@ -322,7 +322,8 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
               <NearList id={reference.id} items={items} onOpen={(id) => { window.location.hash = `#/card/${id}` }} />
               {/* Комментарии — под тегами (владелец 2026-10-03): сначала что это, потом заметки */}
               <CommentFeed comments={comments} hovered={hoverPin} onHover={setHoverPin}
-                onAdd={(text) => void comment({ op: 'add', text })} onEdit={(id, text) => void comment({ op: 'edit', id, text })} onRemove={(id) => void comment({ op: 'remove', id })} />
+                onAdd={(text) => void comment({ op: 'add', text })} onEdit={(id, text) => void comment({ op: 'edit', id, text })} onRemove={(id) => void comment({ op: 'remove', id })}
+                onRemember={(text) => library.addMemory(text)} />
               {/* Источник — таким же полем, как описание и теги: заголовок сверху, ссылка под ним (в строке с подписью она вылезала за колонку) */}
               {sourceUrl && (
                 <section className="flex min-w-0 flex-col gap-2">
@@ -341,10 +342,27 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
                   </>}
                 </section>
               )}
-            </div>
-          </ScrollArea>
-            </>
+    </>
   )
+  const infoPanel = (
+    <>
+          <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
+            <div className={cn('flex flex-col gap-5 pt-4 pb-4 pl-4', page ? 'pr-4' : 'pr-4')}>{infoBody}</div>
+          </ScrollArea>
+    </>
+  )
+  const cardMenuProps = { onDelete: () => { onDelete(); onClose() }, shelved, onShelf: () => onUpdate({ boards: shelved ? (reference.boards ?? []).filter((name) => name !== shelfName) : [...(reference.boards ?? []), shelfName] }), source: sourceUrl, onDownload: canDownload(reference) ? () => void downloadReference(reference) : undefined }
+  // Действия карточки — одни и те же в шапке и в просмотре картинки: копировать для агента и меню «⋮»
+  const cardActions = (
+    <>
+      <AgentCopyButton id={reference.id} title={title} />
+      <CardMenu {...cardMenuProps} />
+    </>
+  )
+  // Колонка «главного» у не-картинок. Страница: одна раскладка у всех типов (PageShell: главное + сведения). Окно: прежняя колонка чтения
+  const column = (children: ReactNode, gap: string, extra?: React.HTMLAttributes<HTMLDivElement>) => page
+    ? <PageShell below={infoBody} main={<div {...extra} className={cn('flex flex-col', gap)}>{children}</div>} />
+    : <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block"><div {...extra} className={cn('mx-auto flex max-w-3xl flex-col px-(--canvas-gutter) pt-6 pb-24', gap)}>{children}</div></ScrollArea>
   return (
     <div ref={root} className={page ? '@container relative flex min-h-0 flex-1 flex-col text-foreground animate-in fade-in duration-200 motion-reduce:animate-none' : 'pointer-events-auto relative flex h-[min(860px,94vh)] w-[min(1280px,calc(94vw-var(--agent-w,0px)))] flex-col rounded-container border bg-card text-card-foreground shadow-lg'}
       style={page ? undefined : { marginRight: 'var(--agent-w, 0px)' }}>
@@ -359,9 +377,7 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
             </div>
           </Island>
           <Island className="[&_button]:size-8">
-            {!infoOn && <Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" aria-label={t('Показать сведения')} onClick={() => onOpenInfo?.()}><Info /></Button></TooltipTrigger><TooltipContent>{t('Показать сведения')}</TooltipContent></Tooltip>}
-            <AgentCopyButton id={reference.id} title={title} />
-            <CardMenu onDelete={() => { onDelete(); onClose() }} shelved={shelved} onShelf={() => onUpdate({ boards: shelved ? (reference.boards ?? []).filter((name) => name !== shelfName) : [...(reference.boards ?? []), shelfName] })} source={sourceUrl} />
+            {cardActions}
             <Button variant="ghost" size="icon" aria-label={t('Закрыть')} onClick={onClose}><X /></Button>
           </Island>
         </header>
@@ -390,23 +406,20 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
           </div>
         )}
         {zoomable && !page && <span className="flex-1" />}
-        <AgentCopyButton id={reference.id} title={title} />
-        <CardMenu onDelete={() => { onDelete(); onClose() }} shelved={shelved} onShelf={() => onUpdate({ boards: shelved ? (reference.boards ?? []).filter((name) => name !== shelfName) : [...(reference.boards ?? []), shelfName] })} source={sourceUrl} />
+        {cardActions}
         {/* Крестик и на странице (владелец 2026-10-03) — то же, что ← и Esc */}
         <Button variant="ghost" size="icon-sm" className={page ? '-mr-2.5' : undefined} aria-label={t('Закрыть')} onClick={onClose}><X className={page ? 'size-5' : undefined} /></Button>
       </header>)}
-      {page && zoomable && <Island className="absolute bottom-2 z-20 [&_button]:h-8" style={{ right: 'calc(var(--agent-overlay-w, 0px) + 8px)' }}><ZoomMenu scale={scale} onZoom={setZoom} onStep={zoomBy} /></Island>}
 
       {/* Две колонки (владелец 2026-10-01): слева материал, справа сведения — описание, теги, комментарии, источник.
           Страница уже 720 px (агент справа, узкое окно) — колонки друг под другом, прокручивается вся страница (grill-card-page.md) */}
       <div className="relative flex min-h-0 flex-1">
-        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col" style={page && !zoomable ? { paddingTop: 56 } : undefined}>
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col" style={page ? { ...(!zoomable ? { paddingTop: 56 } : {}), marginRight: agentW } : undefined}>
           {!page && !infoOpen && <Button variant="outline" size="icon-sm" className="absolute top-2 right-2 z-20 rounded-lg bg-card shadow-sm" aria-label={t('Показать сведения')} onClick={toggleInfo}><PanelRightOpen /></Button>}
           <div className="flex min-h-0 flex-1 flex-col">
             {/* Пост-альбом (владелец 2026-10-02): все файлы лентой друг под другом, видео — с плеером */}
-            {(reference.media?.length ?? 0) > 1 ? (
-              <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
-                <div className={cn('mx-auto flex max-w-3xl flex-col gap-4 px-(--canvas-gutter) pt-6 pb-24', page && '@max-[720px]:pb-6')} role="list" aria-label={t('Файлы поста')}>
+            {(reference.media?.length ?? 0) > 1 ? column(
+              <>
                   {reference.media!.map((item) => (
                     <div key={item.image} role="listitem" className="relative w-full overflow-hidden rounded-surface" style={{ aspectRatio: item.ratio }}>
                       {item.video
@@ -414,17 +427,13 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
                         : <img src={item.image} alt="" className="absolute inset-0 h-full w-full object-contain" />}
                     </div>
                   ))}
-                </div>
-              </ScrollArea>
-            ) : video ? (
-              <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
-                <div className={cn('mx-auto flex max-w-3xl flex-col gap-4 px-(--canvas-gutter) pt-6 pb-24', page && '@max-[720px]:pb-6')}>
+              </>, 'gap-4', { role: 'list', 'aria-label': t('Файлы поста') })
+            : video ? column(
+              <>
                   <div className="relative w-full shrink-0 overflow-hidden rounded-surface" style={{ aspectRatio: ratio }}>{media}</div>
-                </div>
-              </ScrollArea>
-            ) : readable ? (
-              <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
-                <div className={cn('mx-auto flex max-w-3xl flex-col gap-5 px-(--canvas-gutter) pt-6 pb-24', page && '@max-[720px]:pb-6')}>
+              </>, 'gap-4')
+            : readable ? column(
+              <>
                   {isSet ? (
                     <>
                       <div className="relative size-0 overflow-hidden">{media}</div>
@@ -454,24 +463,24 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
                         : <p className="whitespace-pre-wrap text-body">{linkify(noteText.trim())}</p>)}
                     </>
                   )}
-                </div>
-              </ScrollArea>
-            ) : (
+              </>, 'gap-5')
+            : (
               // Превью по центру в рамке, вписано в высоту (как у Fabric); под ним — описание
+              <StageShell on={stage} below={infoBody} ratio={ratio} onOpen={() => setViewing(true)} wrap={(area) => <CardContextMenu id={reference.id} title={title} image={reference.image} {...cardMenuProps}>{area}</CardContextMenu>}>
               <div ref={frame}
                 onMouseDown={(event) => { if (event.button === 1) event.preventDefault() }}
                 onPointerDown={(event) => { if (zoom !== null || !zoomable || !(event.button === 1 || (event.button === 0 && spaceHeld.current))) return; event.preventDefault(); panDrag.current = { x: event.clientX, y: event.clientY, px: pan.x, py: pan.y, moved: false }; event.currentTarget.setPointerCapture(event.pointerId) }}
                 onPointerMove={(event) => { const d = panDrag.current; if (!d) return; d.moved = true; setPan({ x: d.px + event.clientX - d.x, y: d.py + event.clientY - d.y }) }}
                 onPointerUp={() => { if (panDrag.current?.moved) window.setTimeout(() => { panDrag.current = null }, 0); else panDrag.current = null }} onPointerCancel={() => { panDrag.current = null }}
                 onClickCapture={(event) => { if (panDrag.current?.moved) event.stopPropagation() }}
-                className={cn('relative flex min-h-0 flex-1 flex-col items-center gap-4', space && zoom === null && 'cursor-grab', stage ? 'px-(--canvas-gutter) pt-16 pb-20 [--media-reserve:0px]' : 'px-(--canvas-gutter) pt-6 pb-24', page && !stage && '@max-[720px]:flex-none @max-[720px]:aspect-(--card-ratio) @max-[720px]:max-h-[70svh] @max-[720px]:pb-6 @max-[720px]:[--media-reserve:16px]')} style={{ containerType: 'size', '--card-ratio': ratio } as React.CSSProperties}>
+                className={cn('relative flex min-h-0 flex-1 flex-col items-center gap-4', space && zoom === null && 'cursor-grab', stage ? '[--media-reserve:0px]' : 'px-(--canvas-gutter) pt-6 pb-24', page && !stage && '@max-[720px]:flex-none @max-[720px]:aspect-(--card-ratio) @max-[720px]:max-h-[70svh] @max-[720px]:pb-6 @max-[720px]:[--media-reserve:16px]')} style={{ containerType: 'size', '--card-ratio': ratio } as React.CSSProperties}>
                 {/* Приближено — картинка в настоящем размере × масштаб, прокручивается; вписанный вид остаётся смонтированным */}
                 {zoom !== null && natural && (
                   <div ref={scroller} className={cn('absolute inset-0 z-10 overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden', space ? 'cursor-grab active:cursor-grabbing' : 'cursor-grab', page ? 'bg-background' : 'bg-card')}
                     onMouseDown={(event) => { if (event.button === 1) event.preventDefault() }} onPointerDown={(event) => { if (event.button !== 0 && event.button !== 1) return; drag.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, top: event.currentTarget.scrollTop }; event.currentTarget.setPointerCapture(event.pointerId) }}
                     onPointerMove={(event) => { const d = drag.current; if (!d) return; event.currentTarget.scrollLeft = d.left - (event.clientX - d.x); event.currentTarget.scrollTop = d.top - (event.clientY - d.y) }}
                     onPointerUp={() => { drag.current = null }} onPointerCancel={() => { drag.current = null }}>
-                    <div className={cn('flex min-h-full min-w-full items-center justify-center', stage ? 'px-6 py-16' : 'p-6')} style={{ width: natural.w * zoom + 48, height: natural.h * zoom + (stage ? 128 : 48) }}>
+                    <div className={cn('flex min-h-full min-w-full items-center justify-center', 'p-6')} style={{ width: natural.w * zoom + 48, height: natural.h * zoom + 48 }}>
                       <img src={reference.image} alt={reference.title} draggable={false} style={{ width: natural.w * zoom, height: natural.h * zoom }} className="max-w-none select-none" />
                     </div>
                   </div>
@@ -480,16 +489,16 @@ function RefCard({ pinMode, onPinMode: setPinMode, reference, collections, onCre
                   <div className={cn('relative rounded-surface', !page && 'overflow-hidden')} style={{ aspectRatio: ratio, width: `min(calc(100cqw - ${page ? 0 : 22}px), calc((100cqh - var(--media-reserve, 120px)) * (${ratio})))` }}>
                     {media}
                     {/* Комментарии точкой на картинке, как в Figma (владелец 2026-10-03): C или кнопка в шапке — режим, клик — точка и поле */}
-                    <PinLayer comments={comments} active={pinMode} onHover={setHoverPin}
-                      onSave={(text, x, y) => { void comment({ op: 'add', text, x, y }); setPinMode(false) }} onCancel={() => setPinMode(false)} />
+                    <PinLayer comments={comments} active={false} onHover={setHoverPin} onSave={() => {}} onCancel={() => {}} />
                   </div>
                 </div>
                 </div>
+              </StageShell>
             )}
           </div>
         </div>
         {!page && infoOpen && <aside aria-label={t('Сведения')} className="relative m-2 ml-0 flex w-[min(360px,40%)] shrink-0 flex-col overflow-hidden rounded-container bg-card ring-1 ring-foreground/10">{infoPanel}</aside>}
-        {page && infoSlot && createPortal(<div className="flex min-h-0 flex-1 flex-col">{infoPanel}</div>, infoSlot)}
+        {viewing && <ImageViewer src={reference.image} title={reference.title} topActions={cardActions} wrap={(stage) => <CardContextMenu id={reference.id} title={title} image={reference.image} {...cardMenuProps}>{stage}</CardContextMenu>} onClose={() => setViewing(false)} />}
       </div>
     </div>
   )
@@ -712,11 +721,42 @@ function AgentCopyButton({ id, title }: { id: string; title: string }) {
   )
 }
 
+// Страница-карточка: одна раскладка у всех типов материалов (владелец 2026-11-01): «главное» (картинка, плеер, текст) и сведения —
+// описание, теги, заметки, источник. Область шире 900 px — две колонки, уже (агент справа, узкое окно) — друг под другом.
+// Контейнер именованный и стоит внутри сдвига от агента, поэтому меряет место рядом с панелью, а не окно. Сдвиг от агентской панели делает колонка карточки (marginRight: agentW)
+function PageShell({ main, below }: { main: ReactNode; below: ReactNode }) {
+  return (
+    <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:!block">
+      <div className="@container/page px-(--canvas-gutter) pt-6 pb-24">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 @max-[899px]/page:max-w-3xl @min-[900px]/page:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
+          <div className="min-w-0">{main}</div>
+          <div className="flex min-w-0 flex-col gap-5">{below}</div>
+        </div>
+      </div>
+    </ScrollArea>
+  )
+}
+
+// Картинка-страница: область просмотра (в ней зум и сдвиг) идёт «главным» в PageShell. Колесо над областью масштабирует, за её пределами листает страницу
+function StageShell({ on, below, ratio, onOpen, wrap, children }: { on: boolean; below: ReactNode; ratio: string; onOpen: () => void; wrap: (area: ReactNode) => ReactNode; children: ReactNode }) {
+  if (!on) return <>{children}</>
+  // Область ровно по картинке: вписана в ширину колонки и не выше 72% окна. Клик — просмотр; в режиме комментария клик ставит точку, не открывает
+  return <PageShell below={below} main={wrap(
+    <div role="button" tabIndex={0} aria-label={t('Открыть просмотр')}
+      className={cn('relative flex shrink-0 flex-col overflow-hidden rounded-container outline-none focus-visible:ring-2 focus-visible:ring-ring', 'cursor-zoom-in')}
+      style={{ aspectRatio: ratio, width: `min(100%, calc(72svh * (${ratio})))` }}
+      onClick={(event) => { if (!(event.target as HTMLElement).closest('button, a, input, textarea')) onOpen() }}
+      onKeyDown={(event) => { if (event.key === 'Enter' && event.target === event.currentTarget) onOpen() }}>
+      {children}
+    </div>
+  )} />
+}
+
 // «⋯» в шапке карточки — редкие действия (решение владельца): корзина рядом с × — риск удалить промахом.
 // «Удалить» — красным и в два нажатия: первое превращает пункт в «Нажмите ещё раз — удалить», второе удаляет;
 // закрыл меню — подтверждение сброшено. Escape закрывает только меню, не карточку
 // «⋮» карточки: всё редкое — под руку, источник, удалить (как правый клик по плитке)
-function CardMenu({ onDelete, shelved, onShelf, source }: { onDelete: () => void; shelved: boolean; onShelf: () => void; source: string }) {
+function CardMenu({ onDelete, shelved, onShelf, source, onDownload }: { onDelete: () => void; shelved: boolean; onShelf: () => void; source: string; onDownload?: () => void }) {
   const [confirming, setConfirming] = useState(false)
   return (
     <DropdownMenu onOpenChange={(open) => { if (!open) setConfirming(false) }}>
@@ -727,6 +767,7 @@ function CardMenu({ onDelete, shelved, onShelf, source }: { onDelete: () => void
         <DropdownMenuItem onSelect={onShelf}>{shelved ? <PinOff /> : <Pin />}{shelved ? t('Открепить') : t('Закрепить')}</DropdownMenuItem>
         {source && <DropdownMenuItem onSelect={() => window.open(sourceHref(source), '_blank', 'noopener')}><ExternalLink />{t('Открыть источник')}</DropdownMenuItem>}
         {source && <DropdownMenuItem onSelect={() => void navigator.clipboard.writeText(source)}><Link2 />{t('Скопировать ссылку')}</DropdownMenuItem>}
+        {onDownload && <DropdownMenuItem onSelect={onDownload}><Download />{t('Скачать')}</DropdownMenuItem>}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" className="whitespace-nowrap" onSelect={(event) => { if (!confirming) { event.preventDefault(); setConfirming(true) } else onDelete() }}>
           <Trash2 />{confirming ? t('Нажмите ещё раз — удалить') : t('Удалить')}
@@ -736,40 +777,39 @@ function CardMenu({ onDelete, shelved, onShelf, source }: { onDelete: () => void
   )
 }
 
-// Разделитель колонок: линия и «ручка»-таблетка видны при наведении и перетаскивании, подсказка «Ширина» (реф владельца)
-// Меню масштаба по образцу Figma: в кнопке только проценты; сверху поле — ввёл число и Enter; ниже действия с сочетаниями
-function ZoomMenu({ scale, onZoom, onStep }: { scale: number; onZoom: (zoom: number | null) => void; onStep: (step: number) => void }) {
-  const percent = Math.round(scale * 100)
-  const [draft, setDraft] = useState('')
+// Правый клик по картинке карточки — тот же набор, что в «⋮», плюс «Копировать картинку» и «Скопировать для агента» (вместо браузерного меню).
+// Картинку в буфер кладём PNG-ом: другие форматы буфер не принимает
+async function copyImage(src: string) {
+  const bitmap = await createImageBitmap(await (await fetch(src)).blob())
+  const canvas = document.createElement('canvas')
+  canvas.width = bitmap.width; canvas.height = bitmap.height
+  canvas.getContext('2d')?.drawImage(bitmap, 0, 0)
+  const png = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+  if (png) await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })])
+}
+function CardContextMenu({ children, id, title, image, onDelete, shelved, onShelf, source, onDownload }: { children: ReactNode; id: string; title: string; image: string; onDelete: () => void; shelved: boolean; onShelf: () => void; source: string; onDownload?: () => void }) {
+  const [confirming, setConfirming] = useState(false)
   return (
-    <DropdownMenu onOpenChange={(open) => { if (open) setDraft(`${percent}%`) }}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1 tabular-nums text-muted-foreground" aria-label={t('Масштаб {percent}%', { percent })}>{percent}%<ChevronDown className="opacity-60" /></Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="w-56" onEscapeKeyDown={(event) => event.stopPropagation()}>
-        <div className="p-1">
-          <Input aria-label={t('Масштаб в процентах')} value={draft} autoFocus onFocus={(event) => event.currentTarget.select()}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              event.stopPropagation() // буквы и цифры — в поле, а не в навигацию меню
-              if (event.key !== 'Enter') return
-              const value = Number.parseFloat(draft.replace(',', '.'))
-              if (value > 0) onZoom(Math.min(8, Math.max(0.1, value / 100)))
-              setDraft(`${Math.round(value > 0 ? Math.min(800, Math.max(10, value)) : percent)}%`)
-            }} className="h-8 tabular-nums" />
-        </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={(event) => { event.preventDefault(); onStep(1.25) }}>{t('Приблизить')}<DropdownMenuShortcut>⌘+</DropdownMenuShortcut></DropdownMenuItem>
-        <DropdownMenuItem onSelect={(event) => { event.preventDefault(); onStep(0.8) }}>{t('Отдалить')}<DropdownMenuShortcut>⌘−</DropdownMenuShortcut></DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onZoom(null)}>{t('Вписать')}<DropdownMenuShortcut>⇧1</DropdownMenuShortcut></DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onZoom(0.5)}>50%</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onZoom(1)}>100%<DropdownMenuShortcut>⌘0</DropdownMenuShortcut></DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => onZoom(2)}>200%</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <ContextMenu onOpenChange={(open) => { if (!open) setConfirming(false) }}>
+      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+      <ContextMenuContent className="w-56">
+        <ContextMenuItem onSelect={() => void copyImage(image).catch(() => {})}><ImageIcon />{t('Копировать картинку')}</ContextMenuItem>
+        <ContextMenuItem onSelect={() => void navigator.clipboard.writeText(t('Материал из Refkit: «{title}» ({id})', { title, id }))}><Copy />{t('Скопировать для агента')}</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onSelect={onShelf}>{shelved ? <PinOff /> : <Pin />}{shelved ? t('Открепить') : t('Закрепить')}</ContextMenuItem>
+        {source && <ContextMenuItem onSelect={() => window.open(sourceHref(source), '_blank', 'noopener')}><ExternalLink />{t('Открыть источник')}</ContextMenuItem>}
+        {source && <ContextMenuItem onSelect={() => void navigator.clipboard.writeText(source)}><Link2 />{t('Скопировать ссылку')}</ContextMenuItem>}
+        {onDownload && <ContextMenuItem onSelect={onDownload}><Download />{t('Скачать')}</ContextMenuItem>}
+        <ContextMenuSeparator />
+        <ContextMenuItem variant="destructive" className="whitespace-nowrap" onSelect={(event) => { if (!confirming) { event.preventDefault(); setConfirming(true) } else onDelete() }}>
+          <Trash2 />{confirming ? t('Нажмите ещё раз — удалить') : t('Удалить')}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
 
+// Разделитель колонок: линия и «ручка»-таблетка видны при наведении и перетаскивании, подсказка «Ширина» (реф владельца)
 export function WidthHandle({ className }: { className?: string }) {
   return (
     <Tooltip>

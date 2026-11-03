@@ -13,9 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { cjk } from "@streamdown/cjk";
-import { code } from "@streamdown/code";
-import { math } from "@streamdown/math";
-import { mermaid } from "@streamdown/mermaid";
+import { lazyMermaid } from "./lazy-mermaid";
 import type { UIMessage } from "ai";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
@@ -321,19 +319,58 @@ export const MessageBranchPage = ({
 
 export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
-const streamdownPlugins = { cjk, code, math, mermaid };
+// Подсветка кода (shiki) и формулы (katex) — около 1 МБ: грузим их, только когда в тексте есть блок кода или формула $$…$$.
+// До загрузки текст показывается без подсветки, потом ответ перерисовывается с плагином
+type LazyPlugins = { code?: typeof import("@streamdown/code").code; math?: typeof import("@streamdown/math").math };
+const lazyPlugins: LazyPlugins = {};
+const lazyLoads: Partial<Record<keyof LazyPlugins, Promise<void>>> = {};
+const lazyLoaders = {
+  code: () => import("@streamdown/code").then((module) => { lazyPlugins.code = module.code; }),
+  math: () => import("@streamdown/math").then((module) => { lazyPlugins.math = module.math; }),
+};
+const neededPlugins = (text: unknown): Array<keyof LazyPlugins> => {
+  if (typeof text !== "string") return [];
+  const needed: Array<keyof LazyPlugins> = [];
+  if (text.includes("```") || text.includes("~~~")) needed.push("code");
+  if (text.includes("$$")) needed.push("math");
+  return needed;
+};
+const pluginSets = new Map<string, Record<string, unknown>>();
+const pluginsFor = (names: Array<keyof LazyPlugins>) => {
+  const ready = names.filter((name) => lazyPlugins[name]);
+  const key = ready.join(",");
+  let set = pluginSets.get(key);
+  if (!set) { set = { cjk, mermaid: lazyMermaid, ...Object.fromEntries(ready.map((name) => [name, lazyPlugins[name]])) }; pluginSets.set(key, set); }
+  return set as ComponentProps<typeof Streamdown>["plugins"];
+};
 
-export const MessageResponse = memo(
-  ({ className, ...props }: MessageResponseProps) => (
+const MessageResponseBody = ({ className, children, ...props }: MessageResponseProps) => {
+  const needed = neededPlugins(children);
+  const [, setLoaded] = useState(0);
+  const missing = needed.filter((name) => !lazyPlugins[name]).join(",");
+  useEffect(() => {
+    if (!missing) return;
+    let live = true;
+    Promise.all(missing.split(",").map((name) => (lazyLoads[name as keyof LazyPlugins] ??= lazyLoaders[name as keyof LazyPlugins]())))
+      .then(() => { if (live) setLoaded((count) => count + 1); }, () => {});
+    return () => { live = false; };
+  }, [missing]);
+  return (
     <Streamdown
       className={cn(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className
       )}
-      plugins={streamdownPlugins}
+      plugins={pluginsFor(needed)}
       {...props}
-    />
-  ),
+    >
+      {children}
+    </Streamdown>
+  );
+};
+
+export const MessageResponse = memo(
+  (props: MessageResponseProps) => <MessageResponseBody {...props} />,
   (prevProps, nextProps) =>
     prevProps.children === nextProps.children &&
     nextProps.isAnimating === prevProps.isAnimating

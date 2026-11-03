@@ -65,8 +65,7 @@
   --sidebar: oklch(0.985 0 0);
   --canvas-bg: var(--background); /* фон холста нод: тот же цвет, что у шапки над ним, без шва */
   --bar-width: min(560px, 80vw); /* поле поиска в нижней панели */
-  --canvas-gutter: 16px; /* боковой отступ канваса: шапки и лента на одной линии; на телефоне уже, см. ниже */
-  --canvas-gutter: round(down, clamp(16px, 3vw, 64px), 8px); /* на большом экране шире (1920 → 56 px), шаг 8; браузер без round() оставит 16 строкой выше */
+  --canvas-gutter: 16px; /* боковой отступ везде одинаковый, как острова на холсте (владелец 2026-11-01); на главной шире, см. .library-canvas[data-home] в library.css */
   --shell: oklch(0.965 0 0); /* рамка окна вокруг колонок и канваса: светлее/темнее канваса, чтобы читались края поверхностей */
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -79,11 +78,6 @@
   --scrollbar: oklch(0 0 0 / 18%);
   --sidebar-ring: oklch(0.708 0 0)
 ;
-}
-
-/* Телефон: боковой отступ канваса уже (бывший max-compact:px-[18px] по всему коду) */
-@media (width < theme(--breakpoint-compact)) {
-  :root { --canvas-gutter: 16px; }
 }
 
 .dark {
